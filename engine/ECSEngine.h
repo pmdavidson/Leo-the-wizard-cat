@@ -654,7 +654,7 @@ namespace ECSEngine
 			// Reset collision flags
 			colA.collidedSides = {};
 
-			for (auto itB = entityManager.begin(); itB != entityManager.end(); ++itB)
+			for (auto itB = entityManager.begin(); itB != entityManager.end(); ++itB) //change to start from itA? and mathutil intersect?
 			{
 				if (!itB->valid) continue;
 				EntityID idB = itB->id;
