@@ -94,8 +94,8 @@ namespace ECSEngine
 			// Draw all sprites (SpriteSystem)
 			for (auto it = mEntityManager.begin(); it != mEntityManager.end(); ++it)
 			{
-				if (!it->valid) continue;
-				EntityID entityId = it->id;
+				if (!it.isActive()) continue;
+            	EntityID entityId = it.getID();
 				
 				if (mEntityManager.template HasComponent<SpriteComponent>(entityId))
 				{
@@ -566,8 +566,8 @@ namespace ECSEngine
 
 		for (auto it = entityManager.begin(); it != entityManager.end(); ++it)
 		{
-			if (!it->valid) continue;
-			EntityID entityId = it->id;
+			if (!it.isActive()) continue;
+			EntityID entityId = it-.getID();
 
 			if (entityManager.template HasComponent<SpriteComponent>(entityId))
 			{
@@ -605,8 +605,8 @@ namespace ECSEngine
 
 		for (auto it = mEntityManager.begin(); it != mEntityManager.end(); ++it)
 		{
-			if (!it->valid) continue;
-			EntityID entityId = it->id;
+			if (!it.isActive()) continue;
+            EntityID entityId = it.getID();
 
 			if (mEntityManager.template HasComponent<GravityComponent>(entityId) &&
 				mEntityManager.template HasComponent<MovementComponent>(entityId))
@@ -624,8 +624,8 @@ namespace ECSEngine
 	{
 		for (auto it = mEntityManager.begin(); it != mEntityManager.end(); ++it)
 		{
-			if (!it->valid) continue;
-			EntityID entityId = it->id;
+			if (!it.isActive()) continue;
+            EntityID entityId = it.getID();
 
 			if (mEntityManager.template HasComponent<CollisionComponent>(entityId))
 			{
@@ -642,78 +642,30 @@ namespace ECSEngine
 
 		for (auto itA = entityManager.begin(); itA != entityManager.end(); ++itA)
 		{
-			if (!itA->valid) continue;
-			EntityID idA = itA->id;
+			auto& entityA = *itA;
+			if (!entityA.isActive()) continue;
+			EntityID idA = entityA.getID();
 
-			// A must have collision and must be dynamic
 			if (!entityManager.template HasComponent<CollisionComponent>(idA)) continue;
-
 			auto& colA = entityManager.template GetComponent<CollisionComponent>(idA);
 			if (colA.isStatic) continue;
 
-			// Reset collision flags
 			colA.collidedSides = {};
 
-			for (auto itB = entityManager.begin(); itB != entityManager.end(); ++itB)
+			for (auto itB = std::next(itA); itB != entityManager.end(); ++itB)
 			{
-				if (!itB->valid) continue;
-				EntityID idB = itB->id;
+				auto& entityB = *itB;
+				if (!entityB.isActive()) continue;
+				EntityID idB = entityB.getID();
 
-				if (idA == idB) continue; // skip self
 				if (!entityManager.template HasComponent<CollisionComponent>(idB)) continue;
-
 				auto& colB = entityManager.template GetComponent<CollisionComponent>(idB);
-				const Rect& a = colA.currentBounds;
-				const Rect& b = colB.currentBounds;
 
-				// AABB check
-				bool intersecting =
-					a.topLeft.x < b.topLeft.x + b.size.x &&
-					a.topLeft.x + a.size.x > b.topLeft.x &&
-					a.topLeft.y < b.topLeft.y + b.size.y &&
-					a.topLeft.y + a.size.y > b.topLeft.y;
+				if (!colA.currentBounds.intersects(colB.currentBounds)) continue;
 
-				if (!intersecting) continue;
-
-				// Compute overlap on each axis
-				float overlapX1 = b.topLeft.x + b.size.x - a.topLeft.x;
-				float overlapX2 = a.topLeft.x + a.size.x - b.topLeft.x;
-				float overlapX = std::min(overlapX1, overlapX2);
-
-				float overlapY1 = b.topLeft.y + b.size.y - a.topLeft.y;
-				float overlapY2 = a.topLeft.y + a.size.y - b.topLeft.y;
-				float overlapY = std::min(overlapY1, overlapY2);
-
-				// Resolve along the smaller overlap axis
-				if (overlapX < overlapY)
-				{
-					if (a.topLeft.x < b.topLeft.x)
-					{
-						colA.currentBounds.topLeft.x -= overlapX;
-						colA.collidedSides.right = true;
-					}
-					else
-					{
-						colA.currentBounds.topLeft.x += overlapX;
-						colA.collidedSides.left = true;
-					}
-				}
-				else
-				{
-					if (a.topLeft.y < b.topLeft.y)
-					{
-						colA.currentBounds.topLeft.y -= overlapY;
-						colA.collidedSides.bottom = true;
-					}
-					else
-					{
-						colA.currentBounds.topLeft.y += overlapY;
-						colA.collidedSides.top = true;
-					}
-				}
+				ResolveAABBCollision(colA.currentBounds, colB.currentBounds, colA.collidedSides);
 			}
 		}
 	}
-
 
 }

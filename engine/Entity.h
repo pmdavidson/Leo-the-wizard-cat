@@ -15,11 +15,11 @@ namespace ECSEngine {
     public:
         Entity(EntityID id, const std::string& name);
 
-        [[nodiscard]] EntityID GetID() const;
-        [[nodiscard]] const std::string& GetName() const;
-        [[nodiscard]] bool IsActive() const;
+        [[nodiscard]] EntityID getID() const;
+        [[nodiscard]] const std::string& getName() const;
+        [[nodiscard]] bool isActive() const;
 
-        void SetActive(bool active);
+        void setActive(bool active);
 
     private:
         EntityID mID;

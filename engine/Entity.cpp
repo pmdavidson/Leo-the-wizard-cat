@@ -8,22 +8,22 @@ namespace ECSEngine
     {
     }
 
-    EntityID Entity::GetID() const
+    EntityID Entity::getID() const
     {
         return mID;
     }
 
-    const std::string& Entity::GetName() const
+    const std::string& Entity::getName() const
     {
         return mName;
     }
 
-    bool Entity::IsActive() const
+    bool Entity::isActive() const
     {
         return mActive;
     }
 
-    void Entity::SetActive(bool active)
+    void Entity::setActive(bool active)
     {
         mActive = active;
     }
