@@ -9,7 +9,25 @@
 namespace ECSEngine
 {
 
-struct CollisionComponent {
-};
+    struct CollisionFlags {
+        bool top = false;
+        bool bottom = false;
+        bool left = false;
+        bool right = false;
+    };
+
+    struct CollisionComponent {
+        CollisionFlags collidedSides;
+        Rect currentBounds;
+        Rect previousBounds;
+        bool isStatic = false;
+
+        CollisionComponent() = default;
+
+        CollisionComponent(const Rect& bounds, bool isStatic = false)
+            : currentBounds(bounds),
+            previousBounds(bounds),
+            isStatic(isStatic) {}
+    };
 
 }
