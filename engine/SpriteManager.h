@@ -9,16 +9,19 @@
 namespace ECSEngine
 {
 
-using SpriteID = size_t;
+	using SpriteID = size_t;
 
-class SpriteManager
-{
-public:
-	[[nodiscard]] SpriteID RegisterTexture(const std::string &texturePath, const Rect &sourceRect);
-	sf::Sprite &GetSprite(SpriteID id);
-private:
-	std::unordered_map<std::string, sf::Texture> mTextures;
-	std::vector<sf::Sprite> mSprites;
-};
+	class SpriteManager
+	{
+	public:
+		SpriteManager() = default;
+		~SpriteManager() = default;
+		[[nodiscard]] SpriteID RegisterTexture(const std::string &texturePath, const Rect &sourceRect);
+		sf::Sprite &GetSprite(SpriteID id);
+
+	private:
+		std::unordered_map<std::string, sf::Texture> mTextures;
+		std::vector<sf::Sprite> mSprites;
+	};
 
 }

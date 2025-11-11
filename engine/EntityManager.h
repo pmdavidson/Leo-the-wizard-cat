@@ -47,71 +47,35 @@ namespace ECSEngine {
 				return id;
 			}
 
-			void RemoveEntity(EntityID id) {
-				if (IsValid(id)) {
-					mEntities[id].SetActive(false);
-					RemoveComponentsHelper<Components...>(id);
-				}
-			}
-
-			bool IsValid(EntityID id) const {
-				return id < mEntities.size() && mEntities[id].IsActive();
-			}
-
-			template <typename T>
-			void AddComponent(EntityID id, const T& component) {
-				assert(IsValid(id));
-				GetComponentStorage<T>().Add(id, component);
-			}
-
-			template <typename T>
-			void RemoveComponent(EntityID id) {
-				assert(IsValid(id));
-				GetComponentStorage<T>().Remove(id);
-			}
-
-			template <typename T>
-			bool HasComponent(EntityID id) const {
-				assert(id < mEntities.size());
-				return std::get<ComponentStorage<T>>(mComponentStorages).Has(id);
-			}
-
-			template <typename T>
-			T& GetComponent(EntityID id) {
-				assert(IsValid(id));
-				return GetComponentStorage<T>().Get(id);
-			}
-
-			template <typename T>
-			const T& GetComponent(EntityID id) const {
-				assert(IsValid(id));
-				return std::get<ComponentStorage<T>>(mComponentStorages).Get(id);
-			}
-
-			template <typename T>
-			ComponentStorage<T>& GetComponentStorage() {
-				return std::get<ComponentStorage<T>>(mComponentStorages);
-			}
-
-			using tEntity = std::vector<Entity>;
-			using const_iterator = tEntity::const_iterator;
-
-			const_iterator cbegin() const { return mEntities.cbegin(); }
-			const_iterator cend() const { return mEntities.cend(); }
-			const_iterator begin() const { return mEntities.begin(); }
-			const_iterator end() const { return mEntities.end(); }
-
-		private:
-			std::vector<Entity> mEntities;
-			std::tuple<ComponentStorage<Components>...> mComponentStorages;
-
-			void RemoveComponentsHelper(EntityID) {}
-
-			template <typename U, typename... Us>
-			void RemoveComponentsHelper(EntityID entity) {
-				RemoveComponent<U>(entity);
-				RemoveComponentsHelper<Us...>(entity);
-			}
-	};
+	void RemoveEntity(EntityID entity) {}
+	
+	template <typename T>
+	void AddComponent(EntityID entity, T component){}
+	
+	template <typename T>
+	void RemoveComponent(EntityID entity){}
+	
+	template <typename T>
+	bool HasComponent(EntityID entity) const {return false;}
+	
+	template <typename T>
+	T &GetComponent(EntityID entity) { static T tmp; return tmp; }
+	
+	template <typename T>
+	ComponentStorage<T> &GetComponentStorage(){}
+	
+	
+	using tEntity = std::vector<Entity>;
+	using const_iterator = tEntity::const_iterator;
+	const_iterator cbegin() const { return mEntities.begin(); }
+	const_iterator cend() const { return mEntities.end(); }
+	const_iterator begin() { return mEntities.begin(); }
+	const_iterator end() { return mEntities.end(); }
+private:
+	template <typename U, typename... Us>
+	void RemoveComponentsHelper(EntityID entity);
+	
+	std::vector<Entity> mEntities;
+};
 
 }

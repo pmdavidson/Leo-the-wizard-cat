@@ -1,78 +1,89 @@
 #include "WindowManager.h"
+#include <SFML/Window/VideoMode.hpp>
+#include <SFML/Graphics/RenderWindow.hpp>
+#include <iostream>
 
 namespace ECSEngine
 {
 
-WindowManager::WindowManager(unsigned int width, unsigned int height, const std::string &title)
-{
-	
-}
+	WindowManager::WindowManager(unsigned int width, unsigned int height, const std::string &title)
+		: mWidth(width), mHeight(height)
+	{
+		mWindow = new sf::RenderWindow(sf::VideoMode({width, height}), title);
+	}
 
-sf::RenderWindow *WindowManager::GetWindow() const
-{
-	return 0; // replace this code
-}
+	WindowManager::~WindowManager()
+	{
+		if (mWindow)
+		{
+			mWindow->close();
+			delete mWindow;
+			mWindow = nullptr;
+		}
+	}
 
+	sf::RenderWindow *WindowManager::GetWindow() const
+	{
+		return mWindow;
+	}
 
-// Functions to setup the camera
-void WindowManager::SetCamera(const Point2D &worldPt, const Point2D &screenPt)
-{
-	
-}
+	void WindowManager::SetCamera(const Point2D &worldPt, const Point2D &screenPt)
+	{
+		float dx = (screenPt.x - mWidth * 0.5f) * mWorldScale;
+		float dy = (screenPt.y - mHeight * 0.5f) * mWorldScale;
+		mCameraCenter = {worldPt.x - dx, worldPt.y - dy};
+	}
 
-// syntactic sugar for placing the given point at the center of the screen
-// equivalent to passing in screenPt as (windowWidth/2, windowHeight/2)
-void WindowManager::SetCamera(const Point2D &worldPt)
-{
-	
-}
+	void WindowManager::SetCamera(const Point2D &worldCenter)
+	{
+		mCameraCenter = worldCenter;
+	}
 
-void WindowManager::SetWorldScale(float worldUnitsPerPixel)
-{
-	
-}
+	void WindowManager::SetWorldScale(float worldUnitsPerPixel)
+	{
+		mWorldScale = worldUnitsPerPixel;
+	}
 
+	float WindowManager::WindowToWorldX(float x) const
+	{
+		return (x - mWidth * 0.5f) * mWorldScale + mCameraCenter.x;
+	}
 
-// Conversion functions
-float WindowManager::WindowToWorldX(float x) const
-{
-	return 0;
-}
+	float WindowManager::WorldToWindowX(float x) const
+	{
+		return ((x - mCameraCenter.x) / mWorldScale) + mWidth * 0.5f;
+	}
 
-float WindowManager::WorldToWindowX(float x) const
-{
-	return 0;
-}
+	float WindowManager::WindowToWorldY(float y) const
+	{
+		return (y - mHeight * 0.5f) * mWorldScale + mCameraCenter.y;
+	}
 
-float WindowManager::WindowToWorldY(float y) const
-{
-	return 0;
-}
+	float WindowManager::WorldToWindowY(float y) const
+	{
+		return ((y - mCameraCenter.y) / mWorldScale) + mHeight * 0.5f;
+	}
 
-float WindowManager::WorldToWindowY(float y) const
-{
-	return 0;
-}
+	Rect WindowManager::WindowToWorld(const Rect &r) const
+	{
+		Point2D newTopLeft(WindowToWorldX(r.topLeft.x), WindowToWorldY(r.topLeft.y));
+		return Rect(newTopLeft, r.width * mWorldScale, r.height * mWorldScale);
+	}
 
-Rect WindowManager::WindowToWorld(const Rect &rect) const
-{
-	return rect;
-}
+	Rect WindowManager::WorldToWindow(const Rect &r) const
+	{
+		Point2D newTopLeft(WorldToWindowX(r.topLeft.x), WorldToWindowY(r.topLeft.y));
+		return Rect(newTopLeft, r.width / mWorldScale, r.height / mWorldScale);
+	}
 
-Rect WindowManager::WorldToWindow(const Rect &rect) const
-{
-	return rect;
-}
+	Point2D WindowManager::WorldToWindow(const Point2D &p) const
+	{
+		return {WorldToWindowX(p.x), WorldToWindowY(p.y)};
+	}
 
-Point2D WindowManager::WorldToWindow(const Point2D &pt) const
-{
-	return pt;
-}
-
-Point2D WindowManager::WindowToWorld(const Point2D &pt) const
-{
-	return pt;
-}
-
+	Point2D WindowManager::WindowToWorld(const Point2D &p) const
+	{
+		return {WindowToWorldX(p.x), WindowToWorldY(p.y)};
+	}
 
 }

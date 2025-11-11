@@ -9,7 +9,7 @@
 
 namespace ECSEngine {
     
-    using EntityID = std::size_t;
+    using EntityID = size_t;
 
     class Entity {
     public:

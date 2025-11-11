@@ -21,7 +21,7 @@ namespace ECSEngine
         explicit MovementComponent(const Point2D& vel) : velocity(vel) {}
     };
 
-    struct GravityComponent {
+struct GravityComponent {
         Point2D acceleration;
 
         GravityComponent() : acceleration{0.0f, 0.0f} {}
