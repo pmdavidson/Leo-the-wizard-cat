@@ -10,10 +10,13 @@
 namespace ECSEngine
 {
 
-// The sprite rectangle is relative to the entity location in the world
-// This is only defined if an entity also has a LocationComponent.
-class SpriteComponent {
-public:
-};
+	// The sprite rectangle is relative to the entity location in the world
+	// This is only defined if an entity also has a LocationComponent.
+	struct SpriteComponent
+	{
+		SpriteID spriteId; // Sprite id associated with the entity
+		Rect bounds;	   // Bounds where the sprite is drawn (relative to entity location)
+		bool inWorldSpace; // Whether the sprite is in world or screen space
+	};
 
 }

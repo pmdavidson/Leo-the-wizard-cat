@@ -7,14 +7,19 @@
 namespace ECSEngine
 {
 
-struct LocationComponent {
-};
+	struct LocationComponent
+	{
+		Point2D position; // Base location of the entity
+	};
 
-struct MovementComponent {
-};
+	struct MovementComponent
+	{
+		Point2D velocity; // Velocity of the entity
+	};
 
-struct GravityComponent {
-};
-
+	struct GravityComponent
+	{
+		Point2D acceleration; // Acceleration acting on the entity each frame
+	};
 
 }

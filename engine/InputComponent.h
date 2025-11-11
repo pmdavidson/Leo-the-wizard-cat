@@ -9,8 +9,9 @@
 namespace ECSEngine
 {
 
-struct InputComponent {
-	std::bitset<sf::Keyboard::ScancodeCount> keydown;
-};
+	struct InputComponent
+	{
+		std::bitset<sf::Keyboard::ScancodeCount> keydown;
+	};
 
 }

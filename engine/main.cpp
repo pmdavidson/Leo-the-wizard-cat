@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
 	}
 	std::cout << "Usage: " << argv[0] << " [-path resource_path]\n";
 	std::cout << "Using resource path: " << gResourcePath << "\n";
-	
+
 	// Generic entity manager testing
 	if (debugMode)
 	{
@@ -37,16 +37,14 @@ int main(int argc, char *argv[])
 		std::cout << e.GetComponent<int>(e1) << "\n";
 		return 0;
 	}
-	
+
 	// ECS Engine Part 1 startup code
 	ECSEngine::ECSEngine<ECSEngine::LocationComponent, ECSEngine::MovementComponent, ECSEngine::CollisionComponent, ECSEngine::SpriteComponent, ECSEngine::SpawnComponent, ECSEngine::CameraComponent, ECSEngine::CameraFollower, ECSEngine::InputComponent, ECSEngine::GravityComponent, ECSEngine::CameraShake, ECSEngine::ScoreComponent> engine(1024, 768, "Test Engine");
-	
+
 	// Write code to create all the entities needed in the game here
-	
-	
+
 	// Run the game
 	engine.Run();
-	
-	
+
 	return 0;
 }

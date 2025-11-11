@@ -10,9 +10,10 @@
 namespace ECSEngine
 {
 
-using EntityID = size_t;
+    using EntityID = size_t;
 
-class Entity {
-};
+    class Entity
+    {
+    };
 
 }
