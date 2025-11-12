@@ -1,0 +1,81 @@
+Managers
+--------
+The SpriteManager stores textures in an unordered_map and sprites in a vector,
+both valid for the SpriteManager's lifetime. GetSprite() returns a reference that
+remains valid until vector reallocation occurs. SpriteIDs remain valid for the SpriteManager's lifetime, 
+though storing sprite references is unsafe if RegisterTexture() 
+may be called later.
+
+The SoundManager stores sound buffers and sound instances in separate
+unordered_maps, both valid for the SoundManager's lifetime. PlaySound() uses the
+stored instances with non-blocking playback, allowing multiple sounds to play
+simultaneously.
+
+The WindowManager's GetWindow() returns a pointer valid for the WindowManager's
+lifetime. The window is created in the constructor and destroyed in the
+destructor, while camera settings persist until explicitly changed.
+
+The EntityManager maintains EntityIDs that are valid until RemoveEntity() is
+called, after which they may be reused. GetComponent() returns a reference valid
+until the component or entity is removed. Component references are invalidated
+by RemoveComponent() or RemoveEntity(), though component storage reallocation
+is unlikely after initialization.
+
+Systems
+-------
+The Input System processes keyboard input using SFML's scancode system for
+tracking key presses and release states using bitsets.
+
+The Movement System has velocity-based movement with acceleration and
+deceleration, enforces maximum speed limits for horizontal movement, and
+includes a fast-fall mechanic triggered by the S key while falling.
+
+The Gravity System applies gravitational acceleration to entities with
+GravityComponent and reduces gravity to 30% of normal when sliding on walls to
+enable wall-sliding mechanics.
+
+The Collision System uses AABB (Axis-Aligned Bounding Box) collision detection
+with resolution that detects collision sides (top, bottom, left, right). It
+handles both static and dynamic entities, implements star collection mechanics
+where players collect stars for points, and manages star-to-star collisions
+with momentum loss and star-to-wall collisions with bouncing and speed reduction.
+
+The Camera System follows the player with zone-based movement. Hard zones at
+the 10% edges cause the camera to immediately follow the player, soft zones at
+the 30% edges smoothly tween to follow, and the center 40% zone slowly tweens
+to follow. The camera also includes shake effects on player collision with walls
+and handles world-to-window coordinate transformations.
+
+The Sprite System renders sprites in either world space or screen space and
+supports sprite positioning relative to entity locations.
+
+The Spawn System spawns star entities at regular intervals with random
+velocity directions and magnitudes, using configurable spawn rates and total
+spawn counts.
+
+The Score System tracks score with a digit-based display, updates sprite
+components for score visualization, and awards 10 points per star collected.
+
+DESIGN DECISIONS
+---------------
+Freed entity slots are reused to minimize memory allocation. Components are
+stored in vectors with entity-to-index mapping for efficient access. Some systems
+use static variables for jump state tracking so its easier to keep track of over many frames. 
+Delta time is currently fixed at 1/60 seconds, assuming a stable 60 FPS frame rate. This provides a consistent time step for updates, 
+ensuring that gravity and acceleration calculations do not rely on frame rate so we can avoid 
+the game being buggy at higher or lower framerates.
+
+Group A: Peter
+Group B: Eric
+
+Systems:
+Group A: CollisionSystem, CollisionSystemUpdate, SpriteSystem, GravitySystem
+Group B: ProcessEvents, InputSystem, MovementSystem, SpawnSystem, ScoreSystem, CameraSystem 
+
+Components:
+Group A: CollisionComponent, GravityComponent, LocationComponent, SpriteComponent
+Group B: CameraComponent, CameraFollowerComponent, CameraShakeComponent, InputComponent, MovementComponent, ScoreComponent, SpawnComponent
+
+Managers:
+Group A: EntityManager, SoundManager, ECSEngine.h
+Group B: WindowManager, SpriteManager, MathUtil.h 

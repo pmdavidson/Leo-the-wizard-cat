@@ -9,7 +9,116 @@
 #include "SpawnComponent.h"
 #include "ScoreComponent.h"
 
+using EntityId = size_t;
+
 std::string gResourcePath = "../assets/";
+
+struct SpriteEntry {
+	std::string texturePath;
+	sf::IntRect sourceRect;
+	sf::IntRect boundsRect;
+	bool hasCollision = false;
+};
+
+template <typename EngineType>
+void LoadMap(const std::string& path, EngineType& engine, const std::string& resourceRoot) {
+	std::ifstream file(resourceRoot + path);
+	if (!file) {
+		std::cerr << "Failed to open map: " << path << "\n";
+		return;
+	}
+
+	std::unordered_map<char, SpriteEntry> dictionary;
+	std::string line;
+	int dictionaryType = 1;
+
+	// Parse dictionary
+	while (std::getline(file, line)) {
+		if (line.starts_with("dictionary")) {
+			std::istringstream ss(line);
+			std::string dummy;
+			ss >> dummy >> dictionaryType;
+			continue;
+		}
+		if (line.starts_with("map origin")) break;
+
+		std::istringstream ss(line);
+		char symbol;
+		SpriteEntry entry;
+		int sx, sy, sw, sh, bx, by, bw, bh;
+		ss >> symbol >> entry.texturePath >> sx >> sy >> sw >> sh;
+		entry.sourceRect = sf::IntRect(sx, sy, sw, sh);
+
+		if (dictionaryType == 2) {
+			ss >> bx >> by >> bw >> bh;
+			entry.boundsRect = sf::IntRect(bx, by, bw, bh);
+			entry.hasCollision = true;
+		}
+
+		dictionary[symbol] = entry;
+	}
+
+	// Parse map origin and size
+	int originX, originY, tileW, tileH, mapW, mapH;
+	{
+		std::istringstream ss(line); // Last line read was "map origin ..."
+		std::string dummy;
+		ss >> dummy >> dummy >> originX >> originY;
+		ss >> dummy >> tileW >> tileH;
+		ss >> dummy >> mapW >> mapH;
+	}
+
+	// Parse map rows
+	for (int y = 0; y < mapH; ++y) {
+		std::getline(file, line);
+		for (int x = 0; x < mapW; ++x) {
+			char tile = line[x];
+			if (tile == '.') continue;
+			if (!dictionary.contains(tile)) continue;
+
+			const SpriteEntry& entry = dictionary[tile];
+
+			ECSEngine::Point2D position = { originX + x * tileW, originY + y * tileH }; //change to Point2D cause LocationComponent takes Point2D 
+
+
+			EntityId id = engine.GetEntityManager().CreateEntity("tile_" + std::string(1, tile));
+
+			engine.GetEntityManager().template AddComponent<ECSEngine::LocationComponent>(id, {
+				position.x, position.y
+			});
+
+			auto spriteId = engine.GetSpriteManager().RegisterTexture(
+				resourceRoot + entry.texturePath, entry.sourceRect
+			);
+
+			//move outside?
+			ECSEngine::Rect FromSFML(const sf::IntRect& r) {
+				return {
+					{ static_cast<float>(r.left), static_cast<float>(r.top) },
+					static_cast<float>(r.width),
+					static_cast<float>(r.height)
+				};
+			}
+
+			engine.GetEntityManager().template AddComponent<ECSEngine::SpriteComponent>(id, {
+				id, FromSFML(entry.boundsRect), true
+			}); //cast entry.boundsRect from IntRect to Rect? causse sprite and collision component constructor takes Rect
+
+			if (entry.hasCollision) {
+				engine.GetEntityManager().template AddComponent<ECSEngine::CollisionComponent>(id, {
+					false, {}, FromSFML(entry.boundsRect), entry.boundsRect
+				});
+			}
+
+			//Spawner
+			if (tile == 'S') {
+				engine.GetEntityManager().template AddComponent<ECSEngine::SpawnComponent>(id, {
+					id, "star", spriteId, 0.f, 2.f, 10
+				});
+			}
+		}
+	}
+}
 
 int main(int argc, char *argv[])
 {
@@ -40,6 +149,12 @@ int main(int argc, char *argv[])
 
 	// ECS Engine Part 1 startup code
 	ECSEngine::ECSEngine<ECSEngine::LocationComponent, ECSEngine::MovementComponent, ECSEngine::CollisionComponent, ECSEngine::SpriteComponent, ECSEngine::SpawnComponent, ECSEngine::CameraComponent, ECSEngine::CameraFollower, ECSEngine::InputComponent, ECSEngine::GravityComponent, ECSEngine::CameraShake, ECSEngine::ScoreComponent> engine(1024, 768, "Test Engine");
+
+	// Register sounds
+	engine.GetSoundManager().RegisterSound(gResourcePath + "sfx_jump.ogg", "jump");
+	engine.GetSoundManager().RegisterSound(gResourcePath + "footstep_grass_003.ogg", "land");
+	engine.GetSoundManager().RegisterSound(gResourcePath + "sfx_gem.ogg", "star_collect");
+	engine.GetSoundManager().RegisterSound(gResourcePath + "sfx_jump-high.ogg", "wall_push");
 
 	// Write code to create all the entities needed in the game here
 

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <unordered_map>
-#include <SFML/Graphics/Texture.hpp>
 #include "MathUtil.h"
 #include "SpriteManager.h"
 #include "Entity.h"
@@ -16,10 +15,20 @@ namespace ECSEngine
 	{
 		EntityID entityId;			  // Entity id that the component is attached to
 		std::string spawnDescription; // String describing what should be spawned
-		sf::Texture texture;		  // Texture of the object to be spawned
+		SpriteID spriteId;			  // Sprite ID of the object to be spawned
 		float timeToNextSpawn;		  // Time to next spawn
 		float timeBetweenSpawns;	  // Time between spawns
 		int totalSpawnEvents;		  // Total number of spawning events that will be performed
+
+		SpawnComponent() = default;
+
+		SpawnComponent(EntityID id, const std::string& desc, SpriteID sprite, float nextSpawn, float betweenSpawns, int totalEvents)
+			: entityId(id),
+			spawnDescription(desc),
+			spriteId(sprite),
+			timeToNextSpawn(nextSpawn),
+			timeBetweenSpawns(betweenSpawns),
+			totalSpawnEvents(totalEvents) {}
 	};
 
 }

@@ -291,6 +291,9 @@ namespace ECSEngine
 				bool onWallRight = false;
 				bool wasFalling = false;
 
+				// Track if we jumped recently for landing detection
+				static std::unordered_map<EntityID, bool> recentlyJumped;
+
 				if (mEntityManager.template HasComponent<CollisionComponent>(entityId))
 				{
 					auto &collisionComp = mEntityManager.template GetComponent<CollisionComponent>(entityId);
@@ -298,6 +301,30 @@ namespace ECSEngine
 					onWallLeft = collisionComp.collidedSides.left;
 					onWallRight = collisionComp.collidedSides.right;
 					wasFalling = movementComp.velocity.y > 0;
+
+					// Detect landing: if we're on ground and we recently jumped, play landing sound
+					if (onGround && recentlyJumped[entityId])
+					{
+						mSoundManager.PlaySound("land");
+						recentlyJumped[entityId] = false; // Clear the flag
+					}
+
+					// Play wall push sound when pushing against wall while falling (not just wall jumping)
+					static std::unordered_map<EntityID, bool> wasPushingWall;
+					if ((onWallLeft || onWallRight) && wasFalling && !onGround)
+					{
+						// Only play if not already playing
+						bool wasPushingWallLastFrame = wasPushingWall[entityId];
+						if (!wasPushingWallLastFrame)
+						{
+							mSoundManager.PlaySound("wall_push");
+						}
+						wasPushingWall[entityId] = true;
+					}
+					else
+					{
+						wasPushingWall[entityId] = false;
+					}
 				}
 
 				// Handle horizontal movement with acceleration
@@ -356,6 +383,7 @@ namespace ECSEngine
 						// Normal jump
 						movementComp.velocity.y = jumpVelocity;
 						mSoundManager.PlaySound("jump");
+						recentlyJumped[entityId] = true; // Mark that we recently jumped
 					}
 					else if (wasFalling && (onWallLeft || onWallRight))
 					{
@@ -370,6 +398,7 @@ namespace ECSEngine
 						}
 						movementComp.velocity.y = wallJumpVelocityY;
 						mSoundManager.PlaySound("wall_push");
+						recentlyJumped[entityId] = true; // Mark that we recently jumped
 					}
 				}
 
@@ -405,7 +434,20 @@ namespace ECSEngine
 				auto &gravityComp = mEntityManager.template GetComponent<GravityComponent>(entityId);
 				auto &movementComp = mEntityManager.template GetComponent<MovementComponent>(entityId);
 
-				movementComp.velocity += gravityComp.acceleration * deltaTime;
+				// Check if player is on wall while falling
+				bool onWallWhileFalling = false;
+				if (mEntityManager.template HasComponent<InputComponent>(entityId) &&
+					mEntityManager.template HasComponent<CollisionComponent>(entityId))
+				{
+					auto &collisionComp = mEntityManager.template GetComponent<CollisionComponent>(entityId);
+					bool onWall = collisionComp.collidedSides.left || collisionComp.collidedSides.right;
+					bool falling = movementComp.velocity.y > 0;
+					onWallWhileFalling = onWall && falling;
+				}
+
+				// Apply gravity, reduced if sliding on wall
+				float gravityMultiplier = onWallWhileFalling ? 0.3f : 1.0f; // 30% of normal gravity when on wall
+				movementComp.velocity += gravityComp.acceleration * deltaTime * gravityMultiplier;
 			}
 		}
 	}
@@ -415,7 +457,7 @@ namespace ECSEngine
 	{
 		float deltaTime = 1.0f / 60.0f; // assuming 60FPS?
 
-		// Update locations based on velocity and apply gravity
+		// Update locations based on velocity
 		for (auto it = mEntityManager.begin(); it != mEntityManager.end(); ++it)
 		{
 			if (!it->isActive())
@@ -427,13 +469,6 @@ namespace ECSEngine
 			{
 				auto &locationComp = mEntityManager.template GetComponent<LocationComponent>(entityId);
 				auto &movementComp = mEntityManager.template GetComponent<MovementComponent>(entityId);
-
-				// Apply gravity if entity has GravityComponent
-				if (mEntityManager.template HasComponent<GravityComponent>(entityId))
-				{
-					auto &gravityComp = mEntityManager.template GetComponent<GravityComponent>(entityId);
-					movementComp.velocity += gravityComp.acceleration * deltaTime;
-				}
 
 				// Check for wall push while falling
 				if (mEntityManager.template HasComponent<InputComponent>(entityId) &&
@@ -504,6 +539,78 @@ namespace ECSEngine
 				if (entityManager.template HasComponent<InputComponent>(idA) && colB.isStatic)
 				{
 					playerCollisionCheck(idA, colA.collidedSides);
+				}
+
+				// Check if player (idA) collected a star (idB)
+				// Stars have GravityComponent and CollisionComponent but not InputComponent
+				if (entityManager.template HasComponent<InputComponent>(idA) &&
+					!entityManager.template HasComponent<InputComponent>(idB) &&
+					entityManager.template HasComponent<GravityComponent>(idB) &&
+					entityManager.template HasComponent<CollisionComponent>(idB))
+				{
+					// Play collection sound
+					mSoundManager.PlaySound("star_collect");
+
+					// Add score (10 points for star)
+					for (auto scoreIt = entityManager.begin(); scoreIt != entityManager.end(); ++scoreIt)
+					{
+						EntityID scoreEntityId = scoreIt->getID();
+						if (entityManager.template HasComponent<ScoreComponent>(scoreEntityId))
+						{
+							auto &scoreComp = entityManager.template GetComponent<ScoreComponent>(scoreEntityId);
+							scoreComp.currentScore += 10;
+							break;
+						}
+					}
+
+					// Remove the star entity
+					entityManager.RemoveEntity(idB);
+				}
+
+				// Handle star collisions
+				// Check if idA is a star (has GravityComponent and CollisionComponent but not InputComponent)
+				bool isStarA = !entityManager.template HasComponent<InputComponent>(idA) &&
+								entityManager.template HasComponent<GravityComponent>(idA) &&
+								entityManager.template HasComponent<CollisionComponent>(idA);
+
+				if (isStarA && entityManager.template HasComponent<MovementComponent>(idA))
+				{
+					auto &movementCompA = entityManager.template GetComponent<MovementComponent>(idA);
+
+					// Star vs static object: bounce and lose speed
+					if (colB.isStatic)
+					{
+						// Bounce off the surface and reduce velocity
+						float speedLossFactor = 0.5f; // lose 1/2 spd 
+
+						if (colA.collidedSides.left || colA.collidedSides.right)
+						{
+							// Hit left or right wall, reverse horizontal velocity and reduce
+							movementCompA.velocity.x = -movementCompA.velocity.x * speedLossFactor;
+						}
+						if (colA.collidedSides.top || colA.collidedSides.bottom)
+						{
+							// Hit top or bottom, reverse vertical velocity and reduce
+							movementCompA.velocity.y = -movementCompA.velocity.y * speedLossFactor;
+						}
+					}
+					// Star vs star: lose all momentum
+					else if (!entityManager.template HasComponent<InputComponent>(idB) &&
+							 entityManager.template HasComponent<GravityComponent>(idB) &&
+							 entityManager.template HasComponent<CollisionComponent>(idB))
+					{
+						// Lose all spd
+						movementCompA.velocity.x = 0.0f;
+						movementCompA.velocity.y = 0.0f;
+
+						// Other star loses all spd
+						if (entityManager.template HasComponent<MovementComponent>(idB))
+						{
+							auto &movementCompB = entityManager.template GetComponent<MovementComponent>(idB);
+							movementCompB.velocity.x = 0.0f;
+							movementCompB.velocity.y = 0.0f;
+						}
+					}
 				}
 			}
 		}
