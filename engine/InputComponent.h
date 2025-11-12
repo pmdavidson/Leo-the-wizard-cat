@@ -12,6 +12,11 @@ namespace ECSEngine
 	struct InputComponent
 	{
 		std::bitset<sf::Keyboard::ScancodeCount> keydown;
+
+		InputComponent()
+        {
+            keydown.reset(); // sets all bits to 0 (no keys pressed)
+        }
 	};
 
 }

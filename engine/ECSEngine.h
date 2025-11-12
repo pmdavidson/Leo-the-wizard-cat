@@ -570,8 +570,8 @@ namespace ECSEngine
 				// Handle star collisions
 				// Check if idA is a star (has GravityComponent and CollisionComponent but not InputComponent)
 				bool isStarA = !entityManager.template HasComponent<InputComponent>(idA) &&
-								entityManager.template HasComponent<GravityComponent>(idA) &&
-								entityManager.template HasComponent<CollisionComponent>(idA);
+							   entityManager.template HasComponent<GravityComponent>(idA) &&
+							   entityManager.template HasComponent<CollisionComponent>(idA);
 
 				if (isStarA && entityManager.template HasComponent<MovementComponent>(idA))
 				{
@@ -581,7 +581,7 @@ namespace ECSEngine
 					if (colB.isStatic)
 					{
 						// Bounce off the surface and reduce velocity
-						float speedLossFactor = 0.5f; // lose 1/2 spd 
+						float speedLossFactor = 0.5f; // lose 1/2 spd
 
 						if (colA.collidedSides.left || colA.collidedSides.right)
 						{
@@ -839,6 +839,25 @@ namespace ECSEngine
 					{
 						auto &spawnerLocation = mEntityManager.template GetComponent<LocationComponent>(entityId);
 
+						// Get sprite bounds from sprite manager for sprite rendering
+						auto &spriteManager = GetSpriteManager();
+						sf::Sprite &sprite = spriteManager.GetSprite(spawnComp.spriteId);
+						sf::IntRect textureRect = sprite.getTextureRect();
+						
+						// Convert sf::IntRect to Rect for sprite bounds
+						Rect spriteBounds = {
+							{static_cast<float>(textureRect.left), static_cast<float>(textureRect.top)},
+							static_cast<float>(textureRect.width),
+							static_cast<float>(textureRect.height)
+						};
+
+						// Create AABB bounds using tileW and tileH from SpawnComponent
+						Rect collisionBounds = {
+							{0.0f, 0.0f},
+							spawnComp.tileW,
+							spawnComp.tileH
+						};
+
 						// Create new star entity
 						EntityID starId = mEntityManager.CreateEntity("star");
 
@@ -859,12 +878,17 @@ namespace ECSEngine
 						starGravity.acceleration = Point2D(0, 600.0f); // Gravity acceleration
 						mEntityManager.template AddComponent<GravityComponent>(starId, starGravity);
 
-						// Add CollisionComponent (dynamic)
+						// Add CollisionComponent with AABB bounds from tileW and tileH
 						CollisionComponent starCollision;
 						starCollision.isStatic = false;
+						starCollision.currentBounds = collisionBounds;
+						starCollision.previousBounds = collisionBounds;
 						mEntityManager.template AddComponent<CollisionComponent>(starId, starCollision);
 
+						// Add SpriteComponent with spriteId and sprite bounds
 						SpriteComponent starSprite;
+						starSprite.spriteId = spawnComp.spriteId;
+						starSprite.bounds = spriteBounds;
 						starSprite.inWorldSpace = true;
 						mEntityManager.template AddComponent<SpriteComponent>(starId, starSprite);
 
