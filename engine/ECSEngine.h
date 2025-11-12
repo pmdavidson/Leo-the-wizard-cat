@@ -59,6 +59,73 @@ namespace ECSEngine
 		void SpriteSystem();
 		void SpawnSystem();
 
+		void playerCollisionCheck(EntityID playerId, const CollisionFlags &collidedSides)
+		{
+			if (mEntityManager.template HasComponent<MovementComponent>(playerId))
+			{
+				auto &movementComp = mEntityManager.template GetComponent<MovementComponent>(playerId);
+
+				// Calculate camera shake magnitude using velocity
+				float velocityMagnitude = std::sqrt(movementComp.velocity.x * movementComp.velocity.x +
+													movementComp.velocity.y * movementComp.velocity.y);
+				float baseShake = 5.0f;			 // Base shake amount
+				float velocityMultiplier = 0.1f; // How much velocity affects shake
+				float shakeMagnitude = baseShake + (velocityMagnitude * velocityMultiplier);
+
+				// Determine direction of shake based on collision side
+				Point2D shakeDir(0.0f, 0.0f);
+				if (collidedSides.left)
+				{
+					shakeDir.x = -1.0f; // shake left
+				}
+				else if (collidedSides.right)
+				{
+					shakeDir.x = 1.0f; // shake right
+				}
+
+				if (collidedSides.top)
+				{
+					shakeDir.y = -1.0f; // shake up
+				}
+				else if (collidedSides.bottom)
+				{
+					shakeDir.y = 1.0f; // shake down
+				}
+
+				// Find camera entity and apply shake
+				for (auto camIt = mEntityManager.begin(); camIt != mEntityManager.end(); ++camIt)
+				{
+					EntityID camEntityId = camIt->getID();
+
+					if (mEntityManager.template HasComponent<CameraComponent>(camEntityId))
+					{
+						// Add or update CameraShake component
+						CameraShake shake;
+						shake.framesRemaining = 10; // Shake for 10 frames
+						shake.magnitude = Point2D(shakeDir.x * shakeMagnitude,
+												  shakeDir.y * shakeMagnitude);
+
+						if (mEntityManager.template HasComponent<CameraShake>(camEntityId))
+						{
+							// Update existing shake (use larger magnitude if already shaking)
+							auto &existingShake = mEntityManager.template GetComponent<CameraShake>(camEntityId);
+							if (shakeMagnitude > std::sqrt(existingShake.magnitude.x * existingShake.magnitude.x +
+														   existingShake.magnitude.y * existingShake.magnitude.y))
+							{
+								existingShake = shake;
+							}
+						}
+						else
+						{
+							// Add new shake component
+							mEntityManager.template AddComponent(camEntityId, shake);
+						}
+						break; // Only one camera entity
+					}
+				}
+			}
+		}
+
 		EntityManager<Components...> mEntityManager;
 		SpriteManager mSpriteManager;
 		SoundManager mSoundManager;
@@ -109,17 +176,26 @@ namespace ECSEngine
 				// Convert Key to Scancode for InputComponent
 				sf::Keyboard::Scancode scancode = sf::Keyboard::delocalize(keyEvent->code);
 
-				// Update input components for all entities with InputComponent
-				for (auto it = mEntityManager.begin(); it != mEntityManager.end(); ++it)
+				// Only process valid scancodes
+				if (scancode != sf::Keyboard::Scan::Unknown)
 				{
-					if (!it->isActive())
-						continue;
-					EntityID entityId = it->getID();
-
-					if (mEntityManager.template HasComponent<InputComponent>(entityId))
+					size_t scancodeIndex = static_cast<size_t>(scancode);
+					// Check that scancode is within bitset range
+					if (scancodeIndex < sf::Keyboard::ScancodeCount)
 					{
-						auto &inputComp = mEntityManager.template GetComponent<InputComponent>(entityId);
-						inputComp.keydown.set(static_cast<size_t>(scancode));
+						// Update input components for all entities with InputComponent
+						for (auto it = mEntityManager.begin(); it != mEntityManager.end(); ++it)
+						{
+							if (!it->isActive())
+								continue;
+							EntityID entityId = it->getID();
+
+							if (mEntityManager.template HasComponent<InputComponent>(entityId))
+							{
+								auto &inputComp = mEntityManager.template GetComponent<InputComponent>(entityId);
+								inputComp.keydown.set(scancodeIndex);
+							}
+						}
 					}
 				}
 			}
@@ -128,17 +204,26 @@ namespace ECSEngine
 				// Convert Key to Scancode for InputComponent
 				sf::Keyboard::Scancode scancode = sf::Keyboard::delocalize(keyEvent->code);
 
-				// Clear key when released
-				for (auto it = mEntityManager.begin(); it != mEntityManager.end(); ++it)
+				// Only process valid scancodes
+				if (scancode != sf::Keyboard::Scan::Unknown)
 				{
-					if (!it->isActive())
-						continue;
-					EntityID entityId = it->getID();
-
-					if (mEntityManager.template HasComponent<InputComponent>(entityId))
+					size_t scancodeIndex = static_cast<size_t>(scancode);
+					// Bounds check to ensure scancode is within bitset range
+					if (scancodeIndex < sf::Keyboard::ScancodeCount)
 					{
-						auto &inputComp = mEntityManager.template GetComponent<InputComponent>(entityId);
-						inputComp.keydown.reset(static_cast<size_t>(scancode));
+						// Clear key when released
+						for (auto it = mEntityManager.begin(); it != mEntityManager.end(); ++it)
+						{
+							if (!it->isActive())
+								continue;
+							EntityID entityId = it->getID();
+
+							if (mEntityManager.template HasComponent<InputComponent>(entityId))
+							{
+								auto &inputComp = mEntityManager.template GetComponent<InputComponent>(entityId);
+								inputComp.keydown.reset(scancodeIndex);
+							}
+						}
 					}
 				}
 			}
@@ -189,8 +274,16 @@ namespace ECSEngine
 				const float wallJumpVelocityY = -350.0f; // Wall jump vertical velocity
 
 				// Check for horizontal movement (A/D)
-				bool movingLeft = inputComp.keydown[static_cast<size_t>(sf::Keyboard::delocalize(sf::Keyboard::Key::A))];
-				bool movingRight = inputComp.keydown[static_cast<size_t>(sf::Keyboard::delocalize(sf::Keyboard::Key::D))];
+				sf::Keyboard::Scancode scancodeA = sf::Keyboard::delocalize(sf::Keyboard::Key::A);
+				sf::Keyboard::Scancode scancodeD = sf::Keyboard::delocalize(sf::Keyboard::Key::D);
+				bool movingLeft = (scancodeA != sf::Keyboard::Scan::Unknown &&
+								   static_cast<size_t>(scancodeA) < sf::Keyboard::ScancodeCount)
+									  ? inputComp.keydown[static_cast<size_t>(scancodeA)]
+									  : false;
+				bool movingRight = (scancodeD != sf::Keyboard::Scan::Unknown &&
+									static_cast<size_t>(scancodeD) < sf::Keyboard::ScancodeCount)
+									   ? inputComp.keydown[static_cast<size_t>(scancodeD)]
+									   : false;
 
 				// Check collision sides for wall jumping
 				bool onGround = false;
@@ -240,8 +333,17 @@ namespace ECSEngine
 				}
 
 				// Handle jumping (W/Space) - only if on ground
-				bool jumpPressed = inputComp.keydown[static_cast<size_t>(sf::Keyboard::delocalize(sf::Keyboard::Key::W))] ||
-								   inputComp.keydown[static_cast<size_t>(sf::Keyboard::delocalize(sf::Keyboard::Key::Space))];
+				sf::Keyboard::Scancode scancodeW = sf::Keyboard::delocalize(sf::Keyboard::Key::W);
+				sf::Keyboard::Scancode scancodeSpace = sf::Keyboard::delocalize(sf::Keyboard::Key::Space);
+				bool wPressed = (scancodeW != sf::Keyboard::Scan::Unknown &&
+								 static_cast<size_t>(scancodeW) < sf::Keyboard::ScancodeCount)
+									? inputComp.keydown[static_cast<size_t>(scancodeW)]
+									: false;
+				bool spacePressed = (scancodeSpace != sf::Keyboard::Scan::Unknown &&
+									 static_cast<size_t>(scancodeSpace) < sf::Keyboard::ScancodeCount)
+										? inputComp.keydown[static_cast<size_t>(scancodeSpace)]
+										: false;
+				bool jumpPressed = wPressed || spacePressed;
 
 				static std::unordered_map<EntityID, bool> wasJumpPressed;
 				bool wasJumpPressedLastFrame = wasJumpPressed[entityId];
@@ -272,7 +374,11 @@ namespace ECSEngine
 				}
 
 				// Handle fast fall (S key while falling)
-				bool downPressed = inputComp.keydown[static_cast<size_t>(sf::Keyboard::delocalize(sf::Keyboard::Key::S))];
+				sf::Keyboard::Scancode scancodeS = sf::Keyboard::delocalize(sf::Keyboard::Key::S);
+				bool downPressed = (scancodeS != sf::Keyboard::Scan::Unknown &&
+									static_cast<size_t>(scancodeS) < sf::Keyboard::ScancodeCount)
+									   ? inputComp.keydown[static_cast<size_t>(scancodeS)]
+									   : false;
 				if (downPressed && !onGround && movementComp.velocity.y > 0)
 				{
 					// Increase fall speed
@@ -342,6 +448,18 @@ namespace ECSEngine
 				// Update position based on velocity
 				locationComp.position.x += movementComp.velocity.x * deltaTime;
 				locationComp.position.y += movementComp.velocity.y * deltaTime;
+
+				// Update collision bounds for non-static entities
+				if (mEntityManager.template HasComponent<CollisionComponent>(entityId))
+				{
+					auto &collisionComp = mEntityManager.template GetComponent<CollisionComponent>(entityId);
+					if (!collisionComp.isStatic)
+					{
+						// Update collision bounds to match entity position (assuming 32x32 collision box centered)
+						collisionComp.currentBounds.topLeft.x = locationComp.position.x + 16;
+						collisionComp.currentBounds.topLeft.y = locationComp.position.y + 16;
+					}
+				}
 			}
 		}
 	}
@@ -381,6 +499,12 @@ namespace ECSEngine
 					continue;
 
 				ResolveAABBCollision(colA.currentBounds, colB.currentBounds, colA.collidedSides);
+
+				// Check if player (idA) hit a solid object (idB)
+				if (entityManager.template HasComponent<InputComponent>(idA) && colB.isStatic)
+				{
+					playerCollisionCheck(idA, colA.collidedSides);
+				}
 			}
 		}
 	}
