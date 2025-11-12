@@ -10,6 +10,7 @@
 #include "ScoreComponent.h"
 
 using EntityId = size_t;
+using SpriteID = size_t;
 
 std::string gResourcePath = "../assets/";
 
@@ -75,6 +76,14 @@ void LoadMap(const std::string &path, EngineType &engine, const std::string &res
 		ss >> dummy >> mapW >> mapH;
 	}
 
+	ECSEngine::Rect FromSFML(const sf::IntRect& r) {
+		return {
+			{ static_cast<float>(r.left), static_cast<float>(r.top) },
+			static_cast<float>(r.width),
+			static_cast<float>(r.height)
+		};
+	}
+
 	// Parse map rows
 	for (int y = 0; y < mapH; ++y)
 	{
@@ -98,6 +107,7 @@ void LoadMap(const std::string &path, EngineType &engine, const std::string &res
 			auto spriteId = engine.GetSpriteManager().RegisterTexture(
 				resourceRoot + entry.texturePath, entry.sourceRect);
 
+<<<<<<< HEAD
 			// move outside?
 			ECSEngine::Rect FromSFML(const sf::IntRect &r)
 			{
@@ -108,36 +118,69 @@ void LoadMap(const std::string &path, EngineType &engine, const std::string &res
 			}
 
 			engine.GetEntityManager().template AddComponent<ECSEngine::SpriteComponent>(id, {id, FromSFML(entry.boundsRect), true}); // cast entry.boundsRect from IntRect to Rect? causse sprite and collision component constructor takes Rect
+=======
+			engine.GetEntityManager().template AddComponent<ECSEngine::SpriteComponent>(id, {
+				spriteId, FromSFML(entry.boundsRect), true
+			}); //cast entry.boundsRect from IntRect to Rect? causse sprite and collision component constructor takes Rect
+>>>>>>> 22229c09a98d4001081ea029ad2991fdb6fdc2a9
 
 			if (entry.hasCollision)
 			{
 				engine.GetEntityManager().template AddComponent<ECSEngine::CollisionComponent>(id, {false, {}, FromSFML(entry.boundsRect), entry.boundsRect});
 			}
 
+<<<<<<< HEAD
 			// Spawner
 			if (tile == 'S')
 			{
+=======
+			//Spawner
+			if (tile == 'S') {
+>>>>>>> 22229c09a98d4001081ea029ad2991fdb6fdc2a9
 				engine.GetEntityManager().template AddComponent<ECSEngine::SpawnComponent>(id, {id, "star", spriteId, 2.f, 2.f, 10, static_cast<float>(tileW), static_cast<float>(tileH)});
 			}
+
 		}
 	}
+
+	// Spawn position assuming (1,8) is safe
+	float spawnX = tileW * 1;
+	float spawnY = tileH * 8;
+
+	// Create player entity
+	EntityId player = engine.GetEntityManager().CreateEntity("player");
+
+	// Register player sprite
+	SpriteID playerSpriteId = engine.GetSpriteManager().RegisterTexture(
+		"assets/spritesheet-characters-default.png", sf::IntRect(0, 0, 64, 64));
+
+	// Add Components
+	engine.GetEntityManager().AddComponent<LocationComponent>(player, {ECSEngine::Point2D(spawnX, spawnY)});
+	engine.GetEntityManager().AddComponent<GravityComponent>(player, {});
+	engine.GetEntityManager().AddComponent<MovementComponent>(player, {});
+	engine.GetEntityManager().AddComponent<InputComponent>(player, {});
+	engine.GetEntityManager().AddComponent<CameraFollower>(player, {player});
+	engine.GetEntityManager().AddComponent<ScoreComponent>(player, {});
+	engine.GetEntityManager().AddComponent<CollisionComponent>(player, {ECSEngine::Rect(0.f, 0.f, 64, 64), false});
+	engine.GetEntityManager().AddComponent<SpriteComponent>(player, {playerSpriteId, ECSEngine::Rect(0.f, 0.f, 64, 64), true });
+
 }
 
 int main(int argc, char *argv[])
 {
+	std::string gResourcePath = "../assets/";
 	bool debugMode = false;
-	if (argc >= 3 && argv[1] == std::string("-path"))
-	{
+
+	if (argc >= 3 && argv[1] == std::string("-path")) {
 		gResourcePath = argv[2];
 	}
 	std::cout << "Usage: " << argv[0] << " [-path resource_path]\n";
 	std::cout << "Using resource path: " << gResourcePath << "\n";
 
-	// Generic entity manager testing
+	// Debug entity manager test
 	if (debugMode)
 	{
 		ECSEngine::EntityManager<int, float, bool> e;
-		//	e1.AddComponent(42);
 		ECSEngine::EntityID e1 = e.CreateEntity("test");
 		e.AddComponent(e1, 42);
 		e.AddComponent(e1, 3.14f);
@@ -150,19 +193,26 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 
-	// ECS Engine Part 1 startup code
-	ECSEngine::ECSEngine<ECSEngine::LocationComponent, ECSEngine::MovementComponent, ECSEngine::CollisionComponent, ECSEngine::SpriteComponent, ECSEngine::SpawnComponent, ECSEngine::CameraComponent, ECSEngine::CameraFollower, ECSEngine::InputComponent, ECSEngine::GravityComponent, ECSEngine::CameraShake, ECSEngine::ScoreComponent> engine(1024, 768, "Test Engine");
+	// Initialize engine
+	ECSEngine::ECSEngine<
+		ECSEngine::LocationComponent,
+		ECSEngine::MovementComponent,
+		ECSEngine::CollisionComponent,
+		ECSEngine::SpriteComponent,
+		ECSEngine::SpawnComponent,
+		ECSEngine::CameraComponent,
+		ECSEngine::CameraFollower,
+		ECSEngine::InputComponent,
+		ECSEngine::GravityComponent,
+		ECSEngine::CameraShake,
+		ECSEngine::ScoreComponent
+	> engine(1024, 768, "Test Engine");
 
-	// Register sounds
-	engine.GetSoundManager().RegisterSound(gResourcePath + "sfx_jump.ogg", "jump");
-	engine.GetSoundManager().RegisterSound(gResourcePath + "footstep_grass_003.ogg", "land");
-	engine.GetSoundManager().RegisterSound(gResourcePath + "sfx_gem.ogg", "star_collect");
-	engine.GetSoundManager().RegisterSound(gResourcePath + "sfx_jump-high.ogg", "wall_push");
+	// Load maps (order matters: sky → world)
+	LoadMap("maps/sky.map", engine, gResourcePath);
+	LoadMap("maps/world.map", engine, gResourcePath);
 
-	// Write code to create all the entities needed in the game here
-
-	// Run the game
+	// Start game loop
 	engine.Run();
-
 	return 0;
 }
