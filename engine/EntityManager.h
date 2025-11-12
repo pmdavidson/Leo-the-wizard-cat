@@ -1,117 +1,116 @@
 #pragma once
 
+#include <type_traits>
+#include <iostream>
 #include <tuple>
-#include <unordered_map>
+#include <array>
 #include <vector>
-#include <string>
 #include <cassert>
+#include <limits>
+
 #include "Entity.h"
+#include "ComponentStorage.h"
 
 namespace ECSEngine
 {
 
-	template <typename T>
-	class ComponentStorage
-	{
-	public:
-		void Add(EntityID id, const T &component)
-		{
-			mData[id] = component;
-		}
+	using EntityID = size_t;
 
-		void Remove(EntityID id)
-		{
-			mData.erase(id);
-		}
+	template <typename T, typename... Ts>
+	struct IndexOf;
 
-		bool Has(EntityID id) const
-		{
-			return mData.find(id) != mData.end();
-		}
+	template <typename T, typename... Ts>
+	struct IndexOf<T, T, Ts...> : std::integral_constant<size_t, 0> {};
 
-		T &Get(EntityID id)
-		{
-			return mData.at(id);
-		}
-
-		const T &Get(EntityID id) const
-		{
-			return mData.at(id);
-		}
-
-	private:
-		std::unordered_map<EntityID, T> mData;
-	};
+	template <typename T, typename U, typename... Ts>
+	struct IndexOf<T, U, Ts...> : std::integral_constant<size_t, 1 + IndexOf<T, Ts...>::value> {};
 
 	template <typename... Components>
 	class EntityManager
 	{
 
 	public:
-		EntityID CreateEntity(const std::string &name)
+		EntityManager() = default;
+
+		[[nodiscard]] EntityID CreateEntity(const std::string &name)
 		{
-			EntityID id = mEntities.size();
-			mEntities.emplace_back(id, name);
+			EntityID id;
+			if (!mFreeEntityIDs.empty())
+			{
+				id = mFreeEntityIDs.back();
+				mFreeEntityIDs.pop_back();
+				mEntities[id] = Entity(id, name);
+			}
+			else
+			{
+				id = mEntities.size();
+				mEntities.emplace_back(id, name);
+			}
 			return id;
 		}
 
-		void RemoveEntity(EntityID id)
+		void RemoveEntity(EntityID entity)
 		{
-			if (IsValid(id))
-			{
-				mEntities[id].setActive(false);
-				RemoveComponentsHelper<Components...>(id);
-			}
-		}
-
-		bool IsValid(EntityID id) const
-		{
-			return id < mEntities.size() && mEntities[id].isActive();
+			assert(IsValid(entity));
+			RemoveComponentsHelper<Components...>(entity);
+			mEntities[entity].setActive(false);
+			mFreeEntityIDs.push_back(entity);
 		}
 
 		template <typename T>
-		void AddComponent(EntityID id, const T &component)
+		void AddComponent(EntityID entity, T component)
 		{
-			assert(IsValid(id));
-			GetComponentStorage<T>().Add(id, component);
+			constexpr size_t Index = IndexOf<T, Components...>::value;
+			static_assert(Index < sizeof...(Components));
+			assert(IsValid(entity));
+
+			auto &storage = std::get<Index>(mComponentStorages);
+			storage.Store(entity, std::move(component));
 		}
 
 		template <typename T>
-		void RemoveComponent(EntityID id)
+		void RemoveComponent(EntityID entity)
 		{
-			assert(IsValid(id));
-			GetComponentStorage<T>().Remove(id);
+			constexpr size_t Index = IndexOf<T, Components...>::value;
+			static_assert(Index < sizeof...(Components));
+			assert(IsValid(entity));
+
+			auto &storage = std::get<Index>(mComponentStorages);
+			storage.Remove(entity);
 		}
 
 		template <typename T>
-		bool HasComponent(EntityID id) const
+		bool HasComponent(EntityID entity) const
 		{
-			assert(id < mEntities.size());
-			return std::get<ComponentStorage<T>>(mComponentStorages).Has(id);
+			constexpr size_t Index = IndexOf<T, Components...>::value;
+			static_assert(Index < sizeof...(Components));
+			assert(IsValid(entity));
+
+			const auto &storage = std::get<Index>(mComponentStorages);
+			return storage.Valid(entity);
 		}
 
 		template <typename T>
-		T &GetComponent(EntityID id)
+		T &GetComponent(EntityID entity)
 		{
-			assert(IsValid(id));
-			return GetComponentStorage<T>().Get(id);
-		}
+			constexpr size_t Index = IndexOf<T, Components...>::value;
+			static_assert(Index < sizeof...(Components));
+			assert(IsValid(entity));
 
-		template <typename T>
-		const T &GetComponent(EntityID id) const
-		{
-			assert(IsValid(id));
-			return std::get<ComponentStorage<T>>(mComponentStorages).Get(id);
+			auto &storage = std::get<Index>(mComponentStorages);
+			return storage.Get(entity);
 		}
 
 		template <typename T>
 		ComponentStorage<T> &GetComponentStorage()
 		{
-			return std::get<ComponentStorage<T>>(mComponentStorages);
+			constexpr size_t Index = IndexOf<T, Components...>::value;
+			static_assert(Index < sizeof...(Components));
+			return std::get<Index>(mComponentStorages);
 		}
 
 		using tEntity = std::vector<Entity>;
-		using const_iterator = tEntity::const_iterator;
+		using const_iterator = typename tEntity::const_iterator;
 
 		const_iterator cbegin() const { return mEntities.cbegin(); }
 		const_iterator cend() const { return mEntities.cend(); }
@@ -120,15 +119,25 @@ namespace ECSEngine
 
 	private:
 		std::vector<Entity> mEntities;
+		std::vector<EntityID> mFreeEntityIDs;
 		std::tuple<ComponentStorage<Components>...> mComponentStorages;
 
+		bool IsValid(EntityID id) const
+		{
+			return id < mEntities.size() && mEntities[id].isActive();
+		}
+
+		// base case: no components
 		void RemoveComponentsHelper(EntityID) {}
 
+		// recursive case
 		template <typename U, typename... Us>
-		void RemoveComponentsHelper(EntityID entity)
-		{
-			RemoveComponent<U>(entity);
+		void RemoveComponentsHelper(EntityID entity) {
+			if (HasComponent<U>(entity)) {
+				RemoveComponent<U>(entity);
+			}
 			RemoveComponentsHelper<Us...>(entity);
 		}
+
 	};
 }

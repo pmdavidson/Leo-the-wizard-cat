@@ -614,28 +614,28 @@ namespace ECSEngine
 						// Add LocationComponent
 						LocationComponent starLocation;
 						starLocation.position = spawnerLocation.position;
-						mEntityManager.template AddComponent(starId, starLocation);
+						mEntityManager.template AddComponent<LocationComponent>(starId, starLocation);
 
 						// Add MovementComponent with random velocity
 						MovementComponent starMovement;
 						float angle = angleDist(gen);
 						float speed = speedDist(gen);
 						starMovement.velocity = Point2D(std::cos(angle) * speed, std::sin(angle) * speed);
-						mEntityManager.template AddComponent(starId, starMovement);
+						mEntityManager.template AddComponent<MovementComponent>(starId, starMovement);
 
 						// Add GravityComponent
 						GravityComponent starGravity;
 						starGravity.acceleration = Point2D(0, 600.0f); // Gravity acceleration
-						mEntityManager.template AddComponent(starId, starGravity);
+						mEntityManager.template AddComponent<GravityComponent>(starId, starGravity);
 
 						// Add CollisionComponent (dynamic)
 						CollisionComponent starCollision;
 						starCollision.isStatic = false;
-						mEntityManager.template AddComponent(starId, starCollision);
+						mEntityManager.template AddComponent<CollisionComponent>(starId, starCollision);
 
 						SpriteComponent starSprite;
 						starSprite.inWorldSpace = true;
-						mEntityManager.template AddComponent(starId, starSprite);
+						mEntityManager.template AddComponent<SpriteComponent>(starId, starSprite);
 
 						// Reset timer and decrement spawn events
 						spawnComp.timeToNextSpawn = spawnComp.timeBetweenSpawns;
