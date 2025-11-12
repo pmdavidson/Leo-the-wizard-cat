@@ -221,7 +221,7 @@ namespace ECSEngine
             vector.x * sin_a + vector.y * cos_a);
     }
 
-    inline Point2D GetOverlap(const Rect& a, const Rect& b)
+    inline Point2D GetOverlap(const Rect &a, const Rect &b)
     {
         float aRight = a.topLeft.x + a.width;
         float aBottom = a.topLeft.y + a.height;
@@ -232,37 +232,6 @@ namespace ECSEngine
         float overlapY = std::min(aBottom, bBottom) - std::max(a.topLeft.y, b.topLeft.y);
 
         return Point2D(overlapX, overlapY);
-    }
-
-    inline void ResolveAABBCollision(Rect& a, const Rect& b, CollisionFlags& flags)
-    {
-        Point2D overlap = GetOverlap(a, b);
-        if (overlap.x < overlap.y)
-        {
-            if (a.topLeft.x < b.topLeft.x)
-            {
-                a.topLeft.x -= overlap.x;
-                flags.right = true;
-            }
-            else
-            {
-                a.topLeft.x += overlap.x;
-                flags.left = true;
-            }
-        }
-        else
-        {
-            if (a.topLeft.y < b.topLeft.y)
-            {
-                a.topLeft.y -= overlap.y;
-                flags.bottom = true;
-            }
-            else
-            {
-                a.topLeft.y += overlap.y;
-                flags.top = true;
-            }
-        }
     }
 }
 

@@ -58,24 +58,24 @@ namespace ECSEngine
 		void CameraSystem();
 		void SpriteSystem();
 		void SpawnSystem();
-		
+
 		EntityManager<Components...> mEntityManager;
 		SpriteManager mSpriteManager;
 		SoundManager mSoundManager;
 		WindowManager mWindowManager;
 	};
-	
+
 	template <typename... Components>
 	ECSEngine<Components...>::ECSEngine(unsigned int width, unsigned int height, const std::string &name)
-	: mWindowManager(width, height, name)
+		: mWindowManager(width, height, name)
 	{
 	}
-	
+
 	template <typename... Components>
 	void ECSEngine<Components...>::Run()
 	{
-		sf::RenderWindow *window = mWindowManager.GetWindow(); //add GetWindow at the top?
-		
+		sf::RenderWindow *window = mWindowManager.GetWindow(); // add GetWindow at the top?
+
 		// Main game loop
 		while (window->isOpen())
 		{
@@ -84,113 +84,95 @@ namespace ECSEngine
 			InputSystem();
 			GravitySystem();
 			MovementSystem();
-			SpawnSystem();
+			CollisionSystem();
 			ScoreSystem();
 			CameraSystem();
-			
-			// Clear and draw sprites
-			window->clear();
-			
-			// Draw all sprites (SpriteSystem)
-			for (auto it = mEntityManager.begin(); it != mEntityManager.end(); ++it)
-			{
-				if (!it.isActive()) continue;
-            	EntityID entityId = it.getID();
-				
-				if (mEntityManager.template HasComponent<SpriteComponent>(entityId))
-				{
-					auto &spriteComp = mEntityManager.template GetComponent<SpriteComponent>(entityId);
-					
-					if (mEntityManager.template HasComponent<LocationComponent>(entityId))
-					{
-						auto &locationComp = mEntityManager.template GetComponent<LocationComponent>(entityId);
-						
-						// Get the sprite
-						sf::Sprite &sprite = mSpriteManager.GetSprite(spriteComp.spriteId);
-						
-						// Calculate position
-						Point2D drawPos;
-						if (spriteComp.inWorldSpace)
-						{
-							// Convert world to window coordinates
-							drawPos = mWindowManager.WorldToWindow(
-								Point2D(locationComp.position.x + spriteComp.bounds.topLeft.x,
-									locationComp.position.y + spriteComp.bounds.topLeft.y));
-								}
-								else
-								{
-									// Screen space - use bounds directly
-									drawPos = spriteComp.bounds.topLeft;
-								}
-								
-								sprite.setPosition(sf::Vector2f(drawPos.x, drawPos.y));
-								window->draw(sprite);
-							}
-						}
-					}
-					
-					window->display();
-				}
-			}
-			
-		template <typename... Components>
-			void ECSEngine<Components...>::ProcessEvents()
-			{
-				sf::RenderWindow *window = mWindowManager.GetWindow();
-		
-				// Process all pending events
-				while (auto event = window->pollEvent())
-				{
-					if (event->is<sf::Event::Closed>())
-					{
-						window->close();
-					}
-					else if (auto keyEvent = event->getIf<sf::Event::KeyPressed>())
-					{
-						// Convert Key to Scancode for InputComponent
-						sf::Keyboard::Scancode scancode = sf::Keyboard::delocalize(keyEvent->code);
-		
-						// Update input components for all entities with InputComponent
-						for (auto it = mEntityManager.begin(); it != mEntityManager.end(); ++it)
-						{
-							EntityID entityId = std::distance(mEntityManager.begin(), it);
-		
-							if (mEntityManager.template HasComponent<InputComponent>(entityId))
-							{
-								auto &inputComp = mEntityManager.template GetComponent<InputComponent>(entityId);
-								inputComp.keydown.set(static_cast<size_t>(scancode));
-							}
-						}
-					}
-					else if (auto keyEvent = event->getIf<sf::Event::KeyReleased>())
-					{
-						// Convert Key to Scancode for InputComponent
-						sf::Keyboard::Scancode scancode = sf::Keyboard::delocalize(keyEvent->code);
-		
-						// Clear key when released
-						for (auto it = mEntityManager.begin(); it != mEntityManager.end(); ++it)
-						{
-							EntityID entityId = std::distance(mEntityManager.begin(), it);
-		
-							if (mEntityManager.template HasComponent<InputComponent>(entityId))
-							{
-								auto &inputComp = mEntityManager.template GetComponent<InputComponent>(entityId);
-								inputComp.keydown.reset(static_cast<size_t>(scancode));
-							}
-						}
-					}
-				}
-			}
-			
-		template <typename... Components>
-		void ECSEngine<Components...>::InputSystem()
+			SpriteSystem();
+			SpawnSystem();
+		}
+	}
+
+	template <typename... Components>
+	void ECSEngine<Components...>::ProcessEvents()
+	{
+		sf::RenderWindow *window = mWindowManager.GetWindow();
+
+		// Process all pending events
+		while (auto event = window->pollEvent())
 		{
-			// Process input for platformer controls (w/a/s/d/space)
-			float deltaTime = 1.0f / 60.0f;
+			if (event->is<sf::Event::Closed>())
+			{
+				window->close();
+			}
+			else if (auto keyEvent = event->getIf<sf::Event::KeyPressed>())
+			{
+				// Convert Key to Scancode for InputComponent
+				sf::Keyboard::Scancode scancode = sf::Keyboard::delocalize(keyEvent->code);
+
+				// Update input components for all entities with InputComponent
+				for (auto it = mEntityManager.begin(); it != mEntityManager.end(); ++it)
+				{
+					if (!it->isActive())
+						continue;
+					EntityID entityId = it->getID();
+
+					if (mEntityManager.template HasComponent<InputComponent>(entityId))
+					{
+						auto &inputComp = mEntityManager.template GetComponent<InputComponent>(entityId);
+						inputComp.keydown.set(static_cast<size_t>(scancode));
+					}
+				}
+			}
+			else if (auto keyEvent = event->getIf<sf::Event::KeyReleased>())
+			{
+				// Convert Key to Scancode for InputComponent
+				sf::Keyboard::Scancode scancode = sf::Keyboard::delocalize(keyEvent->code);
+
+				// Clear key when released
+				for (auto it = mEntityManager.begin(); it != mEntityManager.end(); ++it)
+				{
+					if (!it->isActive())
+						continue;
+					EntityID entityId = it->getID();
+
+					if (mEntityManager.template HasComponent<InputComponent>(entityId))
+					{
+						auto &inputComp = mEntityManager.template GetComponent<InputComponent>(entityId);
+						inputComp.keydown.reset(static_cast<size_t>(scancode));
+					}
+				}
+			}
+		}
+	}
+
+	template <typename... Components>
+	void ECSEngine<Components...>::CollisionSystemUpdate()
+	{
+		for (auto it = mEntityManager.begin(); it != mEntityManager.end(); ++it)
+		{
+			if (!it->isActive())
+				continue;
+			EntityID entityId = it->getID();
+
+			if (mEntityManager.template HasComponent<CollisionComponent>(entityId))
+			{
+				auto &collisionComp = mEntityManager.template GetComponent<CollisionComponent>(entityId);
+				collisionComp.previousBounds = collisionComp.currentBounds;
+			}
+		}
+	}
+
+	template <typename... Components>
+	void ECSEngine<Components...>::InputSystem()
+	{
+		// Process input for platformer controls (w/a/s/d/space)
+		float deltaTime = 1.0f / 60.0f;
 
 		for (auto it = mEntityManager.begin(); it != mEntityManager.end(); ++it)
 		{
-			EntityID entityId = std::distance(mEntityManager.begin(), it);
+			if (!it->isActive())
+				continue;
+			EntityID entityId = it->getID();
 
 			if (mEntityManager.template HasComponent<InputComponent>(entityId) &&
 				mEntityManager.template HasComponent<MovementComponent>(entityId))
@@ -219,9 +201,9 @@ namespace ECSEngine
 				if (mEntityManager.template HasComponent<CollisionComponent>(entityId))
 				{
 					auto &collisionComp = mEntityManager.template GetComponent<CollisionComponent>(entityId);
-					onGround = collisionComp.collisionSides[static_cast<size_t>(CollisionSide::Bottom)];
-					onWallLeft = collisionComp.collisionSides[static_cast<size_t>(CollisionSide::Left)];
-					onWallRight = collisionComp.collisionSides[static_cast<size_t>(CollisionSide::Right)];
+					onGround = collisionComp.collidedSides.bottom;
+					onWallLeft = collisionComp.collidedSides.left;
+					onWallRight = collisionComp.collidedSides.right;
 					wasFalling = movementComp.velocity.y > 0;
 				}
 
@@ -301,14 +283,38 @@ namespace ECSEngine
 	}
 
 	template <typename... Components>
-	void ECSEngine<Components...>::MovementSystem() //update with GravitySystem now
+	void ECSEngine<Components...>::GravitySystem()
 	{
-		float deltaTime = 1.0f / 60.0f; //assuming 60FPS?
+		float deltaTime = 1.0f / 60.0f; // assuming 60FPS?
+
+		for (auto it = mEntityManager.begin(); it != mEntityManager.end(); ++it)
+		{
+			if (!it->isActive())
+				continue;
+			EntityID entityId = it->getID();
+
+			if (mEntityManager.template HasComponent<GravityComponent>(entityId) &&
+				mEntityManager.template HasComponent<MovementComponent>(entityId))
+			{
+				auto &gravityComp = mEntityManager.template GetComponent<GravityComponent>(entityId);
+				auto &movementComp = mEntityManager.template GetComponent<MovementComponent>(entityId);
+
+				movementComp.velocity += gravityComp.acceleration * deltaTime;
+			}
+		}
+	}
+
+	template <typename... Components>
+	void ECSEngine<Components...>::MovementSystem()
+	{
+		float deltaTime = 1.0f / 60.0f; // assuming 60FPS?
 
 		// Update locations based on velocity and apply gravity
 		for (auto it = mEntityManager.begin(); it != mEntityManager.end(); ++it)
 		{
-			EntityID entityId = std::distance(mEntityManager.begin(), it);
+			if (!it->isActive())
+				continue;
+			EntityID entityId = it->getID();
 
 			if (mEntityManager.template HasComponent<LocationComponent>(entityId) &&
 				mEntityManager.template HasComponent<MovementComponent>(entityId))
@@ -323,16 +329,14 @@ namespace ECSEngine
 					movementComp.velocity += gravityComp.acceleration * deltaTime;
 				}
 
-				// Check for wall push while falling (for wall jump sound)
+				// Check for wall push while falling
 				if (mEntityManager.template HasComponent<InputComponent>(entityId) &&
 					mEntityManager.template HasComponent<CollisionComponent>(entityId))
 				{
 					auto &collisionComp = mEntityManager.template GetComponent<CollisionComponent>(entityId);
-					bool onWall = collisionComp.collisionSides[static_cast<size_t>(CollisionSide::Left)] ||
-								  collisionComp.collisionSides[static_cast<size_t>(CollisionSide::Right)];
+					bool onWall = collisionComp.collidedSides.left ||
+								  collisionComp.collidedSides.right;
 					bool falling = movementComp.velocity.y > 0;
-
-					// Wall push sound is handled in InputSystem when wall jumping
 				}
 
 				// Update position based on velocity
@@ -340,6 +344,237 @@ namespace ECSEngine
 				locationComp.position.y += movementComp.velocity.y * deltaTime;
 			}
 		}
+	}
+
+	template <typename... Components>
+	void ECSEngine<Components...>::CollisionSystem()
+	{
+		auto &entityManager = GetEntityManager();
+
+		for (auto itA = entityManager.begin(); itA != entityManager.end(); ++itA)
+		{
+			auto &entityA = *itA;
+			if (!entityA.isActive())
+				continue;
+			EntityID idA = entityA.getID();
+
+			if (!entityManager.template HasComponent<CollisionComponent>(idA))
+				continue;
+			auto &colA = entityManager.template GetComponent<CollisionComponent>(idA);
+			if (colA.isStatic)
+				continue;
+
+			colA.collidedSides = {};
+
+			for (auto itB = std::next(itA); itB != entityManager.end(); ++itB)
+			{
+				auto &entityB = *itB;
+				if (!entityB.isActive())
+					continue;
+				EntityID idB = entityB.getID();
+
+				if (!entityManager.template HasComponent<CollisionComponent>(idB))
+					continue;
+				auto &colB = entityManager.template GetComponent<CollisionComponent>(idB);
+
+				if (!colA.currentBounds.intersects(colB.currentBounds))
+					continue;
+
+				ResolveAABBCollision(colA.currentBounds, colB.currentBounds, colA.collidedSides);
+			}
+		}
+	}
+
+	template <typename... Components>
+	void ECSEngine<Components...>::ScoreSystem()
+	{
+		// Update score display entities
+		for (auto it = mEntityManager.begin(); it != mEntityManager.end(); ++it)
+		{
+			if (!it->isActive())
+				continue;
+			EntityID entityId = it->getID();
+
+			if (mEntityManager.template HasComponent<ScoreComponent>(entityId))
+			{
+				auto &scoreComp = mEntityManager.template GetComponent<ScoreComponent>(entityId);
+
+				// Update sprite components for each digit in the score
+				// Convert score to string and update display entities
+				std::string scoreStr = std::to_string(scoreComp.currentScore);
+
+				for (size_t i = 0; i < scoreComp.displayEntityIds.size() && i < scoreStr.length(); ++i)
+				{
+					EntityID displayEntityId = scoreComp.displayEntityIds[i];
+					if (mEntityManager.template HasComponent<SpriteComponent>(displayEntityId))
+					{
+						int digit = scoreStr[scoreStr.length() - 1 - i] - '0';
+						if (digit >= 0 && digit < 10 && digit < static_cast<int>(scoreComp.digitSpriteIds.size()))
+						{
+							auto &spriteComp = mEntityManager.template GetComponent<SpriteComponent>(displayEntityId);
+							spriteComp.spriteId = scoreComp.digitSpriteIds[digit];
+						}
+					}
+				}
+			}
+		}
+	}
+
+	template <typename... Components>
+	void ECSEngine<Components...>::CameraSystem()
+	{
+		float deltaTime = 1.0f / 60.0f;
+
+		// Update camera position based on CameraFollower
+		for (auto it = mEntityManager.begin(); it != mEntityManager.end(); ++it)
+		{
+			if (!it->isActive())
+				continue;
+			EntityID entityId = it->getID();
+
+			if (mEntityManager.template HasComponent<CameraFollower>(entityId))
+			{
+				auto &cameraFollower = mEntityManager.template GetComponent<CameraFollower>(entityId);
+				EntityID trackedEntityId = cameraFollower.entityId;
+
+				// Find camera entity (entity with CameraComponent)
+				for (auto camIt = mEntityManager.begin(); camIt != mEntityManager.end(); ++camIt)
+				{
+					EntityID camEntityId = std::distance(mEntityManager.begin(), camIt);
+
+					if (mEntityManager.template HasComponent<CameraComponent>(camEntityId))
+					{
+						auto &cameraComp = mEntityManager.template GetComponent<CameraComponent>(camEntityId);
+
+						// Get tracked entity's location
+						if (mEntityManager.template HasComponent<LocationComponent>(trackedEntityId))
+						{
+							auto &trackedLocation = mEntityManager.template GetComponent<LocationComponent>(trackedEntityId);
+
+							// Get window dimensions
+							sf::RenderWindow *window = mWindowManager.GetWindow();
+							unsigned int windowWidth = window->getSize().x;
+							unsigned int windowHeight = window->getSize().y;
+
+							// Convert player world position to window position
+							Point2D playerWindowPos = mWindowManager.WorldToWindow(trackedLocation.position);
+
+							// Calculate zones (10%, 30%, 40% center)
+							float left10 = windowWidth * 0.1f;
+							float left30 = windowWidth * 0.3f;
+							float right30 = windowWidth * 0.7f;
+							float right10 = windowWidth * 0.9f;
+							float center40Left = windowWidth * 0.3f;
+							float center40Right = windowWidth * 0.7f;
+
+							// Camera follows player in X, fixed Y
+							float targetCameraX = cameraComp.position.x;
+							float targetCameraY = cameraComp.position.y; // Fixed Y
+
+							// Check which zone player is in
+							if (playerWindowPos.x < left10 || playerWindowPos.x > right10)
+							{
+								// hardzone
+								targetCameraX = trackedLocation.position.x;
+							}
+							else if (playerWindowPos.x < left30 || playerWindowPos.x > right30)
+							{
+								float tweenSpeed = 5.0f;
+								float desiredX = trackedLocation.position.x;
+								float diff = desiredX - cameraComp.position.x;
+								targetCameraX = cameraComp.position.x + diff * tweenSpeed * deltaTime;
+							}
+							else
+							{
+								float desiredX = trackedLocation.position.x;
+								float diff = desiredX - cameraComp.position.x;
+								float tweenSpeed = 3.0f;
+								targetCameraX = cameraComp.position.x + diff * tweenSpeed * deltaTime;
+							}
+
+							cameraComp.position.x = targetCameraX;
+
+							// Apply camera shake if present
+							if (mEntityManager.template HasComponent<CameraShake>(camEntityId))
+							{
+								auto &shakeComp = mEntityManager.template GetComponent<CameraShake>(camEntityId);
+
+								if (shakeComp.framesRemaining > 0)
+								{
+									// Apply random shake offset
+									static std::random_device rd;
+									static std::mt19937 gen(rd());
+									std::uniform_real_distribution<float> shakeDist(-1.0f, 1.0f);
+
+									float shakeX = shakeComp.magnitude.x * shakeDist(gen);
+									float shakeY = shakeComp.magnitude.y * shakeDist(gen);
+
+									cameraComp.position.x += shakeX;
+									cameraComp.position.y += shakeY;
+
+									shakeComp.framesRemaining--;
+
+									// Remove shake component when done
+									if (shakeComp.framesRemaining <= 0)
+									{
+										// Component will be removed in next frame
+									}
+									// If EntityManager.
+								}
+							}
+
+							// Update WindowManager camera
+							mWindowManager.SetCamera(cameraComp.position);
+							mWindowManager.SetWorldScale(cameraComp.scale);
+						}
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	template <typename... Components>
+	void ECSEngine<Components...>::SpriteSystem()
+	{
+		auto &entityManager = GetEntityManager();
+		auto &spriteManager = GetSpriteManager();
+		sf::RenderWindow *window = mWindowManager.GetWindow();
+
+		window->clear(); // Clear the screen before drawing
+
+		for (auto it = entityManager.begin(); it != entityManager.end(); ++it)
+		{
+			if (!it->isActive())
+				continue;
+			EntityID entityId = it->getID();
+
+			if (entityManager.template HasComponent<SpriteComponent>(entityId))
+			{
+				auto &spriteComp = entityManager.template GetComponent<SpriteComponent>(entityId);
+
+				sf::Sprite &sprite = spriteManager.GetSprite(spriteComp.spriteId);
+				Point2D drawPos;
+
+				if (spriteComp.inWorldSpace && entityManager.template HasComponent<LocationComponent>(entityId))
+				{
+					auto &locationComp = entityManager.template GetComponent<LocationComponent>(entityId);
+					Point2D worldPos = {
+						locationComp.position.x + spriteComp.bounds.topLeft.x,
+						locationComp.position.y + spriteComp.bounds.topLeft.y};
+					drawPos = mWindowManager.WorldToWindow(worldPos);
+				}
+				else
+				{
+					drawPos = spriteComp.bounds.topLeft;
+				}
+
+				sprite.setPosition(sf::Vector2f(drawPos.x, drawPos.y));
+				window->draw(sprite);
+			}
+		}
+
+		window->display();
 	}
 
 	template <typename... Components>
@@ -354,7 +589,9 @@ namespace ECSEngine
 
 		for (auto it = mEntityManager.begin(); it != mEntityManager.end(); ++it)
 		{
-			EntityID entityId = std::distance(mEntityManager.begin(), it);
+			if (!it->isActive())
+				continue;
+			EntityID entityId = it->getID();
 
 			if (mEntityManager.template HasComponent<SpawnComponent>(entityId))
 			{
@@ -410,262 +647,34 @@ namespace ECSEngine
 		}
 	}
 
-	template <typename... Components>
-	void ECSEngine<Components...>::ScoreSystem()
+	inline void ResolveAABBCollision(Rect &a, const Rect &b, CollisionFlags &flags)
 	{
-		// Update score display entities
-		for (auto it = mEntityManager.begin(); it != mEntityManager.end(); ++it)
+		Point2D overlap = GetOverlap(a, b);
+		if (overlap.x < overlap.y)
 		{
-			EntityID entityId = std::distance(mEntityManager.begin(), it);
-
-			if (mEntityManager.template HasComponent<ScoreComponent>(entityId))
+			if (a.topLeft.x < b.topLeft.x)
 			{
-				auto &scoreComp = mEntityManager.template GetComponent<ScoreComponent>(entityId);
-
-				// Update sprite components for each digit in the score
-				// Convert score to string and update display entities
-				std::string scoreStr = std::to_string(scoreComp.currentScore);
-
-				for (size_t i = 0; i < scoreComp.displayEntityIds.size() && i < scoreStr.length(); ++i)
-				{
-					EntityID displayEntityId = scoreComp.displayEntityIds[i];
-					if (mEntityManager.template HasComponent<SpriteComponent>(displayEntityId))
-					{
-						int digit = scoreStr[scoreStr.length() - 1 - i] - '0';
-						if (digit >= 0 && digit < 10 && digit < static_cast<int>(scoreComp.digitSpriteIds.size()))
-						{
-							auto &spriteComp = mEntityManager.template GetComponent<SpriteComponent>(displayEntityId);
-							spriteComp.spriteId = scoreComp.digitSpriteIds[digit];
-						}
-					}
-				}
+				a.topLeft.x -= overlap.x;
+				flags.right = true;
+			}
+			else
+			{
+				a.topLeft.x += overlap.x;
+				flags.left = true;
+			}
+		}
+		else
+		{
+			if (a.topLeft.y < b.topLeft.y)
+			{
+				a.topLeft.y -= overlap.y;
+				flags.bottom = true;
+			}
+			else
+			{
+				a.topLeft.y += overlap.y;
+				flags.top = true;
 			}
 		}
 	}
-
-	template <typename... Components>
-	void ECSEngine<Components...>::CameraSystem()
-	{
-		float deltaTime = 1.0f / 60.0f;
-
-		// Update camera position based on CameraFollower
-		for (auto it = mEntityManager.begin(); it != mEntityManager.end(); ++it)
-		{
-			EntityID entityId = std::distance(mEntityManager.begin(), it);
-
-			if (mEntityManager.template HasComponent<CameraFollower>(entityId))
-			{
-				auto &cameraFollower = mEntityManager.template GetComponent<CameraFollower>(entityId);
-				EntityID trackedEntityId = cameraFollower.entityId;
-
-				// Find camera entity (entity with CameraComponent)
-				for (auto camIt = mEntityManager.begin(); camIt != mEntityManager.end(); ++camIt)
-				{
-					EntityID camEntityId = std::distance(mEntityManager.begin(), camIt);
-
-					if (mEntityManager.template HasComponent<CameraComponent>(camEntityId))
-					{
-						auto &cameraComp = mEntityManager.template GetComponent<CameraComponent>(camEntityId);
-
-						// Get tracked entity's location
-						if (mEntityManager.template HasComponent<LocationComponent>(trackedEntityId))
-						{
-							auto &trackedLocation = mEntityManager.template GetComponent<LocationComponent>(trackedEntityId);
-
-							// Get window dimensions
-							sf::RenderWindow *window = mWindowManager.GetWindow();
-							unsigned int windowWidth = window->getSize().x;
-							unsigned int windowHeight = window->getSize().y;
-
-							// Convert player world position to window position
-							Point2D playerWindowPos = mWindowManager.WorldToWindow(trackedLocation.position);
-
-							// Calculate zones (10%, 30%, 40% center)
-							float left10 = windowWidth * 0.1f;
-							float left30 = windowWidth * 0.3f;
-							float right30 = windowWidth * 0.7f;
-							float right10 = windowWidth * 0.9f;
-							float center40Left = windowWidth * 0.3f;
-							float center40Right = windowWidth * 0.7f;
-
-							// Camera follows player in X, fixed Y
-							float targetCameraX = cameraComp.position.x;
-							float targetCameraY = cameraComp.position.y; // Fixed Y
-
-							// Check which zone player is in
-							if (playerWindowPos.x < left10 || playerWindowPos.x > right10)
-							{
-								// hardzone
-								targetCameraX = trackedLocation.position.x;
-							}
-						else if (playerWindowPos.x < left30 || playerWindowPos.x > right30)
-						{
-							float tweenSpeed = 5.0f;
-							float desiredX = trackedLocation.position.x;
-							float diff = desiredX - cameraComp.position.x;
-							targetCameraX = cameraComp.position.x + diff * tweenSpeed * deltaTime;
-						}
-						else
-						{
-							float desiredX = trackedLocation.position.x;
-							float diff = desiredX - cameraComp.position.x;
-							float tweenSpeed = 3.0f;
-							targetCameraX = cameraComp.position.x + diff * tweenSpeed * deltaTime;
-						}
-
-							cameraComp.position.x = targetCameraX;
-
-							// Apply camera shake if present
-							if (mEntityManager.template HasComponent<CameraShake>(camEntityId))
-							{
-								auto &shakeComp = mEntityManager.template GetComponent<CameraShake>(camEntityId);
-
-								if (shakeComp.framesRemaining > 0)
-								{
-									// Apply random shake offset
-									static std::random_device rd;
-									static std::mt19937 gen(rd());
-									std::uniform_real_distribution<float> shakeDist(-1.0f, 1.0f);
-
-									float shakeX = shakeComp.magnitude.x * shakeDist(gen);
-									float shakeY = shakeComp.magnitude.y * shakeDist(gen);
-
-									cameraComp.position.x += shakeX;
-									cameraComp.position.y += shakeY;
-
-									shakeComp.framesRemaining--;
-
-									// Remove shake component when done
-									if (shakeComp.framesRemaining <= 0)
-									{
-										// Component will be removed in next frame
-									}
-								}
-							}
-
-							// Update WindowManager camera
-							mWindowManager.SetCamera(cameraComp.position);
-							mWindowManager.SetWorldScale(cameraComp.scale);
-						}
-						break;
-					}
-				}
-			}
-		}
-	}
-
-	template <typename... Components>
-	void ECSEngine<Components...>::SpriteSystem()
-	{
-		auto& entityManager = GetEntityManager();
-		auto& spriteManager = GetSpriteManager();
-		auto& windowManager = GetWindowManager();
-		sf::RenderWindow* window = windowManager.GetWindow(); //add getWindow at top?
-
-		window->clear(); // Clear the screen before drawing
-
-		for (auto it = entityManager.begin(); it != entityManager.end(); ++it)
-		{
-			if (!it.isActive()) continue;
-			EntityID entityId = it-.getID();
-
-			if (entityManager.template HasComponent<SpriteComponent>(entityId))
-			{
-				auto& spriteComp = entityManager.template GetComponent<SpriteComponent>(entityId);
-
-				sf::Sprite& sprite = spriteManager.GetSprite(spriteComp.spriteId);
-				Point2D drawPos;
-
-				if (spriteComp.inWorldSpace && entityManager.template HasComponent<LocationComponent>(entityId))
-				{
-					auto& locationComp = entityManager.template GetComponent<LocationComponent>(entityId);
-					Point2D worldPos = {
-						locationComp.position.x + spriteComp.bounds.topLeft.x,
-						locationComp.position.y + spriteComp.bounds.topLeft.y
-					};
-					drawPos = windowManager.WorldToWindow(worldPos);
-				}
-				else
-				{
-					drawPos = spriteComp.bounds.topLeft;
-				}
-
-				sprite.setPosition(sf::Vector2f(drawPos.x, drawPos.y));
-				window->draw(sprite);
-			}
-		}
-
-		window->display();
-	}
-
-	template <typename... Components>
-	void ECSEngine<Components...>::GravitySystem()
-	{
-		float deltaTime = 1.0f / 60.0f; //assuming 60FPS?
-
-		for (auto it = mEntityManager.begin(); it != mEntityManager.end(); ++it)
-		{
-			if (!it.isActive()) continue;
-            EntityID entityId = it.getID();
-
-			if (mEntityManager.template HasComponent<GravityComponent>(entityId) &&
-				mEntityManager.template HasComponent<MovementComponent>(entityId))
-			{
-				auto& gravityComp = mEntityManager.template GetComponent<GravityComponent>(entityId);
-				auto& movementComp = mEntityManager.template GetComponent<MovementComponent>(entityId);
-
-				movementComp.velocity += gravityComp.acceleration * deltaTime;
-			}
-		}
-	}
-
-	template <typename... Components>
-	void ECSEngine<Components...>::CollisionSystemUpdate()
-	{
-		for (auto it = mEntityManager.begin(); it != mEntityManager.end(); ++it)
-		{
-			if (!it.isActive()) continue;
-            EntityID entityId = it.getID();
-
-			if (mEntityManager.template HasComponent<CollisionComponent>(entityId))
-			{
-				auto& collisionComp = mEntityManager.template GetComponent<CollisionComponent>(entityId);
-				collisionComp.previousBounds = collisionComp.currentBounds;
-			}
-		}
-	}
-
-	template <typename... Components>
-	void ECSEngine<Components...>::CollisionSystem()
-	{
-		auto& entityManager = GetEntityManager();
-
-		for (auto itA = entityManager.begin(); itA != entityManager.end(); ++itA)
-		{
-			auto& entityA = *itA;
-			if (!entityA.isActive()) continue;
-			EntityID idA = entityA.getID();
-
-			if (!entityManager.template HasComponent<CollisionComponent>(idA)) continue;
-			auto& colA = entityManager.template GetComponent<CollisionComponent>(idA);
-			if (colA.isStatic) continue;
-
-			colA.collidedSides = {};
-
-			for (auto itB = std::next(itA); itB != entityManager.end(); ++itB)
-			{
-				auto& entityB = *itB;
-				if (!entityB.isActive()) continue;
-				EntityID idB = entityB.getID();
-
-				if (!entityManager.template HasComponent<CollisionComponent>(idB)) continue;
-				auto& colB = entityManager.template GetComponent<CollisionComponent>(idB);
-
-				if (!colA.currentBounds.intersects(colB.currentBounds)) continue;
-
-				ResolveAABBCollision(colA.currentBounds, colB.currentBounds, colA.collidedSides);
-			}
-		}
-	}
-
 }
