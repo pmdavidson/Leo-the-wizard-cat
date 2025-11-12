@@ -19,16 +19,20 @@ namespace ECSEngine
 		float timeToNextSpawn;		  // Time to next spawn
 		float timeBetweenSpawns;	  // Time between spawns
 		int totalSpawnEvents;		  // Total number of spawning events that will be performed
+		float tileW;					  // Tile width for AABB size
+		float tileH;					  // Tile height for AABB size
 
 		SpawnComponent() = default;
 
-		SpawnComponent(EntityID id, const std::string& desc, SpriteID sprite, float nextSpawn, float betweenSpawns, int totalEvents)
+		SpawnComponent(EntityID id, const std::string& desc, SpriteID sprite, float nextSpawn, float betweenSpawns, int totalEvents, float w, float h)
 			: entityId(id),
 			spawnDescription(desc),
 			spriteId(sprite),
 			timeToNextSpawn(nextSpawn),
 			timeBetweenSpawns(betweenSpawns),
-			totalSpawnEvents(totalEvents) {}
+			totalSpawnEvents(totalEvents),
+			tileW(w),
+			tileH(h) {}
 	};
 
 }
