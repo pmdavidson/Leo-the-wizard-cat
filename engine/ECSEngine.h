@@ -523,15 +523,15 @@ namespace ECSEngine
 				locationComp.position.y += movementComp.velocity.y * deltaTime;
 
 				// Update collision bounds for non-static entities
-				if (mEntityManager.template HasComponent<CollisionComponent>(entityId))
-				{
-					auto &collisionComp = mEntityManager.template GetComponent<CollisionComponent>(entityId);
-					if (!collisionComp.isStatic)
-					{
-						collisionComp.currentBounds.topLeft.x = locationComp.position.x + 16;
-						collisionComp.currentBounds.topLeft.y = locationComp.position.y + 16;
-					}
-				}
+				// if (mEntityManager.template HasComponent<CollisionComponent>(entityId))
+				// {
+				// 	auto &collisionComp = mEntityManager.template GetComponent<CollisionComponent>(entityId);
+				// 	if (!collisionComp.isStatic)
+				// 	{
+				// 		collisionComp.currentBounds.topLeft.x = locationComp.position.x + 16;
+				// 		collisionComp.currentBounds.topLeft.y = locationComp.position.y + 16;
+				// 	}
+				// }
 			}
 		}
 	}
@@ -578,6 +578,13 @@ namespace ECSEngine
 
 				Rect BoundsA(LocA.position + colA.currentBounds.topLeft, colA.currentBounds.width, colA.currentBounds.height);
 				Rect BoundsB(LocB.position + colB.currentBounds.topLeft, colB.currentBounds.width, colB.currentBounds.height);
+
+				if (colB.isStatic) {
+					std::cout << "Tile sprite at y      = " << LocB.position.y << "\n";
+					std::cout << "Tile collider at y    = " << BoundsB.topLeft.y << "\n";
+					std::cout << "boundsRect local y    = " << colB.currentBounds.topLeft.y << "\n";
+					std::cout << "--------\n";
+				}
 
 				if (!BoundsA.intersects(BoundsB))
 					continue;
@@ -889,75 +896,86 @@ namespace ECSEngine
 			}
 		}
 	}
-	inline void ResolveAABBCollision(Rect &a, const Rect &b, CollisionFlags &flagsA, CollisionFlags &flagsB)
-	{
-		Point2D overlap = GetOverlap(a, b);
-
-		if (overlap.x <= 0.0f || overlap.y <= 0.0f)
-			return; // no real overlap
-
-		// Resolve Y-axis
-		if (a.topLeft.y < b.topLeft.y)
-		{
-			a.topLeft.y -= overlap.y;
-			flagsA.bottom = true;
-			flagsB.top = true;
-		}
-		else
-		{
-			a.topLeft.y += overlap.y;
-			flagsA.top = true;
-			flagsB.bottom = true;
-		}
-
-		// Resolve X-axis
-		if (a.topLeft.x < b.topLeft.x)
-		{
-			a.topLeft.x -= overlap.x;
-			flagsA.right = true;
-			flagsB.left = true;
-		}
-		else
-		{
-			a.topLeft.x += overlap.x;
-			flagsA.left = true;
-			flagsB.right = true;
-		}
-	}
-
 
 	// inline void ResolveAABBCollision(Rect &a, const Rect &b, CollisionFlags &flagsA, CollisionFlags &flagsB)
 	// {
 	// 	Point2D overlap = GetOverlap(a, b);
-	// 	if (overlap.x < overlap.y)
+
+	// 	if (overlap.x <= 0.0f || overlap.y <= 0.0f)
+	// 		return; // no real overlap
+
+	// 	// Resolve Y-axis
+	// 	if (a.topLeft.y < b.topLeft.y)
 	// 	{
-	// 		if (a.topLeft.x < b.topLeft.x)
-	// 		{
-	// 			a.topLeft.x -= overlap.x;
-	// 			flagsA.right = true;
-	// 			flagsB.left = true;
-	// 		}
-	// 		else
-	// 		{
-	// 			a.topLeft.x += overlap.x;
-	// 			flagsA.left = true;
-	// 			flagsB.left = true;
-	// 		}
+	// 		a.topLeft.y -= overlap.y;
+	// 		flagsA.bottom = true;
+	// 		flagsB.top = true;
 	// 	}
 	// 	else
 	// 	{
-	// 		if (a.topLeft.y < b.topLeft.y)
-	// 		{
-	// 			a.topLeft.y -= overlap.y;
-	// 			flagsA.bottom = true;
-	// 			flagsB.top = true;
-	// 		}
-	// 		else
-	// 		{
-	// 			a.topLeft.y += overlap.y;
-	// 			flagsA.top = true;
-	// 			flagsB.bottom = true;
-	// 		}
+	// 		a.topLeft.y += overlap.y;
+	// 		flagsA.top = true;
+	// 		flagsB.bottom = true;
+	// 	}
+
+	// 	// Resolve X-axis
+	// 	if (a.topLeft.x < b.topLeft.x)
+	// 	{
+	// 		a.topLeft.x -= overlap.x;
+	// 		flagsA.right = true;
+	// 		flagsB.left = true;
+	// 	}
+	// 	else
+	// 	{
+	// 		a.topLeft.x += overlap.x;
+	// 		flagsA.left = true;
+	// 		flagsB.right = true;
 	// 	}
 	// }
+
+
+	inline void ResolveAABBCollision(Rect &a, const Rect &b,
+                                 CollisionFlags &flagsA, CollisionFlags &flagsB)
+	{
+		Point2D overlap = GetOverlap(a, b);
+		if (overlap.x <= 0.0f || overlap.y <= 0.0f)
+			return;
+
+		// PRIORITIZE VERTICAL COLLISIONS (GROUND/CEILING)
+		if (overlap.y <= overlap.x)
+		{
+			// --- Y-AXIS RESOLUTION ---
+			if (a.topLeft.y < b.topLeft.y)
+			{
+				// A landed on top of B
+				a.topLeft.y -= overlap.y;
+				flagsA.bottom = true;
+				flagsB.top = true;
+			}
+			else
+			{
+				// A hit B from below
+				a.topLeft.y += overlap.y;
+				flagsA.top = true;
+				flagsB.bottom = true;
+			}
+		}
+		else
+		{
+			// --- X-AXIS RESOLUTION ---
+			if (a.topLeft.x < b.topLeft.x)
+			{
+				a.topLeft.x -= overlap.x;
+				flagsA.right = true;
+				flagsB.left = true;
+			}
+			else
+			{
+				a.topLeft.x += overlap.x;
+				flagsA.left = true;
+				flagsB.right = true;
+			}
+		}
+	}
+
 }

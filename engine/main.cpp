@@ -129,14 +129,8 @@ void LoadMap(const std::string &path, EngineType &engine, const std::string &res
 
 			if (entry.hasCollision)
 			{
-				// std::cout << "Adding collision to tile at (" << x << "," << y << ")\n";
-				ECSEngine::Rect worldBounds(
-						ECSEngine::Point2D(entry.boundsRect.position.x + position.x, entry.boundsRect.position.y + position.y), 
-						entry.boundsRect.size.x, entry.boundsRect.size.y);
-
-
 				engine.GetEntityManager().template AddComponent<ECSEngine::CollisionComponent>(id, ECSEngine::CollisionComponent(
-																									   worldBounds, true));
+																									   FromSFML(entry.boundsRect), true));
 			}
 
 			// Spawner
@@ -147,39 +141,41 @@ void LoadMap(const std::string &path, EngineType &engine, const std::string &res
 		}
 	}
 
-	// Spawn position assuming (1,8) is safe
-	float spawnX = tileW * 1;
-	float spawnY = tileH * 4;
+	if (dictionaryType == 2){
+		// Spawn position assuming (1,8) is safe
+		float spawnX = tileW * 1;
+		float spawnY = tileH * 1;
 
-	// Create player entity
-	EntityId player = engine.GetEntityManager().CreateEntity("player");
+		// Create player entity
+		EntityId player = engine.GetEntityManager().CreateEntity("player");
 
-	// Register player sprite
-	SpriteID playerSpriteId = engine.GetSpriteManager().RegisterTexture(
-		gResourcePath + "spritesheet-characters-default.png", ECSEngine::Rect(0.f, 0.f, 128.f, 128.f));
+		// Register player sprite
+		SpriteID playerSpriteId = engine.GetSpriteManager().RegisterTexture(
+			gResourcePath + "spritesheet-characters-default.png", ECSEngine::Rect(0.f, 0.f, 128.f, 128.f));
 
-	// Add Components
-	engine.GetEntityManager().template AddComponent<ECSEngine::LocationComponent>(player, ECSEngine::LocationComponent(ECSEngine::Point2D(spawnX, spawnY)));
-	engine.GetEntityManager().template AddComponent<ECSEngine::GravityComponent>(player, {});
-	engine.GetEntityManager().template AddComponent<ECSEngine::MovementComponent>(player, {});
-	engine.GetEntityManager().template AddComponent<ECSEngine::InputComponent>(player, {});
-	engine.GetEntityManager().template AddComponent<ECSEngine::CameraFollower>(player, {player});
-	engine.GetEntityManager().template AddComponent<ECSEngine::ScoreComponent>(player, {});
-	engine.GetEntityManager().template AddComponent<ECSEngine::CollisionComponent>(player, {ECSEngine::Rect(0.f, 0.f, 64, 64), false});
-	engine.GetEntityManager().template AddComponent<ECSEngine::SpriteComponent>(player, {playerSpriteId, ECSEngine::Rect(0.f, 0.f, 64, 64), true});
+		// Add Components
+		engine.GetEntityManager().template AddComponent<ECSEngine::LocationComponent>(player, ECSEngine::LocationComponent(ECSEngine::Point2D(spawnX, spawnY)));
+		engine.GetEntityManager().template AddComponent<ECSEngine::GravityComponent>(player, {});
+		engine.GetEntityManager().template AddComponent<ECSEngine::MovementComponent>(player, {});
+		engine.GetEntityManager().template AddComponent<ECSEngine::InputComponent>(player, {});
+		engine.GetEntityManager().template AddComponent<ECSEngine::CameraFollower>(player, {player});
+		engine.GetEntityManager().template AddComponent<ECSEngine::ScoreComponent>(player, {});
+		engine.GetEntityManager().template AddComponent<ECSEngine::CollisionComponent>(player, {ECSEngine::Rect(0.f, 0.f, 64, 64), false});
+		engine.GetEntityManager().template AddComponent<ECSEngine::SpriteComponent>(player, {playerSpriteId, ECSEngine::Rect(0.f, 0.f, 64, 64), true});
 
-	// Create camera entity that follows the player
-	EntityId camera = engine.GetEntityManager().CreateEntity("camera");
-	ECSEngine::CameraComponent cameraComp;
-	cameraComp.position = ECSEngine::Point2D(spawnX, spawnY);
-	cameraComp.scale = 1.0f;
-	engine.GetEntityManager().template AddComponent<ECSEngine::CameraComponent>(camera, cameraComp);
+		// Create camera entity that follows the player
+		EntityId camera = engine.GetEntityManager().CreateEntity("camera");
+		ECSEngine::CameraComponent cameraComp;
+		cameraComp.position = ECSEngine::Point2D(spawnX, spawnY);
+		cameraComp.scale = 1.0f;
+		engine.GetEntityManager().template AddComponent<ECSEngine::CameraComponent>(camera, cameraComp);
 
-	// register sounds
-	engine.GetSoundManager().RegisterSound(gResourcePath + "footstep_grass_003.ogg", "land");
-	engine.GetSoundManager().RegisterSound(gResourcePath + "sfx_jump.ogg", "jump");
-	engine.GetSoundManager().RegisterSound(gResourcePath + "footstep_snow_001.ogg", "wall_push");
-	engine.GetSoundManager().RegisterSound(gResourcePath + "sfx_gem.ogg", "star_collect");
+		// register sounds
+		engine.GetSoundManager().RegisterSound(gResourcePath + "footstep_grass_003.ogg", "land");
+		engine.GetSoundManager().RegisterSound(gResourcePath + "sfx_jump.ogg", "jump");
+		engine.GetSoundManager().RegisterSound(gResourcePath + "footstep_snow_001.ogg", "wall_push");
+		engine.GetSoundManager().RegisterSound(gResourcePath + "sfx_gem.ogg", "star_collect");
+	}
 }
 
 int main(int argc, char *argv[])
