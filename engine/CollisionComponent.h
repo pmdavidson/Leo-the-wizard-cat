@@ -20,11 +20,11 @@ namespace ECSEngine
         CollisionFlags collidedSides;
         Rect currentBounds;
         Rect previousBounds;
-        bool isStatic = false;
+        bool isStatic = true;
 
         CollisionComponent() = default;
 
-        CollisionComponent(const Rect& bounds, bool isStatic = false)
+        CollisionComponent(const Rect& bounds, bool isStatic = true)
             : currentBounds(bounds),
             previousBounds(bounds),
             isStatic(isStatic) {}

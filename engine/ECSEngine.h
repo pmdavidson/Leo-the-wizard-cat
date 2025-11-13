@@ -548,11 +548,12 @@ namespace ECSEngine
 				continue;
 			EntityID idA = entityA.getID();
 
-			if (!entityManager.template HasComponent<CollisionComponent>(idA))
+			if (!entityManager.template HasComponent<CollisionComponent>(idA) ||
+				!entityManager.template HasComponent<LocationComponent>(idA))
 				continue;
+
 			auto &colA = entityManager.template GetComponent<CollisionComponent>(idA);
-			if (colA.isStatic)
-				continue;
+			auto &LocA = entityManager.template GetComponent<LocationComponent>(idA);
 
 			colA.collidedSides = {};
 
@@ -563,16 +564,37 @@ namespace ECSEngine
 					continue;
 				EntityID idB = entityB.getID();
 
-				if (!entityManager.template HasComponent<CollisionComponent>(idB))
+				if (!entityManager.template HasComponent<CollisionComponent>(idB) ||
+					!entityManager.template HasComponent<LocationComponent>(idB))
 					continue;
+
 				auto &colB = entityManager.template GetComponent<CollisionComponent>(idB);
+				auto &LocB = entityManager.template GetComponent<LocationComponent>(idB);
 
-				if (!colA.currentBounds.intersects(colB.currentBounds))
+				if (colA.isStatic && colB.isStatic)
 					continue;
 
-				ResolveAABBCollision(colA.currentBounds, colB.currentBounds, colA.collidedSides);
+				colB.collidedSides = {};
 
-				// Check if player hit a solid object (works for both idA=player/idB=static and idB=player/idA=static)
+				Rect BoundsA(LocA.position + colA.currentBounds.topLeft, colA.currentBounds.width, colA.currentBounds.height);
+				Rect BoundsB(LocB.position + colB.currentBounds.topLeft, colB.currentBounds.width, colB.currentBounds.height);
+
+				if (!BoundsA.intersects(BoundsB))
+					continue;
+
+				// if B is static then A is a star/player, and vice-versa
+				if (colB.isStatic)
+				{
+					ResolveAABBCollision(BoundsA, BoundsB, colA.collidedSides, colB.collidedSides);
+					LocA.position = BoundsA.topLeft - colA.currentBounds.topLeft;
+				}
+				else if (colA.isStatic)
+				{
+					ResolveAABBCollision(BoundsB, BoundsA, colB.collidedSides, colA.collidedSides);
+					LocB.position = BoundsB.topLeft - colB.currentBounds.topLeft;
+				}
+
+				// Check if player (idA) hit a solid object (idB)
 				if (entityManager.template HasComponent<InputComponent>(idA) && colB.isStatic)
 				{
 					playerCollisionCheck(idA, colA.collidedSides);
@@ -1040,35 +1062,74 @@ namespace ECSEngine
 			}
 		}
 	}
-
-	inline void ResolveAABBCollision(Rect &a, const Rect &b, CollisionFlags &flags)
+	inline void ResolveAABBCollision(Rect &a, const Rect &b, CollisionFlags &flagsA, CollisionFlags &flagsB)
 	{
 		Point2D overlap = GetOverlap(a, b);
-		if (overlap.x < overlap.y)
+
+		if (overlap.x <= 0.0f || overlap.y <= 0.0f)
+			return; // no real overlap
+
+		// Resolve Y-axis
+		if (a.topLeft.y < b.topLeft.y)
 		{
-			if (a.topLeft.x < b.topLeft.x)
-			{
-				a.topLeft.x -= overlap.x;
-				flags.right = true;
-			}
-			else
-			{
-				a.topLeft.x += overlap.x;
-				flags.left = true;
-			}
+			a.topLeft.y -= overlap.y;
+			flagsA.bottom = true;
+			flagsB.top = true;
 		}
 		else
 		{
-			if (a.topLeft.y < b.topLeft.y)
-			{
-				a.topLeft.y -= overlap.y;
-				flags.bottom = true;
-			}
-			else
-			{
-				a.topLeft.y += overlap.y;
-				flags.top = true;
-			}
+			a.topLeft.y += overlap.y;
+			flagsA.top = true;
+			flagsB.bottom = true;
+		}
+
+		// Resolve X-axis
+		if (a.topLeft.x < b.topLeft.x)
+		{
+			a.topLeft.x -= overlap.x;
+			flagsA.right = true;
+			flagsB.left = true;
+		}
+		else
+		{
+			a.topLeft.x += overlap.x;
+			flagsA.left = true;
+			flagsB.right = true;
 		}
 	}
+
+	// inline void ResolveAABBCollision(Rect &a, const Rect &b, CollisionFlags &flagsA, CollisionFlags &flagsB)
+	// {
+	// 	Point2D overlap = GetOverlap(a, b);
+	// 	if (overlap.x < overlap.y)
+	// 	{
+	// 		if (a.topLeft.x < b.topLeft.x)
+	// 		{
+	// 			a.topLeft.x -= overlap.x;
+	// 			flagsA.right = true;
+	// 			flagsB.left = true;
+	// 		}
+	// 		else
+	// 		{
+	// 			a.topLeft.x += overlap.x;
+	// 			flagsA.left = true;
+	// 			flagsB.left = true;
+	// 		}
+	// 	}
+	// 	else
+	// 	{
+	// 		if (a.topLeft.y < b.topLeft.y)
+	// 		{
+	// 			a.topLeft.y -= overlap.y;
+	// 			flagsA.bottom = true;
+	// 			flagsB.top = true;
+	// 		}
+	// 		else
+	// 		{
+	// 			a.topLeft.y += overlap.y;
+	// 			flagsA.top = true;
+	// 			flagsB.bottom = true;
+	// 		}
+	// 	}
+	// }
 }
