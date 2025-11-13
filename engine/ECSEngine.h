@@ -572,18 +572,32 @@ namespace ECSEngine
 
 				ResolveAABBCollision(colA.currentBounds, colB.currentBounds, colA.collidedSides);
 
-				// Check if player (idA) hit a solid object (idB)
+				// Check if player hit a solid object (works for both idA=player/idB=static and idB=player/idA=static)
 				if (entityManager.template HasComponent<InputComponent>(idA) && colB.isStatic)
 				{
 					playerCollisionCheck(idA, colA.collidedSides);
 				}
+				if (entityManager.template HasComponent<InputComponent>(idB) && colA.isStatic)
+				{
+					playerCollisionCheck(idB, colB.collidedSides);
+				}
 
-				// Check if player (idA) collected a star (idB)
+				// Check if player collected a star (works for both idA=player/idB=star and idB=player/idA=star)
 				// Stars have GravityComponent and CollisionComponent but not InputComponent
-				if (entityManager.template HasComponent<InputComponent>(idA) &&
-					!entityManager.template HasComponent<InputComponent>(idB) &&
-					entityManager.template HasComponent<GravityComponent>(idB) &&
-					entityManager.template HasComponent<CollisionComponent>(idB))
+				bool isPlayerA = entityManager.template HasComponent<InputComponent>(idA);
+				bool isPlayerB = entityManager.template HasComponent<InputComponent>(idB);
+				bool isStarA = !isPlayerA &&
+							   entityManager.template HasComponent<GravityComponent>(idA) &&
+							   entityManager.template HasComponent<CollisionComponent>(idA);
+				bool isStarB = !isPlayerB &&
+							   entityManager.template HasComponent<GravityComponent>(idB) &&
+							   entityManager.template HasComponent<CollisionComponent>(idB);
+
+				// Track if we removed an entity (to skip collision handling for removed entities)
+				bool removedA = false;
+				bool removedB = false;
+
+				if ((isPlayerA && isStarB) || (isPlayerB && isStarA))
 				{
 					// Play collection sound
 					mSoundManager.PlaySound("star_collect");
@@ -601,16 +615,20 @@ namespace ECSEngine
 					}
 
 					// Remove the star entity
-					entityManager.RemoveEntity(idB);
+					if (isStarA)
+					{
+						entityManager.RemoveEntity(idA);
+						removedA = true;
+					}
+					else
+					{
+						entityManager.RemoveEntity(idB);
+						removedB = true;
+					}
 				}
 
 				// Handle star collisions
-				// Check if idA is a star (has GravityComponent and CollisionComponent but not InputComponent)
-				bool isStarA = !entityManager.template HasComponent<InputComponent>(idA) &&
-							   entityManager.template HasComponent<GravityComponent>(idA) &&
-							   entityManager.template HasComponent<CollisionComponent>(idA);
-
-				if (isStarA && entityManager.template HasComponent<MovementComponent>(idA))
+				if (!removedA && isStarA && entityManager.template HasComponent<MovementComponent>(idA))
 				{
 					auto &movementCompA = entityManager.template GetComponent<MovementComponent>(idA);
 
@@ -632,9 +650,7 @@ namespace ECSEngine
 						}
 					}
 					// Star vs star: lose all momentum
-					else if (!entityManager.template HasComponent<InputComponent>(idB) &&
-							 entityManager.template HasComponent<GravityComponent>(idB) &&
-							 entityManager.template HasComponent<CollisionComponent>(idB))
+					else if (!removedB && isStarB)
 					{
 						// Lose all spd
 						movementCompA.velocity.x = 0.0f;
@@ -646,6 +662,44 @@ namespace ECSEngine
 							auto &movementCompB = entityManager.template GetComponent<MovementComponent>(idB);
 							movementCompB.velocity.x = 0.0f;
 							movementCompB.velocity.y = 0.0f;
+						}
+					}
+				}
+				// Also handle case where idB is a star
+				else if (!removedB && isStarB && entityManager.template HasComponent<MovementComponent>(idB))
+				{
+					auto &movementCompB = entityManager.template GetComponent<MovementComponent>(idB);
+
+					// Star vs static object: bounce and lose speed
+					if (colA.isStatic)
+					{
+						// Bounce off the surface and reduce velocity
+						float speedLossFactor = 0.5f; // lose 1/2 spd
+
+						if (colB.collidedSides.left || colB.collidedSides.right)
+						{
+							// Hit left or right wall, reverse horizontal velocity and reduce
+							movementCompB.velocity.x = -movementCompB.velocity.x * speedLossFactor;
+						}
+						if (colB.collidedSides.top || colB.collidedSides.bottom)
+						{
+							// Hit top or bottom, reverse vertical velocity and reduce
+							movementCompB.velocity.y = -movementCompB.velocity.y * speedLossFactor;
+						}
+					}
+					// Star vs star: lose all momentum
+					else if (!removedA && isStarA)
+					{
+						// Lose all spd
+						movementCompB.velocity.x = 0.0f;
+						movementCompB.velocity.y = 0.0f;
+
+						// Other star loses all spd
+						if (entityManager.template HasComponent<MovementComponent>(idA))
+						{
+							auto &movementCompA = entityManager.template GetComponent<MovementComponent>(idA);
+							movementCompA.velocity.x = 0.0f;
+							movementCompA.velocity.y = 0.0f;
 						}
 					}
 				}
@@ -691,7 +745,9 @@ namespace ECSEngine
 	template <typename... Components>
 	void ECSEngine<Components...>::CameraSystem()
 	{
-		// Follows the player, wip
+		// Zone-based camera system with dead zones and tracking zones
+		float deltaTime = 1.0f / 60.0f; // assuming 60FPS
+
 		for (auto it = mEntityManager.begin(); it != mEntityManager.end(); ++it)
 		{
 			if (!it->isActive())
@@ -703,7 +759,7 @@ namespace ECSEngine
 				auto &cameraFollower = mEntityManager.template GetComponent<CameraFollower>(entityId);
 				EntityID trackedEntityId = cameraFollower.entityId;
 
-				// Find camera entity 
+				// Find camera entity
 				for (auto camIt = mEntityManager.begin(); camIt != mEntityManager.end(); ++camIt)
 				{
 					if (!camIt->isActive())
@@ -714,14 +770,132 @@ namespace ECSEngine
 					{
 						auto &cameraComp = mEntityManager.template GetComponent<CameraComponent>(camEntityId);
 
-						// Get tracked entity's location
+						// Get tracked entity's location and movement
 						if (mEntityManager.template HasComponent<LocationComponent>(trackedEntityId))
 						{
 							auto &trackedLocation = mEntityManager.template GetComponent<LocationComponent>(trackedEntityId);
 
-							// Simple direct following - camera position matches player position
-							cameraComp.position.x = trackedLocation.position.x;
-							cameraComp.position.y = trackedLocation.position.y;
+							// Get window size
+							sf::RenderWindow *window = mWindowManager.GetWindow();
+							sf::Vector2u windowSize = window->getSize();
+							float windowWidth = static_cast<float>(windowSize.x);
+
+							float playerWindowX = (trackedLocation.position.x - cameraComp.position.x) / cameraComp.scale + windowWidth * 0.5f;
+
+							// Calculate player's position as percentage of window width (0.0 to 1.0)
+							float playerXPercent = playerWindowX / windowWidth;
+
+							// Check if player is moving
+							bool isMoving = false;
+							if (mEntityManager.template HasComponent<MovementComponent>(trackedEntityId))
+							{
+								auto &movementComp = mEntityManager.template GetComponent<MovementComponent>(trackedEntityId);
+								isMoving = std::abs(movementComp.velocity.x) > 0.1f; // Small threshold for "stopped"
+							}
+
+							// Calculate target camera X position
+							float targetCameraX = cameraComp.position.x;
+							float trackingSpeed = 0.0f; // Interpolation speed (0 = instant, higher = slower)
+
+							// Determine which zone player is in and calculate target camera position
+							if (playerXPercent < 0.1f)
+							{
+								// Left outer 10%
+								targetCameraX = trackedLocation.position.x - (windowWidth * 0.1f - windowWidth * 0.5f) * cameraComp.scale;
+								trackingSpeed = 0.0f; // Instant follow
+							}
+							else if (playerXPercent > 0.9f)
+							{
+								// Right outer 10%
+								targetCameraX = trackedLocation.position.x - (windowWidth * 0.9f - windowWidth * 0.5f) * cameraComp.scale;
+								trackingSpeed = 0.0f; // Instant follow
+							}
+							else if (playerXPercent < 0.3f)
+							{
+								// Left 10-30% zone
+								targetCameraX = trackedLocation.position.x - (windowWidth * 0.3f - windowWidth * 0.5f) * cameraComp.scale;
+								trackingSpeed = 5.0f; // Tuneable: higher = slower tracking
+							}
+							else if (playerXPercent > 0.7f)
+							{
+								// Right 10-30% zone
+								targetCameraX = trackedLocation.position.x - (windowWidth * 0.7f - windowWidth * 0.5f) * cameraComp.scale;
+								trackingSpeed = 5.0f; // Tuneable: higher = slower tracking
+							}
+							else
+							{
+								// Center 40%
+								if (!isMoving)
+								{
+									// Check if player is outside center 40% and adjust toward center
+									float centerWindowX = windowWidth * 0.5f;
+									float distanceFromCenter = playerWindowX - centerWindowX;
+
+									// If outside center 40%, move toward center
+									if (std::abs(distanceFromCenter) > windowWidth * 0.2f) // 20% from center = edge of 40% zone
+									{
+										// Target: playerWindowX = windowWidth * 0.5 (center)
+										targetCameraX = trackedLocation.position.x - (windowWidth * 0.5f - windowWidth * 0.5f) * cameraComp.scale;
+										targetCameraX = trackedLocation.position.x;
+										trackingSpeed = 3.0f; // Slower adjustment when stopped
+									}
+									else
+									{
+										// Player is in center 40%, no adjustment needed
+										targetCameraX = cameraComp.position.x;
+									}
+								}
+								else
+								{
+									// If moving and in dead zone, no camera movement
+									targetCameraX = cameraComp.position.x;
+								}
+							}
+
+							// Apply camera adjustment with interpolation
+							float cameraDeltaX = targetCameraX - cameraComp.position.x;
+							if (std::abs(cameraDeltaX) > 0.01f) // Small threshold to prevent jitter
+							{
+								if (trackingSpeed == 0.0f)
+								{
+									// Instant follow
+									cameraComp.position.x = targetCameraX;
+								}
+								else
+								{
+									// Smooth interpolation using exponential moving average
+									float lerpFactor = 1.0f - std::exp(-trackingSpeed * deltaTime);
+									cameraComp.position.x += cameraDeltaX * lerpFactor;
+								}
+							}
+
+							// Camera Y stays fixed at level position
+							const float levelY = 512.0f;
+							cameraComp.position.y = levelY;
+
+							// Apply camera shake if present
+							if (mEntityManager.template HasComponent<CameraShake>(camEntityId))
+							{
+								auto &shake = mEntityManager.template GetComponent<CameraShake>(camEntityId);
+
+								// Apply random shake offset
+								static std::random_device rd;
+								static std::mt19937 gen(rd());
+								std::uniform_real_distribution<float> shakeDist(-1.0f, 1.0f);
+
+								float shakeX = shakeDist(gen) * shake.magnitude.x;
+								float shakeY = shakeDist(gen) * shake.magnitude.y;
+
+								cameraComp.position.x += shakeX;
+								cameraComp.position.y += shakeY;
+
+								// Decrement frames remaining
+								shake.framesRemaining--;
+								if (shake.framesRemaining <= 0)
+								{
+									mEntityManager.template RemoveComponent<CameraShake>(camEntityId);
+								}
+							}
 
 							// Update WindowManager camera
 							mWindowManager.SetCamera(cameraComp.position);
@@ -808,18 +982,17 @@ namespace ECSEngine
 					{
 						auto &spawnerLocation = mEntityManager.template GetComponent<LocationComponent>(entityId);
 
-						// Get sprite bounds from sprite manager for sprite rendering
+						// Get sprite size from sprite manager for sprite rendering
 						auto &spriteManager = GetSpriteManager();
 						sf::Sprite &sprite = spriteManager.GetSprite(spawnComp.spriteId);
 						sf::IntRect textureRect = sprite.getTextureRect();
 
-						// Convert sf::IntRect to Rect for sprite bounds
-						const sf::IntRect &r = textureRect;
+						// Sprite bounds should be relative to entity position (0, 0), not texture coordinates
 						Rect spriteBounds(
-							static_cast<float>(r.position.x),
-							static_cast<float>(r.position.y),
-							static_cast<float>(r.size.x),
-							static_cast<float>(r.size.y));
+							0.0f,
+							0.0f,
+							static_cast<float>(textureRect.size.x),
+							static_cast<float>(textureRect.size.y));
 
 						// Create AABB bounds using tileW and tileH from SpawnComponent
 						Rect collisionBounds = {0.0f, 0.0f, spawnComp.tileW, spawnComp.tileH};

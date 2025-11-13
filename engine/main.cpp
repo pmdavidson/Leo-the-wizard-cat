@@ -94,6 +94,10 @@ void LoadMap(const std::string &path, EngineType &engine, const std::string &res
 		ss >> dummy >> mapW >> mapH;
 	}
 
+	// Register star sprite
+	SpriteID starSpriteId = engine.GetSpriteManager().RegisterTexture(
+		resourceRoot + "spritesheet-tiles-default.png", ECSEngine::Rect(640.f, 320.f, 64.f, 64.f));
+
 	// Parse map rows
 	for (int y = 0; y < mapH; ++y)
 	{
@@ -132,7 +136,7 @@ void LoadMap(const std::string &path, EngineType &engine, const std::string &res
 			// Spawner
 			if (tile == 'S')
 			{
-				engine.GetEntityManager().template AddComponent<ECSEngine::SpawnComponent>(id, {id, "star", spriteId, 2.f, 2.f, 10, static_cast<float>(tileW), static_cast<float>(tileH)});
+				engine.GetEntityManager().template AddComponent<ECSEngine::SpawnComponent>(id, {id, "star", starSpriteId, 10.f, 10.f, 10, static_cast<float>(tileW), static_cast<float>(tileH)});
 			}
 		}
 	}
