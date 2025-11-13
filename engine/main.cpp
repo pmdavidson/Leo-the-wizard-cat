@@ -158,6 +158,13 @@ void LoadMap(const std::string &path, EngineType &engine, const std::string &res
 	engine.GetEntityManager().template AddComponent<ECSEngine::CollisionComponent>(player, {ECSEngine::Rect(0.f, 0.f, 64, 64), false});
 	engine.GetEntityManager().template AddComponent<ECSEngine::SpriteComponent>(player, {playerSpriteId, ECSEngine::Rect(0.f, 0.f, 64, 64), true});
 
+	// Create camera entity that follows the player
+	EntityId camera = engine.GetEntityManager().CreateEntity("camera");
+	ECSEngine::CameraComponent cameraComp;
+	cameraComp.position = ECSEngine::Point2D(spawnX, spawnY);
+	cameraComp.scale = 1.0f;
+	engine.GetEntityManager().template AddComponent<ECSEngine::CameraComponent>(camera, cameraComp);
+
 	// register sounds
 	engine.GetSoundManager().RegisterSound(gResourcePath + "footstep_grass_003.ogg", "land");
 	engine.GetSoundManager().RegisterSound(gResourcePath + "sfx_jump.ogg", "jump");

@@ -691,9 +691,7 @@ namespace ECSEngine
 	template <typename... Components>
 	void ECSEngine<Components...>::CameraSystem()
 	{
-		float deltaTime = 1.0f / 60.0f;
-
-		// Update camera position based on CameraFollower
+		// Follows the player, wip
 		for (auto it = mEntityManager.begin(); it != mEntityManager.end(); ++it)
 		{
 			if (!it->isActive())
@@ -705,7 +703,7 @@ namespace ECSEngine
 				auto &cameraFollower = mEntityManager.template GetComponent<CameraFollower>(entityId);
 				EntityID trackedEntityId = cameraFollower.entityId;
 
-				// Find camera entity (entity with CameraComponent)
+				// Find camera entity 
 				for (auto camIt = mEntityManager.begin(); camIt != mEntityManager.end(); ++camIt)
 				{
 					if (!camIt->isActive())
@@ -721,79 +719,9 @@ namespace ECSEngine
 						{
 							auto &trackedLocation = mEntityManager.template GetComponent<LocationComponent>(trackedEntityId);
 
-							// Get window dimensions
-							sf::RenderWindow *window = mWindowManager.GetWindow();
-							unsigned int windowWidth = window->getSize().x;
-							unsigned int windowHeight = window->getSize().y;
-
-							// Convert player world position to window position
-							Point2D playerWindowPos = mWindowManager.WorldToWindow(trackedLocation.position);
-
-							// Calculate zones (10%, 30%, 40% center)
-							float left10 = windowWidth * 0.1f;
-							float left30 = windowWidth * 0.3f;
-							float right30 = windowWidth * 0.7f;
-							float right10 = windowWidth * 0.9f;
-							float center40Left = windowWidth * 0.3f;
-							float center40Right = windowWidth * 0.7f;
-
-							// Camera follows player in X, fixed Y
-							float targetCameraX = cameraComp.position.x;
-							float targetCameraY = cameraComp.position.y; // Fixed Y
-
-							// Check which zone player is in
-							if (playerWindowPos.x < left10 || playerWindowPos.x > right10)
-							{
-								// Hardzone, left/right 10%
-								targetCameraX = trackedLocation.position.x;
-							}
-							else if (playerWindowPos.x < left30 || playerWindowPos.x > right30)
-							{
-								// Softzone, left/right 30%
-								float tweenSpeed = 5.0f;
-								float desiredX = trackedLocation.position.x;
-								float diff = desiredX - cameraComp.position.x;
-								targetCameraX = cameraComp.position.x + diff * tweenSpeed * deltaTime;
-							}
-							else
-							{
-								// Deadzone, center 40%
-								float desiredX = trackedLocation.position.x;
-								float diff = desiredX - cameraComp.position.x;
-								float tweenSpeed = 3.0f;
-								targetCameraX = cameraComp.position.x + diff * tweenSpeed * deltaTime;
-							}
-
-							cameraComp.position.x = targetCameraX;
-
-							// Apply camera shake if present
-							if (mEntityManager.template HasComponent<CameraShake>(camEntityId))
-							{
-								auto &shakeComp = mEntityManager.template GetComponent<CameraShake>(camEntityId);
-
-								if (shakeComp.framesRemaining > 0)
-								{
-									// Apply random shake offset
-									static std::random_device rd;
-									static std::mt19937 gen(rd());
-									std::uniform_real_distribution<float> shakeDist(-1.0f, 1.0f);
-
-									float shakeX = shakeComp.magnitude.x * shakeDist(gen);
-									float shakeY = shakeComp.magnitude.y * shakeDist(gen);
-
-									cameraComp.position.x += shakeX;
-									cameraComp.position.y += shakeY;
-
-									shakeComp.framesRemaining--;
-
-									// Remove shake component when done
-									if (shakeComp.framesRemaining <= 0)
-									{
-										// Component will be removed in next frame
-									}
-									// If EntityManager. //is this missing something?
-								}
-							}
+							// Simple direct following - camera position matches player position
+							cameraComp.position.x = trackedLocation.position.x;
+							cameraComp.position.y = trackedLocation.position.y;
 
 							// Update WindowManager camera
 							mWindowManager.SetCamera(cameraComp.position);
