@@ -129,7 +129,6 @@ void LoadMap(const std::string &path, EngineType &engine, const std::string &res
 			engine.GetEntityManager().template AddComponent<ECSEngine::SpriteComponent>(id, {
 				spriteId, FromSFML(entry.boundsRect), true
 			}); //cast entry.boundsRect from IntRect to Rect? causse sprite and collision component constructor takes Rect
->>>>>>> 22229c09a98d4001081ea029ad2991fdb6fdc2a9
 
 			if (entry.hasCollision) {
 				engine.GetEntityManager().template AddComponent<ECSEngine::CollisionComponent>(id, ECSEngine::CollisionComponent(
@@ -137,14 +136,8 @@ void LoadMap(const std::string &path, EngineType &engine, const std::string &res
 				);
 			}
 
-<<<<<<< HEAD
-			// Spawner
-			if (tile == 'S')
-			{
-=======
 			//Spawner
 			if (tile == 'S') {
->>>>>>> 22229c09a98d4001081ea029ad2991fdb6fdc2a9
 				engine.GetEntityManager().template AddComponent<ECSEngine::SpawnComponent>(id, {id, "star", spriteId, 2.f, 2.f, 10, static_cast<float>(tileW), static_cast<float>(tileH)});
 			}
 
