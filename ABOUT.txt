@@ -64,6 +64,8 @@ use static variables for jump state tracking so its easier to keep track of over
 Delta time is currently fixed at 1/60 seconds, assuming a stable 60 FPS frame rate. This provides a consistent time step for updates, 
 ensuring that gravity and acceleration calculations do not rely on frame rate so we can avoid 
 the game being buggy at higher or lower framerates.
+For collision detection, we decided to use tileW and tileH from SpawnComponent to create AABB bounds 
+for an easy work around.
 
 Group A: Peter
 Group B: Eric

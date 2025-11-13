@@ -23,24 +23,60 @@
 namespace ECSEngine
 {
 
+	/**
+	 * @brief Main ECS engine class that manages all systems and resources.
+	 *
+	 * @tparam Components The component types that can be attached to entities.
+	 */
 	template <typename... Components>
 	class ECSEngine
 	{
 	public:
+		/**
+		 * @brief Constructs the ECS engine and initializes the window.
+		 *
+		 * @param width Width of the render window in pixels.
+		 * @param height Height of the render window in pixels.
+		 * @param name Title of the render window.
+		 */
 		ECSEngine(unsigned int width, unsigned int height, const std::string &name);
 
+		/**
+		 * @brief Runs the main game loop until the window is closed.
+		 */
 		void Run();
 
+		/**
+		 * @brief Gets a reference to the SoundManager.
+		 *
+		 * @return SoundManager& Reference to the SoundManager instance.
+		 *
+		 * @note The returned reference is valid for the lifetime of the ECSEngine instance.
+		 */
 		SoundManager &GetSoundManager()
 		{
 			return mSoundManager;
 		}
 
+		/**
+		 * @brief Gets a reference to the SpriteManager.
+		 *
+		 * @return SpriteManager& Reference to the SpriteManager instance.
+		 *
+		 * @note The returned reference is valid for the lifetime of the ECSEngine instance.
+		 */
 		SpriteManager &GetSpriteManager()
 		{
 			return mSpriteManager;
 		}
 
+		/**
+		 * @brief Gets a reference to the EntityManager.
+		 *
+		 * @return EntityManager<Components...>& Reference to the EntityManager instance.
+		 *
+		 * @note The returned reference is valid for the lifetime of the ECSEngine instance.
+		 */
 		EntityManager<Components...> &GetEntityManager()
 		{
 			return mEntityManager;
@@ -141,7 +177,7 @@ namespace ECSEngine
 	template <typename... Components>
 	void ECSEngine<Components...>::Run()
 	{
-		sf::RenderWindow *window = mWindowManager.GetWindow(); // add GetWindow at the top?
+		sf::RenderWindow *window = mWindowManager.GetWindow();
 
 		// Main game loop
 		while (window->isOpen())
@@ -309,7 +345,7 @@ namespace ECSEngine
 						recentlyJumped[entityId] = false; // Clear the flag
 					}
 
-					// Play wall push sound when pushing against wall while falling (not just wall jumping)
+					// Play wall push sound when pushing against wall while falling
 					static std::unordered_map<EntityID, bool> wasPushingWall;
 					if ((onWallLeft || onWallRight) && wasFalling && !onGround)
 					{
@@ -446,7 +482,7 @@ namespace ECSEngine
 				}
 
 				// Apply gravity, reduced if sliding on wall
-				float gravityMultiplier = onWallWhileFalling ? 0.3f : 1.0f; // 30% of normal gravity when on wall
+				float gravityMultiplier = onWallWhileFalling ? 0.3f : 1.0f;
 				movementComp.velocity += gravityComp.acceleration * deltaTime * gravityMultiplier;
 			}
 		}
@@ -490,7 +526,6 @@ namespace ECSEngine
 					auto &collisionComp = mEntityManager.template GetComponent<CollisionComponent>(entityId);
 					if (!collisionComp.isStatic)
 					{
-						// Update collision bounds to match entity position (assuming 32x32 collision box centered)
 						collisionComp.currentBounds.topLeft.x = locationComp.position.x + 16;
 						collisionComp.currentBounds.topLeft.y = locationComp.position.y + 16;
 					}
@@ -671,7 +706,8 @@ namespace ECSEngine
 				// Find camera entity (entity with CameraComponent)
 				for (auto camIt = mEntityManager.begin(); camIt != mEntityManager.end(); ++camIt)
 				{
-					EntityID camEntityId = std::distance(mEntityManager.begin(), camIt);
+					if (!camIt->isActive()) continue;
+					EntityID camEntityId = camIt->getID();
 
 					if (mEntityManager.template HasComponent<CameraComponent>(camEntityId))
 					{
@@ -705,11 +741,12 @@ namespace ECSEngine
 							// Check which zone player is in
 							if (playerWindowPos.x < left10 || playerWindowPos.x > right10)
 							{
-								// hardzone
+								// Hardzone, left/right 10% 
 								targetCameraX = trackedLocation.position.x;
 							}
 							else if (playerWindowPos.x < left30 || playerWindowPos.x > right30)
 							{
+								// Softzone, left/right 30% 
 								float tweenSpeed = 5.0f;
 								float desiredX = trackedLocation.position.x;
 								float diff = desiredX - cameraComp.position.x;
@@ -717,6 +754,7 @@ namespace ECSEngine
 							}
 							else
 							{
+								// Deadzone, center 40%
 								float desiredX = trackedLocation.position.x;
 								float diff = desiredX - cameraComp.position.x;
 								float tweenSpeed = 3.0f;

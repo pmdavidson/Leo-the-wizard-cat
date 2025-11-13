@@ -76,12 +76,12 @@ void LoadMap(const std::string &path, EngineType &engine, const std::string &res
 		ss >> dummy >> mapW >> mapH;
 	}
 
-	ECSEngine::Rect FromSFML(const sf::IntRect& r) {
+	ECSEngine::Rect FromSFML(const sf::IntRect &r)
+	{
 		return {
-			{ static_cast<float>(r.left), static_cast<float>(r.top) },
+			{static_cast<float>(r.left), static_cast<float>(r.top)},
 			static_cast<float>(r.width),
-			static_cast<float>(r.height)
-		};
+			static_cast<float>(r.height)};
 	}
 
 	// Parse map rows
@@ -107,39 +107,18 @@ void LoadMap(const std::string &path, EngineType &engine, const std::string &res
 			auto spriteId = engine.GetSpriteManager().RegisterTexture(
 				resourceRoot + entry.texturePath, entry.sourceRect);
 
-<<<<<<< HEAD
-			// move outside?
-			ECSEngine::Rect FromSFML(const sf::IntRect &r)
-			{
-				return {
-					{static_cast<float>(r.left), static_cast<float>(r.top)},
-					static_cast<float>(r.width),
-					static_cast<float>(r.height)};
-			}
-
-			engine.GetEntityManager().template AddComponent<ECSEngine::SpriteComponent>(id, {id, FromSFML(entry.boundsRect), true}); // cast entry.boundsRect from IntRect to Rect? causse sprite and collision component constructor takes Rect
-=======
-			engine.GetEntityManager().template AddComponent<ECSEngine::SpriteComponent>(id, {
-				spriteId, FromSFML(entry.boundsRect), true
-			}); //cast entry.boundsRect from IntRect to Rect? causse sprite and collision component constructor takes Rect
->>>>>>> 22229c09a98d4001081ea029ad2991fdb6fdc2a9
+			engine.GetEntityManager().template AddComponent<ECSEngine::SpriteComponent>(id, {spriteId, FromSFML(entry.boundsRect), true}); // cast entry.boundsRect from IntRect to Rect? causse sprite and collision component constructor takes Rect
 
 			if (entry.hasCollision)
 			{
 				engine.GetEntityManager().template AddComponent<ECSEngine::CollisionComponent>(id, {false, {}, FromSFML(entry.boundsRect), entry.boundsRect});
 			}
 
-<<<<<<< HEAD
 			// Spawner
 			if (tile == 'S')
 			{
-=======
-			//Spawner
-			if (tile == 'S') {
->>>>>>> 22229c09a98d4001081ea029ad2991fdb6fdc2a9
 				engine.GetEntityManager().template AddComponent<ECSEngine::SpawnComponent>(id, {id, "star", spriteId, 2.f, 2.f, 10, static_cast<float>(tileW), static_cast<float>(tileH)});
 			}
-
 		}
 	}
 
@@ -162,8 +141,7 @@ void LoadMap(const std::string &path, EngineType &engine, const std::string &res
 	engine.GetEntityManager().AddComponent<CameraFollower>(player, {player});
 	engine.GetEntityManager().AddComponent<ScoreComponent>(player, {});
 	engine.GetEntityManager().AddComponent<CollisionComponent>(player, {ECSEngine::Rect(0.f, 0.f, 64, 64), false});
-	engine.GetEntityManager().AddComponent<SpriteComponent>(player, {playerSpriteId, ECSEngine::Rect(0.f, 0.f, 64, 64), true });
-
+	engine.GetEntityManager().AddComponent<SpriteComponent>(player, {playerSpriteId, ECSEngine::Rect(0.f, 0.f, 64, 64), true});
 }
 
 int main(int argc, char *argv[])
@@ -171,7 +149,8 @@ int main(int argc, char *argv[])
 	std::string gResourcePath = "../assets/";
 	bool debugMode = false;
 
-	if (argc >= 3 && argv[1] == std::string("-path")) {
+	if (argc >= 3 && argv[1] == std::string("-path"))
+	{
 		gResourcePath = argv[2];
 	}
 	std::cout << "Usage: " << argv[0] << " [-path resource_path]\n";
@@ -205,8 +184,8 @@ int main(int argc, char *argv[])
 		ECSEngine::InputComponent,
 		ECSEngine::GravityComponent,
 		ECSEngine::CameraShake,
-		ECSEngine::ScoreComponent
-	> engine(1024, 768, "Test Engine");
+		ECSEngine::ScoreComponent>
+		engine(1024, 768, "Test Engine");
 
 	// Load maps (order matters: sky → world)
 	LoadMap("maps/sky.map", engine, gResourcePath);

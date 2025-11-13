@@ -14,7 +14,16 @@ class ComponentStorage {
 public:
     ComponentStorage() = default;
 
-    // Store a component for an entity, reusing free slots when possible.
+    /**
+     * @brief Store a component for an entity, reusing free slots when possible.
+     *
+     * @tparam U The component type (must be T or convertible to T).
+     * @param entity The EntityID of the entity.
+     * @param value The component value to store.
+     * @return size_t The index where the component is stored.
+     *
+     * @note If this entity already has a component, it will be replaced.
+     */
     template <typename U>
     size_t Store(EntityID entity, U&& value) {
         // If this entity already has a component, replace it.
@@ -41,7 +50,11 @@ public:
         return idx;
     }
 
-    // Remove a component belonging to an entity.
+    /**
+     * @brief Remove a component belonging to an entity.
+     *
+     * @param entity The EntityID of the entity.
+     */
     void Remove(EntityID entity) {
         if (!mEntityToIndex.contains(entity)) return;
         size_t idx = mEntityToIndex[entity];
@@ -51,17 +64,37 @@ public:
         mStorage[idx] = T{};
     }
 
-    // Check if an entity has a component.
+    /**
+     * @brief Check if an entity has a component.
+     *
+     * @param entity The EntityID of the entity.
+     * @return bool True if the entity has a component, false otherwise.
+     */
     bool Valid(EntityID entity) const {
         return mEntityToIndex.contains(entity) && mValid[mEntityToIndex.at(entity)];
     }
 
-    // Get component by entity.
+    /**
+     * @brief Get component by entity.
+     *
+     * @param entity The EntityID of the entity.
+     * @return T& Reference to the component.
+     *
+     * @warning The entity must have a component. Use Valid() to check first.
+     */
     T& Get(EntityID entity) {
         assert(Valid(entity));
         return mStorage[mEntityToIndex.at(entity)];
     }
 
+    /**
+     * @brief Get component by entity (const version).
+     *
+     * @param entity The EntityID of the entity.
+     * @return const T& Const reference to the component.
+     *
+     * @warning The entity must have a component. Use Valid() to check first.
+     */
     const T& Get(EntityID entity) const {
         assert(Valid(entity));
         return mStorage[mEntityToIndex.at(entity)];
