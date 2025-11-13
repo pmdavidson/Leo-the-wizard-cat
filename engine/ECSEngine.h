@@ -106,7 +106,7 @@ namespace ECSEngine
 				// Calculate camera shake magnitude using velocity
 				float velocityMagnitude = std::sqrt(movementComp.velocity.x * movementComp.velocity.x +
 													movementComp.velocity.y * movementComp.velocity.y);
-				float baseShake = 1.0f;			 // Base shake amount (reduced for less intensity)
+				float baseShake = 1.0f;			  // Base shake amount (reduced for less intensity)
 				float velocityMultiplier = 0.05f; // How much velocity affects shake (reduced for less intensity)
 				float shakeMagnitude = baseShake + (velocityMagnitude * velocityMultiplier);
 
@@ -579,7 +579,8 @@ namespace ECSEngine
 				Rect BoundsA(LocA.position + colA.currentBounds.topLeft, colA.currentBounds.width, colA.currentBounds.height);
 				Rect BoundsB(LocB.position + colB.currentBounds.topLeft, colB.currentBounds.width, colB.currentBounds.height);
 
-				if (colB.isStatic) {
+				if (colB.isStatic)
+				{
 					std::cout << "Tile sprite at y      = " << LocB.position.y << "\n";
 					std::cout << "Tile collider at y    = " << BoundsB.topLeft.y << "\n";
 					std::cout << "boundsRect local y    = " << colB.currentBounds.topLeft.y << "\n";
@@ -1106,9 +1107,8 @@ namespace ECSEngine
 	// 	}
 	// }
 
-
 	inline void ResolveAABBCollision(Rect &a, const Rect &b,
-                                 CollisionFlags &flagsA, CollisionFlags &flagsB)
+									 CollisionFlags &flagsA, CollisionFlags &flagsB)
 	{
 		Point2D overlap = GetOverlap(a, b);
 		if (overlap.x <= 0.0f || overlap.y <= 0.0f)
