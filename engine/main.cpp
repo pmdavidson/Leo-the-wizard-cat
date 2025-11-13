@@ -80,6 +80,7 @@ void LoadMap(const std::string &path, EngineType &engine, const std::string &res
 
 			entry.hasCollision = true;
 		}
+		// std::cout << "Parsed tile '" << symbol << "' hasCollision: " << entry.hasCollision << "\n";
 
 		dictionary[symbol] = entry;
 	}
@@ -104,7 +105,10 @@ void LoadMap(const std::string &path, EngineType &engine, const std::string &res
 			if (tile == '.')
 				continue;
 			if (!dictionary.contains(tile))
-				continue;
+				{
+					// std::cout << "Skipping unknown tile '" << tile << "' at (" << x << "," << y << ")\n";
+					continue;
+				}
 
 			const SpriteEntry &entry = dictionary[tile];
 
@@ -125,8 +129,14 @@ void LoadMap(const std::string &path, EngineType &engine, const std::string &res
 
 			if (entry.hasCollision)
 			{
+				// std::cout << "Adding collision to tile at (" << x << "," << y << ")\n";
+				ECSEngine::Rect worldBounds(
+						ECSEngine::Point2D(entry.boundsRect.position.x + position.x, entry.boundsRect.position.y + position.y), 
+						entry.boundsRect.size.x, entry.boundsRect.size.y);
+
+
 				engine.GetEntityManager().template AddComponent<ECSEngine::CollisionComponent>(id, ECSEngine::CollisionComponent(
-																									   FromSFML(entry.boundsRect)));
+																									   worldBounds, true));
 			}
 
 			// Spawner
@@ -139,14 +149,14 @@ void LoadMap(const std::string &path, EngineType &engine, const std::string &res
 
 	// Spawn position assuming (1,8) is safe
 	float spawnX = tileW * 1;
-	float spawnY = tileH * 8;
+	float spawnY = tileH * 4;
 
 	// Create player entity
 	EntityId player = engine.GetEntityManager().CreateEntity("player");
 
 	// Register player sprite
 	SpriteID playerSpriteId = engine.GetSpriteManager().RegisterTexture(
-		gResourcePath + "spritesheet-characters-default.png", ECSEngine::Rect(0.f, 0.f, 64.f, 64.f));
+		gResourcePath + "spritesheet-characters-default.png", ECSEngine::Rect(0.f, 0.f, 128.f, 128.f));
 
 	// Add Components
 	engine.GetEntityManager().template AddComponent<ECSEngine::LocationComponent>(player, ECSEngine::LocationComponent(ECSEngine::Point2D(spawnX, spawnY)));
