@@ -20,6 +20,8 @@
 #include "SpawnComponent.h"
 #include "ScoreComponent.h"
 
+static_assert(std::is_same_v<sf::IntRect, sf::Rect<int>>, "IntRect is not defined correctly.");
+
 namespace ECSEngine
 {
 
@@ -154,7 +156,7 @@ namespace ECSEngine
 						else
 						{
 							// Add new shake component
-							mEntityManager.template AddComponent(camEntityId, shake);
+							mEntityManager.template AddComponent<CameraShake>(camEntityId, shake);
 						}
 						break; // Only one camera entity
 					}
@@ -706,7 +708,8 @@ namespace ECSEngine
 				// Find camera entity (entity with CameraComponent)
 				for (auto camIt = mEntityManager.begin(); camIt != mEntityManager.end(); ++camIt)
 				{
-					if (!camIt->isActive()) continue;
+					if (!camIt->isActive())
+						continue;
 					EntityID camEntityId = camIt->getID();
 
 					if (mEntityManager.template HasComponent<CameraComponent>(camEntityId))
@@ -741,12 +744,12 @@ namespace ECSEngine
 							// Check which zone player is in
 							if (playerWindowPos.x < left10 || playerWindowPos.x > right10)
 							{
-								// Hardzone, left/right 10% 
+								// Hardzone, left/right 10%
 								targetCameraX = trackedLocation.position.x;
 							}
 							else if (playerWindowPos.x < left30 || playerWindowPos.x > right30)
 							{
-								// Softzone, left/right 30% 
+								// Softzone, left/right 30%
 								float tweenSpeed = 5.0f;
 								float desiredX = trackedLocation.position.x;
 								float diff = desiredX - cameraComp.position.x;
@@ -788,7 +791,7 @@ namespace ECSEngine
 									{
 										// Component will be removed in next frame
 									}
-									// If EntityManager.
+									// If EntityManager. //is this missing something?
 								}
 							}
 
@@ -881,20 +884,17 @@ namespace ECSEngine
 						auto &spriteManager = GetSpriteManager();
 						sf::Sprite &sprite = spriteManager.GetSprite(spawnComp.spriteId);
 						sf::IntRect textureRect = sprite.getTextureRect();
-						
+
 						// Convert sf::IntRect to Rect for sprite bounds
-						Rect spriteBounds = {
-							{static_cast<float>(textureRect.left), static_cast<float>(textureRect.top)},
-							static_cast<float>(textureRect.width),
-							static_cast<float>(textureRect.height)
-						};
+						const sf::IntRect &r = textureRect;
+						Rect spriteBounds(
+							static_cast<float>(r.position.x),
+							static_cast<float>(r.position.y),
+							static_cast<float>(r.size.x),
+							static_cast<float>(r.size.y));
 
 						// Create AABB bounds using tileW and tileH from SpawnComponent
-						Rect collisionBounds = {
-							{0.0f, 0.0f},
-							spawnComp.tileW,
-							spawnComp.tileH
-						};
+						Rect collisionBounds = {0.0f, 0.0f, spawnComp.tileW, spawnComp.tileH};
 
 						// Create new star entity
 						EntityID starId = mEntityManager.CreateEntity("star");

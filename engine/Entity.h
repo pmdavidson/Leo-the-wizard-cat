@@ -24,6 +24,6 @@ namespace ECSEngine {
     private:
         EntityID mID;
         std::string mName;
-        bool mActive;
+        bool mActive = true;
     };
 }
