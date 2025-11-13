@@ -66,6 +66,7 @@ ensuring that gravity and acceleration calculations do not rely on frame rate so
 the game being buggy at higher or lower framerates.
 For collision detection, we decided to use tileW and tileH from SpawnComponent to create AABB bounds 
 for an easy work around.
+We used Doxygen for the api documentation.
 
 Group A: Peter
 Group B: Eric
@@ -80,4 +81,4 @@ Group B: CameraComponent, CameraFollowerComponent, CameraShakeComponent, InputCo
 
 Managers:
 Group A: EntityManager, SoundManager, ECSEngine.h
-Group B: WindowManager, SpriteManager, MathUtil.h 
+Group B: WindowManager, SpriteManager, MathUtil.h, ECSEngine.h

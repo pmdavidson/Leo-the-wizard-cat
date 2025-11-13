@@ -106,8 +106,8 @@ namespace ECSEngine
 				// Calculate camera shake magnitude using velocity
 				float velocityMagnitude = std::sqrt(movementComp.velocity.x * movementComp.velocity.x +
 													movementComp.velocity.y * movementComp.velocity.y);
-				float baseShake = 5.0f;			 // Base shake amount
-				float velocityMultiplier = 0.1f; // How much velocity affects shake
+				float baseShake = 1.0f;			 // Base shake amount (reduced for less intensity)
+				float velocityMultiplier = 0.05f; // How much velocity affects shake (reduced for less intensity)
 				float shakeMagnitude = baseShake + (velocityMagnitude * velocityMultiplier);
 
 				// Determine direction of shake based on collision side

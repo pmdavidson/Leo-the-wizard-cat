@@ -109,10 +109,10 @@ void LoadMap(const std::string &path, EngineType &engine, const std::string &res
 			if (tile == '.')
 				continue;
 			if (!dictionary.contains(tile))
-				{
-					// std::cout << "Skipping unknown tile '" << tile << "' at (" << x << "," << y << ")\n";
-					continue;
-				}
+			{
+				// std::cout << "Skipping unknown tile '" << tile << "' at (" << x << "," << y << ")\n";
+				continue;
+			}
 
 			const SpriteEntry &entry = dictionary[tile];
 
@@ -135,9 +135,8 @@ void LoadMap(const std::string &path, EngineType &engine, const std::string &res
 			{
 				// std::cout << "Adding collision to tile at (" << x << "," << y << ")\n";
 				ECSEngine::Rect worldBounds(
-						ECSEngine::Point2D(entry.boundsRect.position.x + position.x, entry.boundsRect.position.y + position.y), 
-						entry.boundsRect.size.x, entry.boundsRect.size.y);
-
+					ECSEngine::Point2D(entry.boundsRect.position.x + position.x, entry.boundsRect.position.y + position.y),
+					entry.boundsRect.size.x, entry.boundsRect.size.y);
 
 				engine.GetEntityManager().template AddComponent<ECSEngine::CollisionComponent>(id, ECSEngine::CollisionComponent(
 																									   worldBounds, true));
