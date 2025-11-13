@@ -275,11 +275,26 @@ namespace ECSEngine
 		{
 			if (!it->isActive())
 				continue;
-			EntityID entityId = it->getID();
 
-			if (mEntityManager.template HasComponent<CollisionComponent>(entityId))
+			EntityID id = it->getID();
+
+			if (!mEntityManager.template HasComponent<CollisionComponent>(id) ||
+				!mEntityManager.template HasComponent<LocationComponent>(id))
+				continue;
+
+			auto &collisionComp = mEntityManager.template GetComponent<CollisionComponent>(id);
+			auto &locationComp = mEntityManager.template GetComponent<LocationComponent>(id);
+
+			// STATIC OBJECTS STILL NEED WORLD-BOUNDS
+			collisionComp.currentBounds.topLeft =
+				locationComp.position + collisionComp.localBounds.topLeft;
+
+			collisionComp.currentBounds.width = collisionComp.localBounds.width;
+			collisionComp.currentBounds.height = collisionComp.localBounds.height;
+
+			// ONLY dynamic objects need to store previousBounds
+			if (!collisionComp.isStatic)
 			{
-				auto &collisionComp = mEntityManager.template GetComponent<CollisionComponent>(entityId);
 				collisionComp.previousBounds = collisionComp.currentBounds;
 			}
 		}
@@ -516,22 +531,23 @@ namespace ECSEngine
 					bool onWall = collisionComp.collidedSides.left ||
 								  collisionComp.collidedSides.right;
 					bool falling = movementComp.velocity.y > 0;
+
+					// is this supposed to be for wall jumping?
 				}
 
 				// Update position based on velocity
 				locationComp.position.x += movementComp.velocity.x * deltaTime;
 				locationComp.position.y += movementComp.velocity.y * deltaTime;
 
-				// Update collision bounds for non-static entities
-				// if (mEntityManager.template HasComponent<CollisionComponent>(entityId))
-				// {
-				// 	auto &collisionComp = mEntityManager.template GetComponent<CollisionComponent>(entityId);
-				// 	if (!collisionComp.isStatic)
-				// 	{
-				// 		collisionComp.currentBounds.topLeft.x = locationComp.position.x + 16;
-				// 		collisionComp.currentBounds.topLeft.y = locationComp.position.y + 16;
-				// 	}
-				// }
+				if (mEntityManager.template HasComponent<CollisionComponent>(entityId))
+				{
+
+					auto &collisionComp = mEntityManager.template GetComponent<CollisionComponent>(entityId);
+
+					collisionComp.currentBounds.topLeft = locationComp.position + collisionComp.localBounds.topLeft;
+					collisionComp.currentBounds.width = collisionComp.localBounds.width;
+					collisionComp.currentBounds.height = collisionComp.localBounds.height;
+				}
 			}
 		}
 	}
@@ -574,32 +590,84 @@ namespace ECSEngine
 				if (colA.isStatic && colB.isStatic)
 					continue;
 
-				colB.collidedSides = {};
+				// colB.collidedSides = {};
 
-				Rect BoundsA(LocA.position + colA.currentBounds.topLeft, colA.currentBounds.width, colA.currentBounds.height);
-				Rect BoundsB(LocB.position + colB.currentBounds.topLeft, colB.currentBounds.width, colB.currentBounds.height);
-
-				if (colB.isStatic)
-				{
-					std::cout << "Tile sprite at y      = " << LocB.position.y << "\n";
-					std::cout << "Tile collider at y    = " << BoundsB.topLeft.y << "\n";
-					std::cout << "boundsRect local y    = " << colB.currentBounds.topLeft.y << "\n";
-					std::cout << "--------\n";
-				}
+				Rect BoundsA(colA.currentBounds.topLeft, colA.currentBounds.width, colA.currentBounds.height);
+				Rect BoundsB(colB.currentBounds.topLeft, colB.currentBounds.width, colB.currentBounds.height);
 
 				if (!BoundsA.intersects(BoundsB))
 					continue;
 
+				if (BoundsA.intersects(BoundsB))
+				{
+					std::cout << "=== COLLISION DETECTED ===\n";
+
+					std::cout << "Player Loc: "
+							  << LocA.position.x << ", " << LocA.position.y << "\n";
+
+					std::cout << "A localBounds: ("
+							  << colA.localBounds.topLeft.x << ", " << colA.localBounds.topLeft.y
+							  << ", w=" << colA.localBounds.width
+							  << ", h=" << colA.localBounds.height << ")\n";
+
+					std::cout << "A currentBounds: ("
+							  << colA.currentBounds.topLeft.x << ", " << colA.currentBounds.topLeft.y
+							  << ", w=" << colA.currentBounds.width
+							  << ", h=" << colA.currentBounds.height << ")\n";
+
+					std::cout << "B currentBounds: ("
+							  << colB.currentBounds.topLeft.x << ", " << colB.currentBounds.topLeft.y
+							  << ", w=" << colB.currentBounds.width
+							  << ", h=" << colB.currentBounds.height << ")\n";
+
+					auto overlap = GetOverlap(BoundsA, BoundsB);
+					std::cout << "Overlap: (" << overlap.x << ", " << overlap.y << ")\n";
+				}
+
 				// if B is static then A is a star/player, and vice-versa
 				if (colB.isStatic)
 				{
-					ResolveAABBCollision(BoundsA, BoundsB, colA.collidedSides, colB.collidedSides);
-					LocA.position = BoundsA.topLeft - colA.currentBounds.topLeft;
+					// ResolveAABBCollision(BoundsA, BoundsB, colA.collidedSides, colB.collidedSides);
+
+					ResolveAABBCollision(
+						BoundsA, BoundsB,
+						colA.previousBounds, colB.previousBounds,
+						colA.collidedSides, colB.collidedSides);
+
+					LocA.position = BoundsA.topLeft - colA.localBounds.topLeft;
+					colA.currentBounds = BoundsA;
+
+					// 💡 Add this block to stop movement
+					if (entityManager.template HasComponent<MovementComponent>(idA))
+					{
+						auto &vel = entityManager.template GetComponent<MovementComponent>(idA);
+						if (colA.collidedSides.bottom || colA.collidedSides.top)
+							vel.velocity.y = 0;
+						if (colA.collidedSides.left || colA.collidedSides.right)
+							vel.velocity.x = 0;
+					}
 				}
 				else if (colA.isStatic)
 				{
-					ResolveAABBCollision(BoundsB, BoundsA, colB.collidedSides, colA.collidedSides);
-					LocB.position = BoundsB.topLeft - colB.currentBounds.topLeft;
+					// ResolveAABBCollision(BoundsB, BoundsA, colB.collidedSides, colA.collidedSides);
+
+					ResolveAABBCollision(
+						BoundsB, BoundsA,
+						colB.previousBounds, colA.previousBounds,
+						colB.collidedSides, colA.collidedSides);
+
+					LocB.position = BoundsB.topLeft - colB.localBounds.topLeft;
+					colB.currentBounds = BoundsB;
+
+					// Stop velocity
+					if (entityManager.template HasComponent<MovementComponent>(idB))
+					{
+						auto &vel = entityManager.template GetComponent<MovementComponent>(idB);
+						if (colB.collidedSides.bottom || colB.collidedSides.top)
+							vel.velocity.y = 0;
+						if (colB.collidedSides.left || colB.collidedSides.right)
+							vel.velocity.x = 0;
+					}
 				}
 
 				// Check if player (idA) hit a solid object (idB)
@@ -1107,43 +1175,138 @@ namespace ECSEngine
 	// 	}
 	// }
 
+	// inline void ResolveAABBCollision(Rect &a, const Rect &b,
+	//                              CollisionFlags &flagsA, CollisionFlags &flagsB)
+	// {
+	// 	Point2D overlap = GetOverlap(a, b);
+	// 	if (overlap.x <= 0.0f || overlap.y <= 0.0f)
+	// 		return;
+
+	// 	// PRIORITIZE VERTICAL COLLISIONS (GROUND/CEILING)
+	// 	if (overlap.y <= overlap.x)
+	// 	{
+	// 		// --- Y-AXIS RESOLUTION ---
+	// 		if (a.topLeft.y < b.topLeft.y)
+	// 		{
+	// 			// A landed on top of B
+	// 			a.topLeft.y -= overlap.y;
+	// 			flagsA.bottom = true;
+	// 			flagsB.top = true;
+	// 		}
+	// 		else
+	// 		{
+	// 			// A hit B from below
+	// 			a.topLeft.y += overlap.y;
+	// 			flagsA.top = true;
+	// 			flagsB.bottom = true;
+	// 		}
+	// 	}
+	// 	else
+	// 	{
+	// 		// --- X-AXIS RESOLUTION ---
+	// 		if (a.topLeft.x < b.topLeft.x)
+	// 		{
+	// 			a.topLeft.x -= overlap.x;
+	// 			flagsA.right = true;
+	// 			flagsB.left = true;
+	// 		}
+	// 		else
+	// 		{
+	// 			a.topLeft.x += overlap.x;
+	// 			flagsA.left = true;
+	// 			flagsB.right = true;
+	// 		}
+	// 	}
+	// }
+	// inline void ResolveAABBCollision(Rect &a, const Rect &b,
+	//                                  CollisionFlags &flagsA, CollisionFlags &flagsB)
+	// {
+	//     Point2D overlap = GetOverlap(a, b);
+	//     if (overlap.x <= 0.0f || overlap.y <= 0.0f)
+	//         return;
+
+	//     // PRIORITIZE VERTICAL COLLISIONS
+	//     if (overlap.y <= overlap.x)
+	//     {
+	//         // ---------- Y AXIS COLLISION ----------
+	//         if (a.topLeft.y < b.topLeft.y)
+	//         {
+	//             // A landed on B → SNAP A ON TOP OF B
+	//             a.topLeft.y = b.topLeft.y - a.height;
+	//             flagsA.bottom = true;
+	//             flagsB.top = true;
+	//         }
+	//         else
+	//         {
+	//             // A hit B from below
+	//             a.topLeft.y = b.topLeft.y + b.height;
+	//             flagsA.top = true;
+	//             flagsB.bottom = true;
+	//         }
+	//     }
+	//     else
+	//     {
+	//         // ---------- X AXIS COLLISION ----------
+	//         if (a.topLeft.x < b.topLeft.x)
+	//         {
+	//             a.topLeft.x = b.topLeft.x - a.width;
+	//             flagsA.right = true;
+	//             flagsB.left = true;
+	//         }
+	//         else
+	//         {
+	//             a.topLeft.x = b.topLeft.x + b.width;
+	//             flagsA.left = true;
+	//             flagsB.right = true;
+	//         }
+	//     }
+	// }
+
 	inline void ResolveAABBCollision(Rect &a, const Rect &b,
+									 const Rect &aPrev, const Rect &bPrev,
 									 CollisionFlags &flagsA, CollisionFlags &flagsB)
 	{
 		Point2D overlap = GetOverlap(a, b);
 		if (overlap.x <= 0.0f || overlap.y <= 0.0f)
 			return;
 
-		// PRIORITIZE VERTICAL COLLISIONS (GROUND/CEILING)
-		if (overlap.y <= overlap.x)
+		Point2D prevCenterA = aPrev.topLeft + Point2D(aPrev.width * 0.5f, aPrev.height * 0.5f);
+		Point2D prevCenterB = bPrev.topLeft + Point2D(bPrev.width * 0.5f, bPrev.height * 0.5f);
+
+		float dx = prevCenterA.x - prevCenterB.x;
+		float dy = prevCenterA.y - prevCenterB.y;
+
+		if (std::abs(dy) > std::abs(dx))
 		{
-			// --- Y-AXIS RESOLUTION ---
-			if (a.topLeft.y < b.topLeft.y)
+			// Resolve Y axis first
+			if (dy > 0)
 			{
-				// A landed on top of B
-				a.topLeft.y -= overlap.y;
-				flagsA.bottom = true;
-				flagsB.top = true;
-			}
-			else
-			{
-				// A hit B from below
+				// Came from below — hit ceiling
 				a.topLeft.y += overlap.y;
 				flagsA.top = true;
 				flagsB.bottom = true;
 			}
+			else
+			{
+				// Came from above — landed on top
+				a.topLeft.y -= overlap.y;
+				flagsA.bottom = true;
+				flagsB.top = true;
+			}
 		}
 		else
 		{
-			// --- X-AXIS RESOLUTION ---
-			if (a.topLeft.x < b.topLeft.x)
+			// Resolve X axis
+			if (dx < 0)
 			{
+				// Came from left
 				a.topLeft.x -= overlap.x;
 				flagsA.right = true;
 				flagsB.left = true;
 			}
 			else
 			{
+				// Came from right
 				a.topLeft.x += overlap.x;
 				flagsA.left = true;
 				flagsB.right = true;

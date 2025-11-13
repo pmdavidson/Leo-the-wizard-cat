@@ -100,10 +100,10 @@ void LoadMap(const std::string &path, EngineType &engine, const std::string &res
 		resourceRoot + "spritesheet-tiles-default.png", ECSEngine::Rect(640.f, 320.f, 64.f, 64.f));
 
 	// Parse map rows
-	for (int y = 0; y < mapH; ++y)
+	for (int y = 0; y <= mapH; ++y)
 	{
 		std::getline(file, line);
-		for (int x = 0; x < mapW; ++x)
+		for (int x = 0; x <= mapW; ++x)
 		{
 			char tile = line[x];
 			if (tile == '.')
@@ -142,6 +142,15 @@ void LoadMap(const std::string &path, EngineType &engine, const std::string &res
 			{
 				engine.GetEntityManager().template AddComponent<ECSEngine::SpawnComponent>(id, {id, "star", starSpriteId, 10.f, 10.f, 10, static_cast<float>(tileW), static_cast<float>(tileH)});
 			}
+
+		// 	std::cout << "Tile " << tile
+        //   << " worldPos=(" << position.x << "," << position.y << ") "
+        //   << "collisionRect=("
+        //   << entry.boundsRect.position.x << ","
+        //   << entry.boundsRect.position.y << ", w="
+        //   << entry.boundsRect.size.x << ", h="
+        //   << entry.boundsRect.size.y << ")\n";
+
 		}
 	}
 

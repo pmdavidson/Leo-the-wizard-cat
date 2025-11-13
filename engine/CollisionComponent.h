@@ -18,16 +18,17 @@ namespace ECSEngine
 
     struct CollisionComponent {
         CollisionFlags collidedSides;
+        Rect localBounds;
         Rect currentBounds;
         Rect previousBounds;
         bool isStatic = true;
 
         CollisionComponent() = default;
 
-        CollisionComponent(const Rect& bounds, bool isStatic = true)
-            : currentBounds(bounds),
-            previousBounds(bounds),
-            isStatic(isStatic) {}
+        CollisionComponent(const Rect& local, bool isStatic)
+                : localBounds(local),
+                currentBounds(local),     // Will be converted to world space in CollisionSystem
+                previousBounds(local),    // Will be replaced next frame
+                isStatic(isStatic) {}
     };
-
 }
