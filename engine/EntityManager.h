@@ -127,16 +127,15 @@ namespace ECSEngine
 			return id < mEntities.size() && mEntities[id].isActive();
 		}
 
-		// base case: no components
-		void RemoveComponentsHelper(EntityID) {}
-
-		// recursive case
 		template <typename U, typename... Us>
 		void RemoveComponentsHelper(EntityID entity) {
 			if (HasComponent<U>(entity)) {
 				RemoveComponent<U>(entity);
 			}
-			RemoveComponentsHelper<Us...>(entity);
+
+			if constexpr (sizeof...(Us) > 0) {
+				RemoveComponentsHelper<Us...>(entity);
+			}
 		}
 
 	};
