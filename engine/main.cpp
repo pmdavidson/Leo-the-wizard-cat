@@ -17,7 +17,8 @@ using SpriteID = size_t;
 
 std::string gResourcePath = "../../assets/";
 
-struct SpriteEntry {
+struct SpriteEntry
+{
 	std::string texturePath;
 	sf::IntRect sourceRect;
 	sf::IntRect boundsRect;
@@ -33,9 +34,11 @@ ECSEngine::Rect FromSFML(const sf::IntRect& r) {
 }
 
 template <typename EngineType>
-void LoadMap(const std::string& path, EngineType& engine, const std::string& resourceRoot) {
+void LoadMap(const std::string &path, EngineType &engine, const std::string &resourceRoot)
+{
 	std::ifstream file(resourceRoot + path);
-	if (!file) {
+	if (!file)
+	{
 		std::cerr << "Failed to open map: " << path << "\n";
 		return;
 	}
@@ -45,14 +48,17 @@ void LoadMap(const std::string& path, EngineType& engine, const std::string& res
 	int dictionaryType = 1;
 
 	// Parse dictionary
-	while (std::getline(file, line)) {
-		if (line.starts_with("dictionary")) {
+	while (std::getline(file, line))
+	{
+		if (line.starts_with("dictionary"))
+		{
 			std::istringstream ss(line);
 			std::string dummy;
 			ss >> dummy >> dictionaryType;
 			continue;
 		}
-		if (line.starts_with("map origin")) break;
+		if (line.starts_with("map origin"))
+			break;
 
 		std::istringstream ss(line);
 		char symbol;
@@ -90,14 +96,18 @@ void LoadMap(const std::string& path, EngineType& engine, const std::string& res
 	}
 
 	// Parse map rows
-	for (int y = 0; y < mapH; ++y) {
+	for (int y = 0; y < mapH; ++y)
+	{
 		std::getline(file, line);
-		for (int x = 0; x < mapW; ++x) {
+		for (int x = 0; x < mapW; ++x)
+		{
 			char tile = line[x];
-			if (tile == '.') continue;
-			if (!dictionary.contains(tile)) continue;
+			if (tile == '.')
+				continue;
+			if (!dictionary.contains(tile))
+				continue;
 
-			const SpriteEntry& entry = dictionary[tile];
+			const SpriteEntry &entry = dictionary[tile];
 
 			// ECSEngine::Point2D position = { originX + x * tileW, originY + y * tileH }; //change to Point2D cause LocationComponent takes Point2D
 			
@@ -119,6 +129,7 @@ void LoadMap(const std::string& path, EngineType& engine, const std::string& res
 			engine.GetEntityManager().template AddComponent<ECSEngine::SpriteComponent>(id, {
 				spriteId, FromSFML(entry.boundsRect), true
 			}); //cast entry.boundsRect from IntRect to Rect? causse sprite and collision component constructor takes Rect
+>>>>>>> 22229c09a98d4001081ea029ad2991fdb6fdc2a9
 
 			if (entry.hasCollision) {
 				engine.GetEntityManager().template AddComponent<ECSEngine::CollisionComponent>(id, ECSEngine::CollisionComponent(
@@ -126,8 +137,14 @@ void LoadMap(const std::string& path, EngineType& engine, const std::string& res
 				);
 			}
 
+<<<<<<< HEAD
+			// Spawner
+			if (tile == 'S')
+			{
+=======
 			//Spawner
 			if (tile == 'S') {
+>>>>>>> 22229c09a98d4001081ea029ad2991fdb6fdc2a9
 				engine.GetEntityManager().template AddComponent<ECSEngine::SpawnComponent>(id, {id, "star", spriteId, 2.f, 2.f, 10, static_cast<float>(tileW), static_cast<float>(tileH)});
 			}
 
