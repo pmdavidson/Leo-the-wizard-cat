@@ -25,12 +25,12 @@ struct SpriteEntry
 	bool hasCollision = false;
 };
 
-ECSEngine::Rect FromSFML(const sf::IntRect& r) {
+ECSEngine::Rect FromSFML(const sf::IntRect &r)
+{
 	return {
-		{ static_cast<float>(r.position.x), static_cast<float>(r.position.y) },
+		{static_cast<float>(r.position.x), static_cast<float>(r.position.y)},
 		r.size.x,
-		r.size.y
-	};
+		r.size.y};
 }
 
 template <typename EngineType>
@@ -67,17 +67,16 @@ void LoadMap(const std::string &path, EngineType &engine, const std::string &res
 		ss >> symbol >> entry.texturePath >> sx >> sy >> sw >> sh;
 		entry.sourceRect = sf::IntRect(
 			sf::Vector2i(sx, sy),
-			sf::Vector2i(sw, sh)
-		);
+			sf::Vector2i(sw, sh));
 
-		if (dictionaryType == 2) {
+		if (dictionaryType == 2)
+		{
 			int bx, by, bw, bh;
 			ss >> bx >> by >> bw >> bh;
 
 			entry.boundsRect = sf::IntRect(
-			sf::Vector2i(bx, by),
-			sf::Vector2i(bw, bh)
-			);
+				sf::Vector2i(bx, by),
+				sf::Vector2i(bw, bh));
 
 			entry.hasCollision = true;
 		}
@@ -95,17 +94,6 @@ void LoadMap(const std::string &path, EngineType &engine, const std::string &res
 		ss >> dummy >> mapW >> mapH;
 	}
 
-<<<<<<< HEAD
-	ECSEngine::Rect FromSFML(const sf::IntRect &r)
-	{
-		return {
-			{static_cast<float>(r.left), static_cast<float>(r.top)},
-			static_cast<float>(r.width),
-			static_cast<float>(r.height)};
-	}
-
-=======
->>>>>>> 41e2abee0d36944f1f0609b7eabe879a11fcc55a
 	// Parse map rows
 	for (int y = 0; y < mapH; ++y)
 	{
@@ -121,44 +109,29 @@ void LoadMap(const std::string &path, EngineType &engine, const std::string &res
 			const SpriteEntry &entry = dictionary[tile];
 
 			// ECSEngine::Point2D position = { originX + x * tileW, originY + y * tileH }; //change to Point2D cause LocationComponent takes Point2D
-			
+
 			ECSEngine::Point2D position = {
 				static_cast<float>(originX + x * tileW),
-				static_cast<float>(originY + y * tileH)
-			};
-
-
+				static_cast<float>(originY + y * tileH)};
 
 			EntityId id = engine.GetEntityManager().CreateEntity("tile_" + std::string(1, tile));
 
 			engine.GetEntityManager().template AddComponent<ECSEngine::LocationComponent>(id, ECSEngine::LocationComponent(position));
 
 			auto spriteId = engine.GetSpriteManager().RegisterTexture(
-				resourceRoot + entry.texturePath, FromSFML(entry.sourceRect)
-			);
+				resourceRoot + entry.texturePath, FromSFML(entry.sourceRect));
 
-<<<<<<< HEAD
 			engine.GetEntityManager().template AddComponent<ECSEngine::SpriteComponent>(id, {spriteId, FromSFML(entry.boundsRect), true}); // cast entry.boundsRect from IntRect to Rect? causse sprite and collision component constructor takes Rect
-=======
-			engine.GetEntityManager().template AddComponent<ECSEngine::SpriteComponent>(id, {
-				spriteId, FromSFML(entry.boundsRect), true
-			}); //cast entry.boundsRect from IntRect to Rect? causse sprite and collision component constructor takes Rect
->>>>>>> 41e2abee0d36944f1f0609b7eabe879a11fcc55a
 
-			if (entry.hasCollision) {
+			if (entry.hasCollision)
+			{
 				engine.GetEntityManager().template AddComponent<ECSEngine::CollisionComponent>(id, ECSEngine::CollisionComponent(
-					FromSFML(entry.boundsRect))
-				);
+																									   FromSFML(entry.boundsRect)));
 			}
 
-<<<<<<< HEAD
 			// Spawner
 			if (tile == 'S')
 			{
-=======
-			//Spawner
-			if (tile == 'S') {
->>>>>>> 41e2abee0d36944f1f0609b7eabe879a11fcc55a
 				engine.GetEntityManager().template AddComponent<ECSEngine::SpawnComponent>(id, {id, "star", spriteId, 2.f, 2.f, 10, static_cast<float>(tileW), static_cast<float>(tileH)});
 			}
 		}
@@ -173,20 +146,9 @@ void LoadMap(const std::string &path, EngineType &engine, const std::string &res
 
 	// Register player sprite
 	SpriteID playerSpriteId = engine.GetSpriteManager().RegisterTexture(
-    	gResourcePath + "spritesheet-characters-default.png", ECSEngine::Rect(0.f, 0.f, 64.f, 64.f));
-
+		gResourcePath + "spritesheet-characters-default.png", ECSEngine::Rect(0.f, 0.f, 64.f, 64.f));
 
 	// Add Components
-<<<<<<< HEAD
-	engine.GetEntityManager().AddComponent<LocationComponent>(player, {ECSEngine::Point2D(spawnX, spawnY)});
-	engine.GetEntityManager().AddComponent<GravityComponent>(player, {});
-	engine.GetEntityManager().AddComponent<MovementComponent>(player, {});
-	engine.GetEntityManager().AddComponent<InputComponent>(player, {});
-	engine.GetEntityManager().AddComponent<CameraFollower>(player, {player});
-	engine.GetEntityManager().AddComponent<ScoreComponent>(player, {});
-	engine.GetEntityManager().AddComponent<CollisionComponent>(player, {ECSEngine::Rect(0.f, 0.f, 64, 64), false});
-	engine.GetEntityManager().AddComponent<SpriteComponent>(player, {playerSpriteId, ECSEngine::Rect(0.f, 0.f, 64, 64), true});
-=======
 	engine.GetEntityManager().template AddComponent<ECSEngine::LocationComponent>(player, ECSEngine::LocationComponent(ECSEngine::Point2D(spawnX, spawnY)));
 	engine.GetEntityManager().template AddComponent<ECSEngine::GravityComponent>(player, {});
 	engine.GetEntityManager().template AddComponent<ECSEngine::MovementComponent>(player, {});
@@ -194,15 +156,13 @@ void LoadMap(const std::string &path, EngineType &engine, const std::string &res
 	engine.GetEntityManager().template AddComponent<ECSEngine::CameraFollower>(player, {player});
 	engine.GetEntityManager().template AddComponent<ECSEngine::ScoreComponent>(player, {});
 	engine.GetEntityManager().template AddComponent<ECSEngine::CollisionComponent>(player, {ECSEngine::Rect(0.f, 0.f, 64, 64), false});
-	engine.GetEntityManager().template AddComponent<ECSEngine::SpriteComponent>(player, {playerSpriteId, ECSEngine::Rect(0.f, 0.f, 64, 64), true });
+	engine.GetEntityManager().template AddComponent<ECSEngine::SpriteComponent>(player, {playerSpriteId, ECSEngine::Rect(0.f, 0.f, 64, 64), true});
 
-	//register sounds 
+	// register sounds
 	engine.GetSoundManager().RegisterSound(gResourcePath + "footstep_grass_003.ogg", "land");
 	engine.GetSoundManager().RegisterSound(gResourcePath + "sfx_jump.ogg", "jump");
 	engine.GetSoundManager().RegisterSound(gResourcePath + "footstep_snow_001.ogg", "wall_push");
 	engine.GetSoundManager().RegisterSound(gResourcePath + "sfx_gem.ogg", "star_collect");
-
->>>>>>> 41e2abee0d36944f1f0609b7eabe879a11fcc55a
 }
 
 int main(int argc, char *argv[])
