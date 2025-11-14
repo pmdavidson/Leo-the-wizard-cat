@@ -647,10 +647,6 @@ namespace ECSEngine
 				if (!BoundsA.intersects(BoundsB))
 					continue;
 
-				// Debug: Print collision information
-				std::cout << "[COLLISION] idA=" << idA << " (" << entityA.getName()
-						  << ") hit idB=" << idB << " (" << entityB.getName() << ")\n";
-
 				bool isPlayerA = entityManager.template HasComponent<InputComponent>(idA);
 				bool isPlayerB = entityManager.template HasComponent<InputComponent>(idB);
 				bool isSpawnerA = entityManager.template HasComponent<SpawnComponent>(idA);

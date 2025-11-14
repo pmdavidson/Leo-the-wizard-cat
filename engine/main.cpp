@@ -80,7 +80,6 @@ void LoadMap(const std::string &path, EngineType &engine, const std::string &res
 
 			entry.hasCollision = true;
 		}
-		// std::cout << "Parsed tile '" << symbol << "' hasCollision: " << entry.hasCollision << "\n";
 
 		dictionary[symbol] = entry;
 	}
@@ -110,7 +109,6 @@ void LoadMap(const std::string &path, EngineType &engine, const std::string &res
 				continue;
 			if (!dictionary.contains(tile))
 			{
-				// std::cout << "Skipping unknown tile '" << tile << "' at (" << x << "," << y << ")\n";
 				continue;
 			}
 
@@ -142,14 +140,6 @@ void LoadMap(const std::string &path, EngineType &engine, const std::string &res
 			{
 				engine.GetEntityManager().template AddComponent<ECSEngine::SpawnComponent>(id, {id, "star", starSpriteId, 10.f, 10.f, 10, static_cast<float>(tileW), static_cast<float>(tileH)});
 			}
-
-		// 	std::cout << "Tile " << tile
-        //   << " worldPos=(" << position.x << "," << position.y << ") "
-        //   << "collisionRect=("
-        //   << entry.boundsRect.position.x << ","
-        //   << entry.boundsRect.position.y << ", w="
-        //   << entry.boundsRect.size.x << ", h="
-        //   << entry.boundsRect.size.y << ")\n";
 
 		}
 	}
