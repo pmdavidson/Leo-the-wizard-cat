@@ -61,13 +61,17 @@ DESIGN DECISIONS
 Freed entity slots are reused to minimize memory allocation. Components are
 stored in vectors with entity-to-index mapping for efficient access. Some systems
 use static variables for jump state tracking so its easier to keep track of over many frames. 
-Delta time is currently fixed at 1/60 seconds, assuming a stable 60 FPS frame rate. This provides a consistent time step for updates, 
+Delta time is currently fixed at 1/60 seconds, assuming a stable 60 FPS frame rate. 
+This provides a consistent time step for updates, 
 ensuring that gravity and acceleration calculations do not rely on frame rate so we can avoid 
 the game being buggy at higher or lower framerates.
 For collision detection, we decided to use tileW and tileH from SpawnComponent to create AABB bounds 
 for an easy work around.
 We used Doxygen for the api documentation.
 We also made it so that stars cannot collide with spawners for spawning simplicty.
+And lastly, we reuse some code from our Project 1 Pt.2, this ranges from inspiration for collision 
+structure, to almost our exact MathUtil.h. This means that some helper functions in MathUtil.h
+are not used for this project but will be left there for contingency purposes in the future.
 
 Group A: Peter
 Group B: Eric
