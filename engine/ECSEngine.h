@@ -675,7 +675,7 @@ namespace ECSEngine
 					ResolveAABBCollision(
 						BoundsA, BoundsB,
 						colA.previousBounds, colB.previousBounds,
-						colA.collidedSides, colB.collidedSides);
+						colA.collidedSides, colB.collidedSides, preCollisionVelocityA);
 
 					LocA.position = BoundsA.topLeft - colA.localBounds.topLeft;
 					colA.currentBounds = BoundsA;
@@ -695,7 +695,7 @@ namespace ECSEngine
 					ResolveAABBCollision(
 						BoundsB, BoundsA,
 						colB.previousBounds, colA.previousBounds,
-						colB.collidedSides, colA.collidedSides);
+						colB.collidedSides, colA.collidedSides, preCollisionVelocityB);
 
 					LocB.position = BoundsB.topLeft - colB.localBounds.topLeft;
 					colB.currentBounds = BoundsB;
@@ -715,7 +715,7 @@ namespace ECSEngine
 					ResolveAABBCollision(
 						BoundsA, BoundsB,
 						colA.previousBounds, colB.previousBounds,
-						colA.collidedSides, colB.collidedSides);
+						colA.collidedSides, colB.collidedSides, preCollisionVelocityA);
 
 					LocA.position = BoundsA.topLeft - colA.localBounds.topLeft;
 					colA.currentBounds = BoundsA;
@@ -723,7 +723,7 @@ namespace ECSEngine
 					ResolveAABBCollision(
 						BoundsB, BoundsA,
 						colB.previousBounds, colA.previousBounds,
-						colB.collidedSides, colA.collidedSides);
+						colB.collidedSides, colA.collidedSides, preCollisionVelocityB);
 
 					LocB.position = BoundsB.topLeft - colB.localBounds.topLeft;
 					colB.currentBounds = BoundsB;
@@ -733,7 +733,7 @@ namespace ECSEngine
 				{
 					playerCollisionCheck(colA.collidedSides, preCollisionVelocityA);
 				}
-				if (isPlayerB && colA.isStatic)
+				else if (isPlayerB && colA.isStatic)
 				{
 					playerCollisionCheck(colB.collidedSides, preCollisionVelocityB);
 				}
@@ -1181,180 +1181,58 @@ namespace ECSEngine
 		}
 	}
 
-	// inline void ResolveAABBCollision(Rect &a, const Rect &b, CollisionFlags &flagsA, CollisionFlags &flagsB)
-	// {
-	// 	Point2D overlap = GetOverlap(a, b);
-
-	// 	if (overlap.x <= 0.0f || overlap.y <= 0.0f)
-	// 		return; // no real overlap
-
-	// 	// Resolve Y-axis
-	// 	if (a.topLeft.y < b.topLeft.y)
-	// 	{
-	// 		a.topLeft.y -= overlap.y;
-	// 		flagsA.bottom = true;
-	// 		flagsB.top = true;
-	// 	}
-	// 	else
-	// 	{
-	// 		a.topLeft.y += overlap.y;
-	// 		flagsA.top = true;
-	// 		flagsB.bottom = true;
-	// 	}
-
-	// 	// Resolve X-axis
-	// 	if (a.topLeft.x < b.topLeft.x)
-	// 	{
-	// 		a.topLeft.x -= overlap.x;
-	// 		flagsA.right = true;
-	// 		flagsB.left = true;
-	// 	}
-	// 	else
-	// 	{
-	// 		a.topLeft.x += overlap.x;
-	// 		flagsA.left = true;
-	// 		flagsB.right = true;
-	// 	}
-	// }
-
-	// inline void ResolveAABBCollision(Rect &a, const Rect &b,
-	//                              CollisionFlags &flagsA, CollisionFlags &flagsB)
-	// {
-	// 	Point2D overlap = GetOverlap(a, b);
-	// 	if (overlap.x <= 0.0f || overlap.y <= 0.0f)
-	// 		return;
-
-	// 	// PRIORITIZE VERTICAL COLLISIONS (GROUND/CEILING)
-	// 	if (overlap.y <= overlap.x)
-	// 	{
-	// 		// --- Y-AXIS RESOLUTION ---
-	// 		if (a.topLeft.y < b.topLeft.y)
-	// 		{
-	// 			// A landed on top of B
-	// 			a.topLeft.y -= overlap.y;
-	// 			flagsA.bottom = true;
-	// 			flagsB.top = true;
-	// 		}
-	// 		else
-	// 		{
-	// 			// A hit B from below
-	// 			a.topLeft.y += overlap.y;
-	// 			flagsA.top = true;
-	// 			flagsB.bottom = true;
-	// 		}
-	// 	}
-	// 	else
-	// 	{
-	// 		// --- X-AXIS RESOLUTION ---
-	// 		if (a.topLeft.x < b.topLeft.x)
-	// 		{
-	// 			a.topLeft.x -= overlap.x;
-	// 			flagsA.right = true;
-	// 			flagsB.left = true;
-	// 		}
-	// 		else
-	// 		{
-	// 			a.topLeft.x += overlap.x;
-	// 			flagsA.left = true;
-	// 			flagsB.right = true;
-	// 		}
-	// 	}
-	// }
-	// inline void ResolveAABBCollision(Rect &a, const Rect &b,
-	//                                  CollisionFlags &flagsA, CollisionFlags &flagsB)
-	// {
-	//     Point2D overlap = GetOverlap(a, b);
-	//     if (overlap.x <= 0.0f || overlap.y <= 0.0f)
-	//         return;
-
-	//     // PRIORITIZE VERTICAL COLLISIONS
-	//     if (overlap.y <= overlap.x)
-	//     {
-	//         // ---------- Y AXIS COLLISION ----------
-	//         if (a.topLeft.y < b.topLeft.y)
-	//         {
-	//             // A landed on B → SNAP A ON TOP OF B
-	//             a.topLeft.y = b.topLeft.y - a.height;
-	//             flagsA.bottom = true;
-	//             flagsB.top = true;
-	//         }
-	//         else
-	//         {
-	//             // A hit B from below
-	//             a.topLeft.y = b.topLeft.y + b.height;
-	//             flagsA.top = true;
-	//             flagsB.bottom = true;
-	//         }
-	//     }
-	//     else
-	//     {
-	//         // ---------- X AXIS COLLISION ----------
-	//         if (a.topLeft.x < b.topLeft.x)
-	//         {
-	//             a.topLeft.x = b.topLeft.x - a.width;
-	//             flagsA.right = true;
-	//             flagsB.left = true;
-	//         }
-	//         else
-	//         {
-	//             a.topLeft.x = b.topLeft.x + b.width;
-	//             flagsA.left = true;
-	//             flagsB.right = true;
-	//         }
-	//     }
-	// }
-
 	inline void ResolveAABBCollision(Rect &a, const Rect &b,
-									 const Rect &aPrev, const Rect &bPrev,
-									 CollisionFlags &flagsA, CollisionFlags &flagsB)
+									const Rect &aPrev, const Rect &bPrev,
+									CollisionFlags &flagsA, CollisionFlags &flagsB,
+									const Point2D &velocityA = Point2D(0, 0)) // optional
 	{
 		Point2D overlap = GetOverlap(a, b);
 		if (overlap.x <= 0.0f || overlap.y <= 0.0f)
 			return;
 
-		// Small epsilon to add separation and prevent immediate re-collision
 		const float epsilon = 0.01f;
 
-		Point2D prevCenterA = aPrev.topLeft + Point2D(aPrev.width * 0.5f, aPrev.height * 0.5f);
-		Point2D prevCenterB = bPrev.topLeft + Point2D(bPrev.width * 0.5f, bPrev.height * 0.5f);
+		// Compute center delta
+		Point2D centerA = aPrev.topLeft + Point2D(aPrev.width / 2, aPrev.height / 2);
+		Point2D centerB = bPrev.topLeft + Point2D(bPrev.width / 2, bPrev.height / 2);
+		float dx = centerA.x - centerB.x;
+		float dy = centerA.y - centerB.y;
 
-		float dx = prevCenterA.x - prevCenterB.x;
-		float dy = prevCenterA.y - prevCenterB.y;
+		// Determine which axis to resolve
+		bool resolveX = overlap.x < overlap.y;
 
-		if (std::abs(dy) > std::abs(dx))
+		if (resolveX)
 		{
-			// Resolve Y axis first
-			if (dy > 0)
+			if (dx < 0.0f && velocityA.x >= 0.0f)
 			{
-				// Came from below — hit ceiling
-				a.topLeft.y += overlap.y + epsilon;
-				flagsA.top = true;
-				flagsB.bottom = true;
-			}
-			else
-			{
-				// Came from above — landed on top
-				a.topLeft.y -= overlap.y + epsilon;
-				flagsA.bottom = true;
-				flagsB.top = true;
-			}
-		}
-		else
-		{
-			// Resolve X axis
-			if (dx < 0)
-			{
-				// Came from left
+				// Came from left, hit right side of B
 				a.topLeft.x -= overlap.x + epsilon;
 				flagsA.right = true;
 				flagsB.left = true;
 			}
-			else
+			else if (dx > 0.0f && velocityA.x <= 0.0f)
 			{
-				// Came from right
+				// Came from right, hit left side of B
 				a.topLeft.x += overlap.x + epsilon;
 				flagsA.left = true;
 				flagsB.right = true;
+			}
+		}
+		else
+		{
+			if (dy < 0.0f && velocityA.y >= 0.0f)
+			{
+				// Came from above, landed on B
+				a.topLeft.y -= overlap.y + epsilon;
+				flagsA.bottom = true;
+				flagsB.top = true;
+			}
+			else if (dy > 0.0f && velocityA.y <= 0.0f)
+			{
+				// Came from below, hit ceiling
+				a.topLeft.y += overlap.y + epsilon;
+				flagsA.top = true;
+				flagsB.bottom = true;
 			}
 		}
 	}
