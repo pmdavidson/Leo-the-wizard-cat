@@ -168,13 +168,18 @@ void LoadMap(const std::string &path, EngineType &engine, const std::string &res
 
 		// Add Components
 		engine.GetEntityManager().template AddComponent<ECSEngine::LocationComponent>(player, ECSEngine::LocationComponent(ECSEngine::Point2D(spawnX, spawnY)));
-		engine.GetEntityManager().template AddComponent<ECSEngine::GravityComponent>(player, {});
+		engine.GetEntityManager().template AddComponent<ECSEngine::GravityComponent>(player, ECSEngine::GravityComponent(ECSEngine::Point2D(0.0f, 600.0f)));
 		engine.GetEntityManager().template AddComponent<ECSEngine::MovementComponent>(player, {});
 		engine.GetEntityManager().template AddComponent<ECSEngine::InputComponent>(player, {});
 		engine.GetEntityManager().template AddComponent<ECSEngine::CameraFollower>(player, {player});
 		engine.GetEntityManager().template AddComponent<ECSEngine::ScoreComponent>(player, {});
-		engine.GetEntityManager().template AddComponent<ECSEngine::CollisionComponent>(player, {ECSEngine::Rect(0.f, 0.f, 64, 64), false});
-		engine.GetEntityManager().template AddComponent<ECSEngine::SpriteComponent>(player, {playerSpriteId, ECSEngine::Rect(0.f, 0.f, 64, 64), true});
+		
+		// Collision box: 64x64, centered horizontally (offset by 32 from left) and positioned at bottom (offset by 64 from top)
+		// This aligns with where the character's body is in the 128x128 sprite
+		engine.GetEntityManager().template AddComponent<ECSEngine::CollisionComponent>(player, {ECSEngine::Rect(32.f, 64.f, 64.f, 64.f), false});
+		
+		// Sprite display bounds: show the full 128x128 sprite
+		engine.GetEntityManager().template AddComponent<ECSEngine::SpriteComponent>(player, {playerSpriteId, ECSEngine::Rect(0.f, 0.f, 128.f, 128.f), true});
 
 		// Create camera entity that follows the player
 		EntityId camera = engine.GetEntityManager().CreateEntity("camera");
@@ -182,6 +187,48 @@ void LoadMap(const std::string &path, EngineType &engine, const std::string &res
 		cameraComp.position = ECSEngine::Point2D(spawnX, spawnY);
 		cameraComp.scale = 1.0f;
 		engine.GetEntityManager().template AddComponent<ECSEngine::CameraComponent>(camera, cameraComp);
+
+		// Set up score display system
+		// Get the ScoreComponent attached to the player entity
+		auto &scoreComp = engine.GetEntityManager().template GetComponent<ECSEngine::ScoreComponent>(player);
+		
+		// Register digit sprites (0-9) from the spritesheet
+		const float tileSize = 64.f;
+		const float digitX = 13.f * tileSize;        // X position of digit column in spritesheet
+		const float digitStartY = 4.f * tileSize;    // Y position where digit 0 starts
+		
+		for (int digit = 0; digit < 10; ++digit)
+		{
+			// Calculate Y position: digits are arranged top-to-bottom (0 at top, 9 at bottom)
+			float digitY = digitStartY + (9 - digit) * tileSize;
+			SpriteID digitSpriteId = engine.GetSpriteManager().RegisterTexture(
+				gResourcePath + "spritesheet-tiles-default.png",
+				ECSEngine::Rect(digitX, digitY, tileSize, tileSize));
+			scoreComp.digitSpriteIds.push_back(digitSpriteId);
+		}
+
+		// Create 3 display entities for the score
+		const float digitSize = 64.f;
+		const float startX = 20.f; 
+		const float startY = 20.f;  
+
+		for (int i = 0; i < 3; ++i)
+		{
+			// Create an entity for each digit position
+			EntityId digitEntity = engine.GetEntityManager().CreateEntity("score_digit_" + std::to_string(i));
+			
+			// Space by digitSize
+			engine.GetEntityManager().template AddComponent<ECSEngine::LocationComponent>(
+				digitEntity,
+				ECSEngine::LocationComponent(ECSEngine::Point2D(startX + i * digitSize, startY)));
+			
+			// Initialize sprite component with digit 0 sprite
+			engine.GetEntityManager().template AddComponent<ECSEngine::SpriteComponent>(
+				digitEntity,
+				{scoreComp.digitSpriteIds[0], ECSEngine::Rect(0.f, 0.f, digitSize, digitSize), false});
+			
+			scoreComp.displayEntityIds.push_back(digitEntity);
+		}
 
 		// register sounds
 		engine.GetSoundManager().RegisterSound(gResourcePath + "footstep_grass_003.ogg", "land");

@@ -67,6 +67,7 @@ the game being buggy at higher or lower framerates.
 For collision detection, we decided to use tileW and tileH from SpawnComponent to create AABB bounds 
 for an easy work around.
 We used Doxygen for the api documentation.
+We also made it so that stars cannot collide with spawners for spawning simplicty.
 
 Group A: Peter
 Group B: Eric

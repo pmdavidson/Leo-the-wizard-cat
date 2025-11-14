@@ -97,21 +97,17 @@ namespace ECSEngine
 		void SpriteSystem();
 		void SpawnSystem();
 
-		void playerCollisionCheck(EntityID playerId, const CollisionFlags &collidedSides)
+		void playerCollisionCheck(const CollisionFlags &collidedSides, const Point2D &preCollisionVelocity)
 		{
-			if (mEntityManager.template HasComponent<MovementComponent>(playerId))
+			// Determine if we should shake based on collision type
+			bool shouldShake = false;
+			Point2D shakeDir(0.0f, 0.0f);
+			float shakeMagnitude = 0.0f;
+			
+			// Wall collisions (left or right) - always shake when hitting a wall
+			if (collidedSides.left || collidedSides.right)
 			{
-				auto &movementComp = mEntityManager.template GetComponent<MovementComponent>(playerId);
-
-				// Calculate camera shake magnitude using velocity
-				float velocityMagnitude = std::sqrt(movementComp.velocity.x * movementComp.velocity.x +
-													movementComp.velocity.y * movementComp.velocity.y);
-				float baseShake = 1.0f;			  // Base shake amount (reduced for less intensity)
-				float velocityMultiplier = 0.05f; // How much velocity affects shake (reduced for less intensity)
-				float shakeMagnitude = baseShake + (velocityMagnitude * velocityMultiplier);
-
-				// Determine direction of shake based on collision side
-				Point2D shakeDir(0.0f, 0.0f);
+				shouldShake = true;
 				if (collidedSides.left)
 				{
 					shakeDir.x = -1.0f; // shake left
@@ -120,46 +116,89 @@ namespace ECSEngine
 				{
 					shakeDir.x = 1.0f; // shake right
 				}
-
-				if (collidedSides.top)
+				
+				// Use horizontal velocity for wall shake (before it was zeroed)
+				float horizontalVelocity = std::abs(preCollisionVelocity.x);
+				const float minWallShakeVelocity = 50.0f;
+				if (horizontalVelocity < minWallShakeVelocity)
 				{
-					shakeDir.y = -1.0f; // shake up
+					horizontalVelocity = minWallShakeVelocity;
 				}
-				else if (collidedSides.bottom)
+				float baseShake = 1.0f;
+				float velocityMultiplier = 0.05f;
+				shakeMagnitude = baseShake + (horizontalVelocity * velocityMultiplier);
+			}
+			// Floor collision (bottom) - only shake if we were falling (landing impact)
+			else if (collidedSides.bottom)
+			{
+				// Only shake if we were falling (positive Y velocity means downward)
+				// Use a high threshold to prevent shake from small bounces or walking
+				const float minLandingShakeVelocity = 200.0f; // Need substantial fall to shake
+				if (preCollisionVelocity.y > minLandingShakeVelocity)
 				{
+					shouldShake = true;
 					shakeDir.y = 1.0f; // shake down
+					
+					// Use vertical velocity for landing shake (before it was zeroed)
+					float verticalVelocity = preCollisionVelocity.y;
+					float baseShake = 1.0f;
+					float velocityMultiplier = 0.05f;
+					shakeMagnitude = baseShake + (verticalVelocity * velocityMultiplier);
 				}
-
-				// Find camera entity and apply shake
-				for (auto camIt = mEntityManager.begin(); camIt != mEntityManager.end(); ++camIt)
+			}
+			// Ceiling collision (top) - shake if we hit it
+			else if (collidedSides.top)
+			{
+				shouldShake = true;
+				shakeDir.y = -1.0f; // shake up
+				
+				// Use upward velocity for ceiling shake (before it was zeroed)
+				float verticalVelocity = std::abs(preCollisionVelocity.y);
+				const float minCeilingShakeVelocity = 50.0f;
+				if (verticalVelocity < minCeilingShakeVelocity)
 				{
-					EntityID camEntityId = camIt->getID();
+					verticalVelocity = minCeilingShakeVelocity;
+				}
+				float baseShake = 1.0f;
+				float velocityMultiplier = 0.05f;
+				shakeMagnitude = baseShake + (verticalVelocity * velocityMultiplier);
+			}
+			
+			// If no shake condition met, return early
+			if (!shouldShake)
+			{
+				return;
+			}
 
-					if (mEntityManager.template HasComponent<CameraComponent>(camEntityId))
+			// Find camera entity and apply shake
+			for (auto camIt = mEntityManager.begin(); camIt != mEntityManager.end(); ++camIt)
+			{
+				EntityID camEntityId = camIt->getID();
+
+				if (mEntityManager.template HasComponent<CameraComponent>(camEntityId))
+				{
+					// Add or update CameraShake component
+					CameraShake shake;
+					shake.framesRemaining = 10; // Shake for 10 frames
+					shake.magnitude = Point2D(shakeDir.x * shakeMagnitude,
+											  shakeDir.y * shakeMagnitude);
+
+					if (mEntityManager.template HasComponent<CameraShake>(camEntityId))
 					{
-						// Add or update CameraShake component
-						CameraShake shake;
-						shake.framesRemaining = 10; // Shake for 10 frames
-						shake.magnitude = Point2D(shakeDir.x * shakeMagnitude,
-												  shakeDir.y * shakeMagnitude);
-
-						if (mEntityManager.template HasComponent<CameraShake>(camEntityId))
+						// Update existing shake (use larger magnitude if already shaking)
+						auto &existingShake = mEntityManager.template GetComponent<CameraShake>(camEntityId);
+						if (shakeMagnitude > std::sqrt(existingShake.magnitude.x * existingShake.magnitude.x +
+													   existingShake.magnitude.y * existingShake.magnitude.y))
 						{
-							// Update existing shake (use larger magnitude if already shaking)
-							auto &existingShake = mEntityManager.template GetComponent<CameraShake>(camEntityId);
-							if (shakeMagnitude > std::sqrt(existingShake.magnitude.x * existingShake.magnitude.x +
-														   existingShake.magnitude.y * existingShake.magnitude.y))
-							{
-								existingShake = shake;
-							}
+							existingShake = shake;
 						}
-						else
-						{
-							// Add new shake component
-							mEntityManager.template AddComponent<CameraShake>(camEntityId, shake);
-						}
-						break; // Only one camera entity
 					}
+					else
+					{
+						// Add new shake component
+						mEntityManager.template AddComponent<CameraShake>(camEntityId, shake);
+					}
+					break; // Only one camera entity
 				}
 			}
 		}
@@ -285,17 +324,27 @@ namespace ECSEngine
 			auto &collisionComp = mEntityManager.template GetComponent<CollisionComponent>(id);
 			auto &locationComp = mEntityManager.template GetComponent<LocationComponent>(id);
 
-			// STATIC OBJECTS STILL NEED WORLD-BOUNDS
-			collisionComp.currentBounds.topLeft =
-				locationComp.position + collisionComp.localBounds.topLeft;
+			// Calculate what the current world bounds should be
+			Rect newCurrentBounds;
+			newCurrentBounds.topLeft = locationComp.position + collisionComp.localBounds.topLeft;
+			newCurrentBounds.width = collisionComp.localBounds.width;
+			newCurrentBounds.height = collisionComp.localBounds.height;
 
-			collisionComp.currentBounds.width = collisionComp.localBounds.width;
-			collisionComp.currentBounds.height = collisionComp.localBounds.height;
-
-			// ONLY dynamic objects need to store previousBounds
-			if (!collisionComp.isStatic)
+			// Check if this is the first frame (currentBounds not yet in world space)
+			// If currentBounds equals localBounds, it hasn't been initialized yet
+			if (collisionComp.currentBounds.topLeft.x == collisionComp.localBounds.topLeft.x &&
+				collisionComp.currentBounds.topLeft.y == collisionComp.localBounds.topLeft.y &&
+				collisionComp.currentBounds.width == collisionComp.localBounds.width)
 			{
+				// First frame: initialize both to the same world position
+				collisionComp.previousBounds = newCurrentBounds;
+				collisionComp.currentBounds = newCurrentBounds;
+			}
+			else
+			{
+				// Normal frame: store previous before updating current
 				collisionComp.previousBounds = collisionComp.currentBounds;
+				collisionComp.currentBounds = newCurrentBounds;
 			}
 		}
 	}
@@ -523,31 +572,10 @@ namespace ECSEngine
 				auto &locationComp = mEntityManager.template GetComponent<LocationComponent>(entityId);
 				auto &movementComp = mEntityManager.template GetComponent<MovementComponent>(entityId);
 
-				// Check for wall push while falling
-				if (mEntityManager.template HasComponent<InputComponent>(entityId) &&
-					mEntityManager.template HasComponent<CollisionComponent>(entityId))
-				{
-					auto &collisionComp = mEntityManager.template GetComponent<CollisionComponent>(entityId);
-					bool onWall = collisionComp.collidedSides.left ||
-								  collisionComp.collidedSides.right;
-					bool falling = movementComp.velocity.y > 0;
-
-					// is this supposed to be for wall jumping?
-				}
 
 				// Update position based on velocity
 				locationComp.position.x += movementComp.velocity.x * deltaTime;
 				locationComp.position.y += movementComp.velocity.y * deltaTime;
-
-				if (mEntityManager.template HasComponent<CollisionComponent>(entityId))
-				{
-
-					auto &collisionComp = mEntityManager.template GetComponent<CollisionComponent>(entityId);
-
-					collisionComp.currentBounds.topLeft = locationComp.position + collisionComp.localBounds.topLeft;
-					collisionComp.currentBounds.width = collisionComp.localBounds.width;
-					collisionComp.currentBounds.height = collisionComp.localBounds.height;
-				}
 			}
 		}
 	}
@@ -557,6 +585,30 @@ namespace ECSEngine
 	{
 		auto &entityManager = GetEntityManager();
 
+		// First pass: Update all current bounds after movement and clear collision flags
+		for (auto it = entityManager.begin(); it != entityManager.end(); ++it)
+		{
+			if (!it->isActive())
+				continue;
+			EntityID id = it->getID();
+
+			if (!entityManager.template HasComponent<CollisionComponent>(id) ||
+				!entityManager.template HasComponent<LocationComponent>(id))
+				continue;
+
+			auto &collisionComp = entityManager.template GetComponent<CollisionComponent>(id);
+			auto &locationComp = entityManager.template GetComponent<LocationComponent>(id);
+
+			// Update current bounds to match position after movement
+			collisionComp.currentBounds.topLeft = locationComp.position + collisionComp.localBounds.topLeft;
+			collisionComp.currentBounds.width = collisionComp.localBounds.width;
+			collisionComp.currentBounds.height = collisionComp.localBounds.height;
+
+			// Clear collision flags for this frame
+			collisionComp.collidedSides = {};
+		}
+
+		// Second pass: Check and resolve collisions
 		for (auto itA = entityManager.begin(); itA != entityManager.end(); ++itA)
 		{
 			auto &entityA = *itA;
@@ -570,8 +622,6 @@ namespace ECSEngine
 
 			auto &colA = entityManager.template GetComponent<CollisionComponent>(idA);
 			auto &LocA = entityManager.template GetComponent<LocationComponent>(idA);
-
-			colA.collidedSides = {};
 
 			for (auto itB = std::next(itA); itB != entityManager.end(); ++itB)
 			{
@@ -590,45 +640,38 @@ namespace ECSEngine
 				if (colA.isStatic && colB.isStatic)
 					continue;
 
-				// colB.collidedSides = {};
-
 				Rect BoundsA(colA.currentBounds.topLeft, colA.currentBounds.width, colA.currentBounds.height);
 				Rect BoundsB(colB.currentBounds.topLeft, colB.currentBounds.width, colB.currentBounds.height);
 
 				if (!BoundsA.intersects(BoundsB))
 					continue;
 
-				if (BoundsA.intersects(BoundsB))
-				{
-					std::cout << "=== COLLISION DETECTED ===\n";
+				bool isPlayerA = entityManager.template HasComponent<InputComponent>(idA);
+				bool isPlayerB = entityManager.template HasComponent<InputComponent>(idB);
+				bool isSpawnerA = entityManager.template HasComponent<SpawnComponent>(idA);
+				bool isSpawnerB = entityManager.template HasComponent<SpawnComponent>(idB);
+				
+				bool isStarA = !isPlayerA && !isSpawnerA &&
+							   entityManager.template HasComponent<CollisionComponent>(idA) &&
+							   !entityManager.template GetComponent<CollisionComponent>(idA).isStatic &&
+							   (entityManager.template HasComponent<GravityComponent>(idA) ||
+								!entityManager.template HasComponent<MovementComponent>(idA));
+				bool isStarB = !isPlayerB && !isSpawnerB &&
+							   entityManager.template HasComponent<CollisionComponent>(idB) &&
+							   !entityManager.template GetComponent<CollisionComponent>(idB).isStatic &&
+							   (entityManager.template HasComponent<GravityComponent>(idB) ||
+								!entityManager.template HasComponent<MovementComponent>(idB));
 
-					std::cout << "Player Loc: "
-							  << LocA.position.x << ", " << LocA.position.y << "\n";
+				Point2D preCollisionVelocityA(0.0f, 0.0f);
+				Point2D preCollisionVelocityB(0.0f, 0.0f);
+				
+				if (isPlayerA && entityManager.template HasComponent<MovementComponent>(idA))
+					preCollisionVelocityA = entityManager.template GetComponent<MovementComponent>(idA).velocity;
+				if (isPlayerB && entityManager.template HasComponent<MovementComponent>(idB))
+					preCollisionVelocityB = entityManager.template GetComponent<MovementComponent>(idB).velocity;
 
-					std::cout << "A localBounds: ("
-							  << colA.localBounds.topLeft.x << ", " << colA.localBounds.topLeft.y
-							  << ", w=" << colA.localBounds.width
-							  << ", h=" << colA.localBounds.height << ")\n";
-
-					std::cout << "A currentBounds: ("
-							  << colA.currentBounds.topLeft.x << ", " << colA.currentBounds.topLeft.y
-							  << ", w=" << colA.currentBounds.width
-							  << ", h=" << colA.currentBounds.height << ")\n";
-
-					std::cout << "B currentBounds: ("
-							  << colB.currentBounds.topLeft.x << ", " << colB.currentBounds.topLeft.y
-							  << ", w=" << colB.currentBounds.width
-							  << ", h=" << colB.currentBounds.height << ")\n";
-
-					auto overlap = GetOverlap(BoundsA, BoundsB);
-					std::cout << "Overlap: (" << overlap.x << ", " << overlap.y << ")\n";
-				}
-
-				// if B is static then A is a star/player, and vice-versa
 				if (colB.isStatic)
 				{
-					// ResolveAABBCollision(BoundsA, BoundsB, colA.collidedSides, colB.collidedSides);
-
 					ResolveAABBCollision(
 						BoundsA, BoundsB,
 						colA.previousBounds, colB.previousBounds,
@@ -637,8 +680,8 @@ namespace ECSEngine
 					LocA.position = BoundsA.topLeft - colA.localBounds.topLeft;
 					colA.currentBounds = BoundsA;
 
-					// 💡 Add this block to stop movement
-					if (entityManager.template HasComponent<MovementComponent>(idA))
+					// Stop player movement
+					if (isPlayerA && entityManager.template HasComponent<MovementComponent>(idA))
 					{
 						auto &vel = entityManager.template GetComponent<MovementComponent>(idA);
 						if (colA.collidedSides.bottom || colA.collidedSides.top)
@@ -649,8 +692,6 @@ namespace ECSEngine
 				}
 				else if (colA.isStatic)
 				{
-					// ResolveAABBCollision(BoundsB, BoundsA, colB.collidedSides, colA.collidedSides);
-
 					ResolveAABBCollision(
 						BoundsB, BoundsA,
 						colB.previousBounds, colA.previousBounds,
@@ -659,8 +700,7 @@ namespace ECSEngine
 					LocB.position = BoundsB.topLeft - colB.localBounds.topLeft;
 					colB.currentBounds = BoundsB;
 
-					// Stop velocity
-					if (entityManager.template HasComponent<MovementComponent>(idB))
+					if (isPlayerB && entityManager.template HasComponent<MovementComponent>(idB))
 					{
 						auto &vel = entityManager.template GetComponent<MovementComponent>(idB);
 						if (colB.collidedSides.bottom || colB.collidedSides.top)
@@ -669,29 +709,35 @@ namespace ECSEngine
 							vel.velocity.x = 0;
 					}
 				}
-
-				// Check if player (idA) hit a solid object (idB)
-				if (entityManager.template HasComponent<InputComponent>(idA) && colB.isStatic)
+				else
 				{
-					playerCollisionCheck(idA, colA.collidedSides);
+					// For star-to-star collisions
+					ResolveAABBCollision(
+						BoundsA, BoundsB,
+						colA.previousBounds, colB.previousBounds,
+						colA.collidedSides, colB.collidedSides);
+
+					LocA.position = BoundsA.topLeft - colA.localBounds.topLeft;
+					colA.currentBounds = BoundsA;
+					
+					ResolveAABBCollision(
+						BoundsB, BoundsA,
+						colB.previousBounds, colA.previousBounds,
+						colB.collidedSides, colA.collidedSides);
+
+					LocB.position = BoundsB.topLeft - colB.localBounds.topLeft;
+					colB.currentBounds = BoundsB;
 				}
-				if (entityManager.template HasComponent<InputComponent>(idB) && colA.isStatic)
+
+				if (isPlayerA && colB.isStatic)
 				{
-					playerCollisionCheck(idB, colB.collidedSides);
+					playerCollisionCheck(colA.collidedSides, preCollisionVelocityA);
+				}
+				if (isPlayerB && colA.isStatic)
+				{
+					playerCollisionCheck(colB.collidedSides, preCollisionVelocityB);
 				}
 
-				// Check if player collected a star (works for both idA=player/idB=star and idB=player/idA=star)
-				// Stars have GravityComponent and CollisionComponent but not InputComponent
-				bool isPlayerA = entityManager.template HasComponent<InputComponent>(idA);
-				bool isPlayerB = entityManager.template HasComponent<InputComponent>(idB);
-				bool isStarA = !isPlayerA &&
-							   entityManager.template HasComponent<GravityComponent>(idA) &&
-							   entityManager.template HasComponent<CollisionComponent>(idA);
-				bool isStarB = !isPlayerB &&
-							   entityManager.template HasComponent<GravityComponent>(idB) &&
-							   entityManager.template HasComponent<CollisionComponent>(idB);
-
-				// Track if we removed an entity (to skip collision handling for removed entities)
 				bool removedA = false;
 				bool removedB = false;
 
@@ -706,8 +752,7 @@ namespace ECSEngine
 						EntityID scoreEntityId = scoreIt->getID();
 						if (entityManager.template HasComponent<ScoreComponent>(scoreEntityId))
 						{
-							auto &scoreComp = entityManager.template GetComponent<ScoreComponent>(scoreEntityId);
-							scoreComp.currentScore += 10;
+							entityManager.template GetComponent<ScoreComponent>(scoreEntityId).currentScore += 10;
 							break;
 						}
 					}
@@ -733,71 +778,81 @@ namespace ECSEngine
 					// Star vs static object: bounce and lose speed
 					if (colB.isStatic)
 					{
-						// Bounce off the surface and reduce velocity
-						float speedLossFactor = 0.5f; // lose 1/2 spd
+						const float speedLossFactor = 0.5f;
+						const float minBounceVelocity = 50.0f;
 
 						if (colA.collidedSides.left || colA.collidedSides.right)
-						{
-							// Hit left or right wall, reverse horizontal velocity and reduce
 							movementCompA.velocity.x = -movementCompA.velocity.x * speedLossFactor;
-						}
 						if (colA.collidedSides.top || colA.collidedSides.bottom)
 						{
-							// Hit top or bottom, reverse vertical velocity and reduce
 							movementCompA.velocity.y = -movementCompA.velocity.y * speedLossFactor;
+							if (colA.collidedSides.bottom && movementCompA.velocity.y > -minBounceVelocity)
+								movementCompA.velocity.y = -minBounceVelocity;
 						}
 					}
-					// Star vs star: lose all momentum
 					else if (!removedB && isStarB)
 					{
-						// Lose all spd
-						movementCompA.velocity.x = 0.0f;
-						movementCompA.velocity.y = 0.0f;
-
-						// Other star loses all spd
-						if (entityManager.template HasComponent<MovementComponent>(idB))
+						bool isVerticalCollision = colA.collidedSides.top || colA.collidedSides.bottom ||
+													colB.collidedSides.top || colB.collidedSides.bottom;
+						
+						if (isVerticalCollision)
 						{
-							auto &movementCompB = entityManager.template GetComponent<MovementComponent>(idB);
-							movementCompB.velocity.x = 0.0f;
-							movementCompB.velocity.y = 0.0f;
+							if (entityManager.template HasComponent<GravityComponent>(idA))
+								entityManager.template RemoveComponent<GravityComponent>(idA);
+							if (entityManager.template HasComponent<MovementComponent>(idA))
+								entityManager.template RemoveComponent<MovementComponent>(idA);
+							if (entityManager.template HasComponent<GravityComponent>(idB))
+								entityManager.template RemoveComponent<GravityComponent>(idB);
+							if (entityManager.template HasComponent<MovementComponent>(idB))
+								entityManager.template RemoveComponent<MovementComponent>(idB);
+						}
+						else
+						{
+							movementCompA.velocity = Point2D(0.0f, 0.0f);
+							if (entityManager.template HasComponent<MovementComponent>(idB))
+								entityManager.template GetComponent<MovementComponent>(idB).velocity = Point2D(0.0f, 0.0f);
 						}
 					}
 				}
-				// Also handle case where idB is a star
 				else if (!removedB && isStarB && entityManager.template HasComponent<MovementComponent>(idB))
 				{
 					auto &movementCompB = entityManager.template GetComponent<MovementComponent>(idB);
 
-					// Star vs static object: bounce and lose speed
 					if (colA.isStatic)
 					{
-						// Bounce off the surface and reduce velocity
-						float speedLossFactor = 0.5f; // lose 1/2 spd
+						const float speedLossFactor = 0.5f;
+						const float minBounceVelocity = 50.0f;
 
 						if (colB.collidedSides.left || colB.collidedSides.right)
-						{
-							// Hit left or right wall, reverse horizontal velocity and reduce
 							movementCompB.velocity.x = -movementCompB.velocity.x * speedLossFactor;
-						}
 						if (colB.collidedSides.top || colB.collidedSides.bottom)
 						{
-							// Hit top or bottom, reverse vertical velocity and reduce
 							movementCompB.velocity.y = -movementCompB.velocity.y * speedLossFactor;
+							if (colB.collidedSides.bottom && movementCompB.velocity.y > -minBounceVelocity)
+								movementCompB.velocity.y = -minBounceVelocity;
 						}
 					}
-					// Star vs star: lose all momentum
 					else if (!removedA && isStarA)
 					{
-						// Lose all spd
-						movementCompB.velocity.x = 0.0f;
-						movementCompB.velocity.y = 0.0f;
-
-						// Other star loses all spd
-						if (entityManager.template HasComponent<MovementComponent>(idA))
+						bool isVerticalCollision = colA.collidedSides.top || colA.collidedSides.bottom ||
+													colB.collidedSides.top || colB.collidedSides.bottom;
+						
+						if (isVerticalCollision)
 						{
-							auto &movementCompA = entityManager.template GetComponent<MovementComponent>(idA);
-							movementCompA.velocity.x = 0.0f;
-							movementCompA.velocity.y = 0.0f;
+							if (entityManager.template HasComponent<GravityComponent>(idA))
+								entityManager.template RemoveComponent<GravityComponent>(idA);
+							if (entityManager.template HasComponent<MovementComponent>(idA))
+								entityManager.template RemoveComponent<MovementComponent>(idA);
+							if (entityManager.template HasComponent<GravityComponent>(idB))
+								entityManager.template RemoveComponent<GravityComponent>(idB);
+							if (entityManager.template HasComponent<MovementComponent>(idB))
+								entityManager.template RemoveComponent<MovementComponent>(idB);
+						}
+						else
+						{
+							movementCompB.velocity = Point2D(0.0f, 0.0f);
+							if (entityManager.template HasComponent<MovementComponent>(idA))
+								entityManager.template GetComponent<MovementComponent>(idA).velocity = Point2D(0.0f, 0.0f);
 						}
 					}
 				}
@@ -819,16 +874,18 @@ namespace ECSEngine
 			{
 				auto &scoreComp = mEntityManager.template GetComponent<ScoreComponent>(entityId);
 
-				// Update sprite components for each digit in the score
-				// Convert score to string and update display entities
 				std::string scoreStr = std::to_string(scoreComp.currentScore);
+				if (scoreStr.length() < 3)
+					scoreStr = std::string(3 - scoreStr.length(), '0') + scoreStr;
+				if (scoreStr.length() > 3)
+					scoreStr = scoreStr.substr(scoreStr.length() - 3);
 
-				for (size_t i = 0; i < scoreComp.displayEntityIds.size() && i < scoreStr.length(); ++i)
+				for (size_t i = 0; i < scoreComp.displayEntityIds.size() && i < 3; ++i)
 				{
 					EntityID displayEntityId = scoreComp.displayEntityIds[i];
 					if (mEntityManager.template HasComponent<SpriteComponent>(displayEntityId))
 					{
-						int digit = scoreStr[scoreStr.length() - 1 - i] - '0';
+						int digit = scoreStr[i] - '0';
 						if (digit >= 0 && digit < 10 && digit < static_cast<int>(scoreComp.digitSpriteIds.size()))
 						{
 							auto &spriteComp = mEntityManager.template GetComponent<SpriteComponent>(displayEntityId);
@@ -1036,6 +1093,13 @@ namespace ECSEngine
 						locationComp.position.y + spriteComp.bounds.topLeft.y};
 					drawPos = mWindowManager.WorldToWindow(worldPos);
 				}
+				else if (entityManager.template HasComponent<LocationComponent>(entityId))
+				{
+					auto &locationComp = entityManager.template GetComponent<LocationComponent>(entityId);
+					drawPos = Point2D(
+						locationComp.position.x + spriteComp.bounds.topLeft.x,
+						locationComp.position.y + spriteComp.bounds.topLeft.y);
+				}
 				else
 				{
 					drawPos = spriteComp.bounds.topLeft;
@@ -1052,7 +1116,6 @@ namespace ECSEngine
 	template <typename... Components>
 	void ECSEngine<Components...>::SpawnSystem()
 	{
-		// Handle spawning for entities with SpawnComponent
 		float deltaTime = 1.0f / 60.0f;
 		static std::random_device rd;
 		static std::mt19937 gen(rd());
@@ -1075,64 +1138,43 @@ namespace ECSEngine
 				// Check if it's time to spawn
 				if (spawnComp.timeToNextSpawn <= 0.0f && spawnComp.totalSpawnEvents > 0)
 				{
-					// Get spawner location
 					if (mEntityManager.template HasComponent<LocationComponent>(entityId))
 					{
 						auto &spawnerLocation = mEntityManager.template GetComponent<LocationComponent>(entityId);
-
-						// Get sprite size from sprite manager for sprite rendering
 						auto &spriteManager = GetSpriteManager();
 						sf::Sprite &sprite = spriteManager.GetSprite(spawnComp.spriteId);
 						sf::IntRect textureRect = sprite.getTextureRect();
 
-						// Sprite bounds should be relative to entity position (0, 0), not texture coordinates
-						Rect spriteBounds(
-							0.0f,
-							0.0f,
+						Rect spriteBounds(0.0f, 0.0f,
 							static_cast<float>(textureRect.size.x),
 							static_cast<float>(textureRect.size.y));
-
-						// Create AABB bounds using tileW and tileH from SpawnComponent
 						Rect collisionBounds = {0.0f, 0.0f, spawnComp.tileW, spawnComp.tileH};
 
-						// Create new star entity
 						EntityID starId = mEntityManager.CreateEntity("star");
 
-						// Add LocationComponent
-						LocationComponent starLocation;
-						starLocation.position = spawnerLocation.position;
-						mEntityManager.template AddComponent<LocationComponent>(starId, starLocation);
+						mEntityManager.template AddComponent<LocationComponent>(starId, LocationComponent(spawnerLocation.position));
 
-						// Add MovementComponent with random velocity
-						MovementComponent starMovement;
 						float angle = angleDist(gen);
 						float speed = speedDist(gen);
+						MovementComponent starMovement;
 						starMovement.velocity = Point2D(std::cos(angle) * speed, std::sin(angle) * speed);
 						mEntityManager.template AddComponent<MovementComponent>(starId, starMovement);
 
-						// Add GravityComponent
-						GravityComponent starGravity;
-						starGravity.acceleration = Point2D(0, 600.0f); // Gravity acceleration
-						mEntityManager.template AddComponent<GravityComponent>(starId, starGravity);
+						mEntityManager.template AddComponent<GravityComponent>(starId, GravityComponent(Point2D(0, 600.0f)));
 
-						// Add CollisionComponent with AABB bounds from tileW and tileH
-						CollisionComponent starCollision;
-						starCollision.isStatic = false;
+						CollisionComponent starCollision(collisionBounds, false);
 						starCollision.currentBounds = collisionBounds;
 						starCollision.previousBounds = collisionBounds;
 						mEntityManager.template AddComponent<CollisionComponent>(starId, starCollision);
 
-						// Add SpriteComponent with spriteId and sprite bounds
 						SpriteComponent starSprite;
 						starSprite.spriteId = spawnComp.spriteId;
 						starSprite.bounds = spriteBounds;
 						starSprite.inWorldSpace = true;
 						mEntityManager.template AddComponent<SpriteComponent>(starId, starSprite);
 
-						// Reset timer and decrement spawn events
 						spawnComp.timeToNextSpawn = spawnComp.timeBetweenSpawns;
-						if (spawnComp.totalSpawnEvents > 0)
-							spawnComp.totalSpawnEvents--;
+						spawnComp.totalSpawnEvents--;
 					}
 				}
 			}
@@ -1270,6 +1312,9 @@ namespace ECSEngine
 		if (overlap.x <= 0.0f || overlap.y <= 0.0f)
 			return;
 
+		// Small epsilon to add separation and prevent immediate re-collision
+		const float epsilon = 0.01f;
+
 		Point2D prevCenterA = aPrev.topLeft + Point2D(aPrev.width * 0.5f, aPrev.height * 0.5f);
 		Point2D prevCenterB = bPrev.topLeft + Point2D(bPrev.width * 0.5f, bPrev.height * 0.5f);
 
@@ -1282,14 +1327,14 @@ namespace ECSEngine
 			if (dy > 0)
 			{
 				// Came from below — hit ceiling
-				a.topLeft.y += overlap.y;
+				a.topLeft.y += overlap.y + epsilon;
 				flagsA.top = true;
 				flagsB.bottom = true;
 			}
 			else
 			{
 				// Came from above — landed on top
-				a.topLeft.y -= overlap.y;
+				a.topLeft.y -= overlap.y + epsilon;
 				flagsA.bottom = true;
 				flagsB.top = true;
 			}
@@ -1300,14 +1345,14 @@ namespace ECSEngine
 			if (dx < 0)
 			{
 				// Came from left
-				a.topLeft.x -= overlap.x;
+				a.topLeft.x -= overlap.x + epsilon;
 				flagsA.right = true;
 				flagsB.left = true;
 			}
 			else
 			{
 				// Came from right
-				a.topLeft.x += overlap.x;
+				a.topLeft.x += overlap.x + epsilon;
 				flagsA.left = true;
 				flagsB.right = true;
 			}
