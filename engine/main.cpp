@@ -99,10 +99,10 @@ void LoadMap(const std::string &path, EngineType &engine, const std::string &res
 		resourceRoot + "spritesheet-tiles-default.png", ECSEngine::Rect(640.f, 320.f, 64.f, 64.f));
 
 	// Parse map rows
-	for (int y = 0; y <= mapH; ++y)
+	for (int y = 0; y < mapH; ++y)
 	{
 		std::getline(file, line);
-		for (int x = 0; x <= mapW; ++x)
+		for (int x = 0; x < mapW; ++x)
 		{
 			char tile = line[x];
 			if (tile == '.')
@@ -114,8 +114,6 @@ void LoadMap(const std::string &path, EngineType &engine, const std::string &res
 
 			const SpriteEntry &entry = dictionary[tile];
 
-			// ECSEngine::Point2D position = { originX + x * tileW, originY + y * tileH }; //change to Point2D cause LocationComponent takes Point2D
-
 			ECSEngine::Point2D position = {
 				static_cast<float>(originX + x * tileW),
 				static_cast<float>(originY + y * tileH)};
@@ -124,11 +122,13 @@ void LoadMap(const std::string &path, EngineType &engine, const std::string &res
 
 			engine.GetEntityManager().template AddComponent<ECSEngine::LocationComponent>(id, ECSEngine::LocationComponent(position));
 
+			// Drawing Sprites
 			auto spriteId = engine.GetSpriteManager().RegisterTexture(
 				resourceRoot + entry.texturePath, FromSFML(entry.sourceRect));
 
-			engine.GetEntityManager().template AddComponent<ECSEngine::SpriteComponent>(id, {spriteId, FromSFML(entry.boundsRect), true}); // cast entry.boundsRect from IntRect to Rect? causse sprite and collision component constructor takes Rect
+			engine.GetEntityManager().template AddComponent<ECSEngine::SpriteComponent>(id, {spriteId, FromSFML(entry.boundsRect), true});
 
+			// Every object in the world map should be subject to collision
 			if (entry.hasCollision)
 			{
 				engine.GetEntityManager().template AddComponent<ECSEngine::CollisionComponent>(id, ECSEngine::CollisionComponent(
@@ -144,6 +144,7 @@ void LoadMap(const std::string &path, EngineType &engine, const std::string &res
 		}
 	}
 
+	// Make Player after everything else has been made
 	if (dictionaryType == 2){
 		// Spawn position assuming (1,8) is safe
 		float spawnX = tileW * 1;
@@ -220,7 +221,7 @@ void LoadMap(const std::string &path, EngineType &engine, const std::string &res
 			scoreComp.displayEntityIds.push_back(digitEntity);
 		}
 
-		// register sounds
+		// Register sounds
 		engine.GetSoundManager().RegisterSound(gResourcePath + "footstep_grass_003.ogg", "land");
 		engine.GetSoundManager().RegisterSound(gResourcePath + "sfx_jump.ogg", "jump");
 		engine.GetSoundManager().RegisterSound(gResourcePath + "footstep_snow_001.ogg", "wall_push");
@@ -239,7 +240,6 @@ int main(int argc, char *argv[])
 	std::cout << "Usage: " << argv[0] << " [-path resource_path]\n";
 	std::cout << "Using resource path: " << gResourcePath << "\n";
 
-	// Debug entity manager test
 	if (debugMode)
 	{
 		ECSEngine::EntityManager<int, float, bool> e;
@@ -270,11 +270,9 @@ int main(int argc, char *argv[])
 		ECSEngine::ScoreComponent>
 		engine(1024, 768, "Test Engine");
 
-	// Load maps (order matters: sky → world)
 	LoadMap("sky.map", engine, gResourcePath);
 	LoadMap("world.map", engine, gResourcePath);
 
-	// Start game loop
 	engine.Run();
 	return 0;
 }
