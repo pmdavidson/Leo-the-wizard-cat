@@ -7,6 +7,7 @@
 #include <unordered_map>
 #include <random>
 #include <cmath>
+#include <iostream>
 #include "MathUtil.h"
 #include "EntityManager.h"
 #include "SpriteManager.h"
@@ -104,29 +105,30 @@ namespace ECSEngine
 			Point2D shakeDir(0.0f, 0.0f);
 			float shakeMagnitude = 0.0f;
 			
-			// Wall collisions (left or right) - always shake when hitting a wall
+			// Wall collisions (left or right) - only shake if hitting wall with significant velocity
 			if (collidedSides.left || collidedSides.right)
 			{
-				shouldShake = true;
-				if (collidedSides.left)
-				{
-					shakeDir.x = -1.0f; // shake left
-				}
-				else if (collidedSides.right)
-				{
-					shakeDir.x = 1.0f; // shake right
-				}
-				
-				// Use horizontal velocity for wall shake (before it was zeroed)
+				// Use horizontal velocity for wall shake
 				float horizontalVelocity = std::abs(preCollisionVelocity.x);
 				const float minWallShakeVelocity = 50.0f;
-				if (horizontalVelocity < minWallShakeVelocity)
+				
+				// Only shake if there's significant velocity towards the wall
+				if (horizontalVelocity >= minWallShakeVelocity)
 				{
-					horizontalVelocity = minWallShakeVelocity;
+					shouldShake = true;
+					if (collidedSides.left)
+					{
+						shakeDir.x = -1.0f; // shake left
+					}
+					else if (collidedSides.right)
+					{
+						shakeDir.x = 1.0f; // shake right
+					}
+					
+					float baseShake = 1.0f;
+					float velocityMultiplier = 0.05f;
+					shakeMagnitude = baseShake + (horizontalVelocity * velocityMultiplier);
 				}
-				float baseShake = 1.0f;
-				float velocityMultiplier = 0.05f;
-				shakeMagnitude = baseShake + (horizontalVelocity * velocityMultiplier);
 			}
 			// Floor collision (bottom) - only shake if we were falling (landing impact)
 			else if (collidedSides.bottom)
@@ -646,6 +648,10 @@ namespace ECSEngine
 				if (!BoundsA.intersects(BoundsB))
 					continue;
 
+				// Debug: Print collision information
+				std::cout << "[COLLISION] idA=" << idA << " (" << entityA.getName() 
+				          << ") hit idB=" << idB << " (" << entityB.getName() << ")\n";
+
 				bool isPlayerA = entityManager.template HasComponent<InputComponent>(idA);
 				bool isPlayerB = entityManager.template HasComponent<InputComponent>(idB);
 				bool isSpawnerA = entityManager.template HasComponent<SpawnComponent>(idA);
@@ -1138,41 +1144,52 @@ namespace ECSEngine
 				// Check if it's time to spawn
 				if (spawnComp.timeToNextSpawn <= 0.0f && spawnComp.totalSpawnEvents > 0)
 				{
+					// Ensure spawner has a location component to determine spawn position
 					if (mEntityManager.template HasComponent<LocationComponent>(entityId))
 					{
+						// Get spawner's position and sprite information
 						auto &spawnerLocation = mEntityManager.template GetComponent<LocationComponent>(entityId);
 						auto &spriteManager = GetSpriteManager();
 						sf::Sprite &sprite = spriteManager.GetSprite(spawnComp.spriteId);
 						sf::IntRect textureRect = sprite.getTextureRect();
 
+						// Calculate sprite bounds from texture dimensions
 						Rect spriteBounds(0.0f, 0.0f,
 							static_cast<float>(textureRect.size.x),
 							static_cast<float>(textureRect.size.y));
+
 						Rect collisionBounds = {0.0f, 0.0f, spawnComp.tileW, spawnComp.tileH};
 
 						EntityID starId = mEntityManager.CreateEntity("star");
 
 						mEntityManager.template AddComponent<LocationComponent>(starId, LocationComponent(spawnerLocation.position));
 
+						// Generate random angle and speed for star movement
 						float angle = angleDist(gen);
 						float speed = speedDist(gen);
 						MovementComponent starMovement;
+
+						// Calculate velocity vector from angle and speed
 						starMovement.velocity = Point2D(std::cos(angle) * speed, std::sin(angle) * speed);
 						mEntityManager.template AddComponent<MovementComponent>(starId, starMovement);
 
+						// Apply gravity to the star
 						mEntityManager.template AddComponent<GravityComponent>(starId, GravityComponent(Point2D(0, 600.0f)));
 
+						// Set up collision component with initial bounds
 						CollisionComponent starCollision(collisionBounds, false);
 						starCollision.currentBounds = collisionBounds;
 						starCollision.previousBounds = collisionBounds;
 						mEntityManager.template AddComponent<CollisionComponent>(starId, starCollision);
 
+						// Set up sprite component for rendering
 						SpriteComponent starSprite;
 						starSprite.spriteId = spawnComp.spriteId;
 						starSprite.bounds = spriteBounds;
 						starSprite.inWorldSpace = true;
 						mEntityManager.template AddComponent<SpriteComponent>(starId, starSprite);
 
+						// Reset spawn timer and decrement remaining spawn events
 						spawnComp.timeToNextSpawn = spawnComp.timeBetweenSpawns;
 						spawnComp.totalSpawnEvents--;
 					}
@@ -1312,7 +1329,7 @@ namespace ECSEngine
 		if (overlap.x <= 0.0f || overlap.y <= 0.0f)
 			return;
 
-		// Small epsilon to add separation and prevent immediate re-collision
+		// Small epsilon to add separation
 		const float epsilon = 0.01f;
 
 		Point2D prevCenterA = aPrev.topLeft + Point2D(aPrev.width * 0.5f, aPrev.height * 0.5f);
@@ -1326,14 +1343,14 @@ namespace ECSEngine
 			// Resolve Y axis first
 			if (dy > 0)
 			{
-				// Came from below — hit ceiling
+				// Came from below, hit ceiling
 				a.topLeft.y += overlap.y + epsilon;
 				flagsA.top = true;
 				flagsB.bottom = true;
 			}
 			else
 			{
-				// Came from above — landed on top
+				// Came from above, landed on top
 				a.topLeft.y -= overlap.y + epsilon;
 				flagsA.bottom = true;
 				flagsB.top = true;
