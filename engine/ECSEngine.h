@@ -104,14 +104,14 @@ namespace ECSEngine
 			bool shouldShake = false;
 			Point2D shakeDir(0.0f, 0.0f);
 			float shakeMagnitude = 0.0f;
-			
+
 			// Wall collisions (left or right) - only shake if hitting wall with significant velocity
 			if (collidedSides.left || collidedSides.right)
 			{
 				// Use horizontal velocity for wall shake
 				float horizontalVelocity = std::abs(preCollisionVelocity.x);
 				const float minWallShakeVelocity = 50.0f;
-				
+
 				// Only shake if there's significant velocity towards the wall
 				if (horizontalVelocity >= minWallShakeVelocity)
 				{
@@ -124,7 +124,7 @@ namespace ECSEngine
 					{
 						shakeDir.x = 1.0f; // shake right
 					}
-					
+
 					float baseShake = 1.0f;
 					float velocityMultiplier = 0.05f;
 					shakeMagnitude = baseShake + (horizontalVelocity * velocityMultiplier);
@@ -140,7 +140,7 @@ namespace ECSEngine
 				{
 					shouldShake = true;
 					shakeDir.y = 1.0f; // shake down
-					
+
 					// Use vertical velocity for landing shake (before it was zeroed)
 					float verticalVelocity = preCollisionVelocity.y;
 					float baseShake = 1.0f;
@@ -153,7 +153,7 @@ namespace ECSEngine
 			{
 				shouldShake = true;
 				shakeDir.y = -1.0f; // shake up
-				
+
 				// Use upward velocity for ceiling shake (before it was zeroed)
 				float verticalVelocity = std::abs(preCollisionVelocity.y);
 				const float minCeilingShakeVelocity = 50.0f;
@@ -165,7 +165,7 @@ namespace ECSEngine
 				float velocityMultiplier = 0.05f;
 				shakeMagnitude = baseShake + (verticalVelocity * velocityMultiplier);
 			}
-			
+
 			// If no shake condition met, return early
 			if (!shouldShake)
 			{
@@ -574,7 +574,6 @@ namespace ECSEngine
 				auto &locationComp = mEntityManager.template GetComponent<LocationComponent>(entityId);
 				auto &movementComp = mEntityManager.template GetComponent<MovementComponent>(entityId);
 
-
 				// Update position based on velocity
 				locationComp.position.x += movementComp.velocity.x * deltaTime;
 				locationComp.position.y += movementComp.velocity.y * deltaTime;
@@ -649,14 +648,14 @@ namespace ECSEngine
 					continue;
 
 				// Debug: Print collision information
-				std::cout << "[COLLISION] idA=" << idA << " (" << entityA.getName() 
-				          << ") hit idB=" << idB << " (" << entityB.getName() << ")\n";
+				std::cout << "[COLLISION] idA=" << idA << " (" << entityA.getName()
+						  << ") hit idB=" << idB << " (" << entityB.getName() << ")\n";
 
 				bool isPlayerA = entityManager.template HasComponent<InputComponent>(idA);
 				bool isPlayerB = entityManager.template HasComponent<InputComponent>(idB);
 				bool isSpawnerA = entityManager.template HasComponent<SpawnComponent>(idA);
 				bool isSpawnerB = entityManager.template HasComponent<SpawnComponent>(idB);
-				
+
 				bool isStarA = !isPlayerA && !isSpawnerA &&
 							   entityManager.template HasComponent<CollisionComponent>(idA) &&
 							   !entityManager.template GetComponent<CollisionComponent>(idA).isStatic &&
@@ -670,7 +669,7 @@ namespace ECSEngine
 
 				Point2D preCollisionVelocityA(0.0f, 0.0f);
 				Point2D preCollisionVelocityB(0.0f, 0.0f);
-				
+
 				if (isPlayerA && entityManager.template HasComponent<MovementComponent>(idA))
 					preCollisionVelocityA = entityManager.template GetComponent<MovementComponent>(idA).velocity;
 				if (isPlayerB && entityManager.template HasComponent<MovementComponent>(idB))
@@ -681,7 +680,7 @@ namespace ECSEngine
 					ResolveAABBCollision(
 						BoundsA, BoundsB,
 						colA.previousBounds, colB.previousBounds,
-						colA.collidedSides, colB.collidedSides);
+						colA.collidedSides, colB.collidedSides, preCollisionVelocityA);
 
 					LocA.position = BoundsA.topLeft - colA.localBounds.topLeft;
 					colA.currentBounds = BoundsA;
@@ -701,7 +700,7 @@ namespace ECSEngine
 					ResolveAABBCollision(
 						BoundsB, BoundsA,
 						colB.previousBounds, colA.previousBounds,
-						colB.collidedSides, colA.collidedSides);
+						colB.collidedSides, colA.collidedSides, preCollisionVelocityB);
 
 					LocB.position = BoundsB.topLeft - colB.localBounds.topLeft;
 					colB.currentBounds = BoundsB;
@@ -721,15 +720,15 @@ namespace ECSEngine
 					ResolveAABBCollision(
 						BoundsA, BoundsB,
 						colA.previousBounds, colB.previousBounds,
-						colA.collidedSides, colB.collidedSides);
+						colA.collidedSides, colB.collidedSides, preCollisionVelocityA);
 
 					LocA.position = BoundsA.topLeft - colA.localBounds.topLeft;
 					colA.currentBounds = BoundsA;
-					
+
 					ResolveAABBCollision(
 						BoundsB, BoundsA,
 						colB.previousBounds, colA.previousBounds,
-						colB.collidedSides, colA.collidedSides);
+						colB.collidedSides, colA.collidedSides, preCollisionVelocityB);
 
 					LocB.position = BoundsB.topLeft - colB.localBounds.topLeft;
 					colB.currentBounds = BoundsB;
@@ -739,7 +738,7 @@ namespace ECSEngine
 				{
 					playerCollisionCheck(colA.collidedSides, preCollisionVelocityA);
 				}
-				if (isPlayerB && colA.isStatic)
+				else if (isPlayerB && colA.isStatic)
 				{
 					playerCollisionCheck(colB.collidedSides, preCollisionVelocityB);
 				}
@@ -799,8 +798,8 @@ namespace ECSEngine
 					else if (!removedB && isStarB)
 					{
 						bool isVerticalCollision = colA.collidedSides.top || colA.collidedSides.bottom ||
-													colB.collidedSides.top || colB.collidedSides.bottom;
-						
+												   colB.collidedSides.top || colB.collidedSides.bottom;
+
 						if (isVerticalCollision)
 						{
 							if (entityManager.template HasComponent<GravityComponent>(idA))
@@ -841,8 +840,8 @@ namespace ECSEngine
 					else if (!removedA && isStarA)
 					{
 						bool isVerticalCollision = colA.collidedSides.top || colA.collidedSides.bottom ||
-													colB.collidedSides.top || colB.collidedSides.bottom;
-						
+												   colB.collidedSides.top || colB.collidedSides.bottom;
+
 						if (isVerticalCollision)
 						{
 							if (entityManager.template HasComponent<GravityComponent>(idA))
@@ -1155,8 +1154,8 @@ namespace ECSEngine
 
 						// Calculate sprite bounds from texture dimensions
 						Rect spriteBounds(0.0f, 0.0f,
-							static_cast<float>(textureRect.size.x),
-							static_cast<float>(textureRect.size.y));
+										  static_cast<float>(textureRect.size.x),
+										  static_cast<float>(textureRect.size.y));
 
 						Rect collisionBounds = {0.0f, 0.0f, spawnComp.tileW, spawnComp.tileH};
 
@@ -1198,132 +1197,10 @@ namespace ECSEngine
 		}
 	}
 
-	// inline void ResolveAABBCollision(Rect &a, const Rect &b, CollisionFlags &flagsA, CollisionFlags &flagsB)
-	// {
-	// 	Point2D overlap = GetOverlap(a, b);
-
-	// 	if (overlap.x <= 0.0f || overlap.y <= 0.0f)
-	// 		return; // no real overlap
-
-	// 	// Resolve Y-axis
-	// 	if (a.topLeft.y < b.topLeft.y)
-	// 	{
-	// 		a.topLeft.y -= overlap.y;
-	// 		flagsA.bottom = true;
-	// 		flagsB.top = true;
-	// 	}
-	// 	else
-	// 	{
-	// 		a.topLeft.y += overlap.y;
-	// 		flagsA.top = true;
-	// 		flagsB.bottom = true;
-	// 	}
-
-	// 	// Resolve X-axis
-	// 	if (a.topLeft.x < b.topLeft.x)
-	// 	{
-	// 		a.topLeft.x -= overlap.x;
-	// 		flagsA.right = true;
-	// 		flagsB.left = true;
-	// 	}
-	// 	else
-	// 	{
-	// 		a.topLeft.x += overlap.x;
-	// 		flagsA.left = true;
-	// 		flagsB.right = true;
-	// 	}
-	// }
-
-	// inline void ResolveAABBCollision(Rect &a, const Rect &b,
-	//                              CollisionFlags &flagsA, CollisionFlags &flagsB)
-	// {
-	// 	Point2D overlap = GetOverlap(a, b);
-	// 	if (overlap.x <= 0.0f || overlap.y <= 0.0f)
-	// 		return;
-
-	// 	// PRIORITIZE VERTICAL COLLISIONS (GROUND/CEILING)
-	// 	if (overlap.y <= overlap.x)
-	// 	{
-	// 		// --- Y-AXIS RESOLUTION ---
-	// 		if (a.topLeft.y < b.topLeft.y)
-	// 		{
-	// 			// A landed on top of B
-	// 			a.topLeft.y -= overlap.y;
-	// 			flagsA.bottom = true;
-	// 			flagsB.top = true;
-	// 		}
-	// 		else
-	// 		{
-	// 			// A hit B from below
-	// 			a.topLeft.y += overlap.y;
-	// 			flagsA.top = true;
-	// 			flagsB.bottom = true;
-	// 		}
-	// 	}
-	// 	else
-	// 	{
-	// 		// --- X-AXIS RESOLUTION ---
-	// 		if (a.topLeft.x < b.topLeft.x)
-	// 		{
-	// 			a.topLeft.x -= overlap.x;
-	// 			flagsA.right = true;
-	// 			flagsB.left = true;
-	// 		}
-	// 		else
-	// 		{
-	// 			a.topLeft.x += overlap.x;
-	// 			flagsA.left = true;
-	// 			flagsB.right = true;
-	// 		}
-	// 	}
-	// }
-	// inline void ResolveAABBCollision(Rect &a, const Rect &b,
-	//                                  CollisionFlags &flagsA, CollisionFlags &flagsB)
-	// {
-	//     Point2D overlap = GetOverlap(a, b);
-	//     if (overlap.x <= 0.0f || overlap.y <= 0.0f)
-	//         return;
-
-	//     // PRIORITIZE VERTICAL COLLISIONS
-	//     if (overlap.y <= overlap.x)
-	//     {
-	//         // ---------- Y AXIS COLLISION ----------
-	//         if (a.topLeft.y < b.topLeft.y)
-	//         {
-	//             // A landed on B → SNAP A ON TOP OF B
-	//             a.topLeft.y = b.topLeft.y - a.height;
-	//             flagsA.bottom = true;
-	//             flagsB.top = true;
-	//         }
-	//         else
-	//         {
-	//             // A hit B from below
-	//             a.topLeft.y = b.topLeft.y + b.height;
-	//             flagsA.top = true;
-	//             flagsB.bottom = true;
-	//         }
-	//     }
-	//     else
-	//     {
-	//         // ---------- X AXIS COLLISION ----------
-	//         if (a.topLeft.x < b.topLeft.x)
-	//         {
-	//             a.topLeft.x = b.topLeft.x - a.width;
-	//             flagsA.right = true;
-	//             flagsB.left = true;
-	//         }
-	//         else
-	//         {
-	//             a.topLeft.x = b.topLeft.x + b.width;
-	//             flagsA.left = true;
-	//             flagsB.right = true;
-	//         }
-	//     }
-	// }
-
 	inline void ResolveAABBCollision(Rect &a, const Rect &b,
 									 const Rect &aPrev, const Rect &bPrev,
-									 CollisionFlags &flagsA, CollisionFlags &flagsB)
+									 CollisionFlags &flagsA, CollisionFlags &flagsB,
+									 const Point2D &velocityA = Point2D(0, 0)) // optional
 	{
 		Point2D overlap = GetOverlap(a, b);
 		if (overlap.x <= 0.0f || overlap.y <= 0.0f)
@@ -1332,46 +1209,47 @@ namespace ECSEngine
 		// Small epsilon to add separation
 		const float epsilon = 0.01f;
 
-		Point2D prevCenterA = aPrev.topLeft + Point2D(aPrev.width * 0.5f, aPrev.height * 0.5f);
-		Point2D prevCenterB = bPrev.topLeft + Point2D(bPrev.width * 0.5f, bPrev.height * 0.5f);
+		// Compute center delta
+		Point2D centerA = aPrev.topLeft + Point2D(aPrev.width / 2, aPrev.height / 2);
+		Point2D centerB = bPrev.topLeft + Point2D(bPrev.width / 2, bPrev.height / 2);
+		float dx = centerA.x - centerB.x;
+		float dy = centerA.y - centerB.y;
 
-		float dx = prevCenterA.x - prevCenterB.x;
-		float dy = prevCenterA.y - prevCenterB.y;
+		// Determine which axis to resolve
+		bool resolveX = overlap.x < overlap.y;
 
-		if (std::abs(dy) > std::abs(dx))
+		if (resolveX)
 		{
-			// Resolve Y axis first
-			if (dy > 0)
+			if (dx < 0.0f && velocityA.x >= 0.0f)
+			{
+				// Came from left, hit right side of B
+				a.topLeft.x -= overlap.x + epsilon;
+				flagsA.right = true;
+				flagsB.left = true;
+			}
+			else if (dx > 0.0f && velocityA.x <= 0.0f)
+			{
+				// Came from right, hit left side of B
+				a.topLeft.x += overlap.x + epsilon;
+				flagsA.left = true;
+				flagsB.right = true;
+			}
+		}
+		else
+		{
+			if (dy < 0.0f && velocityA.y >= 0.0f)
+			{
+				// Came from above, landed on B
+				a.topLeft.y -= overlap.y + epsilon;
+				flagsA.bottom = true;
+				flagsB.top = true;
+			}
+			else if (dy > 0.0f && velocityA.y <= 0.0f)
 			{
 				// Came from below, hit ceiling
 				a.topLeft.y += overlap.y + epsilon;
 				flagsA.top = true;
 				flagsB.bottom = true;
-			}
-			else
-			{
-				// Came from above, landed on top
-				a.topLeft.y -= overlap.y + epsilon;
-				flagsA.bottom = true;
-				flagsB.top = true;
-			}
-		}
-		else
-		{
-			// Resolve X axis
-			if (dx < 0)
-			{
-				// Came from left
-				a.topLeft.x -= overlap.x + epsilon;
-				flagsA.right = true;
-				flagsB.left = true;
-			}
-			else
-			{
-				// Came from right
-				a.topLeft.x += overlap.x + epsilon;
-				flagsA.left = true;
-				flagsB.right = true;
 			}
 		}
 	}
