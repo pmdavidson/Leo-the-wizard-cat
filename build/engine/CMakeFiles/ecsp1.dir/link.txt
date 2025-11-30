@@ -1,1 +1,0 @@
-/usr/bin/c++  -pedantic-errors -Wall -Wextra -Wpedantic CMakeFiles/ecsp1.dir/main.cpp.o -o ecsp1  -Wl,-rpath,/usr/local/lib libECS.a /usr/local/lib/libsfml-graphics-d.so.3.0.0 /usr/local/lib/libsfml-window-d.so.3.0.0 /usr/local/lib/libsfml-audio-d.so.3.0.0 /usr/local/lib/libsfml-system-d.so.3.0.0 
