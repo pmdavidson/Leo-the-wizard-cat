@@ -1,0 +1,2 @@
+/usr/bin/ar qc libECS.a CMakeFiles/ECS.dir/EntityManager.cpp.o CMakeFiles/ECS.dir/Entity.cpp.o CMakeFiles/ECS.dir/SpriteManager.cpp.o CMakeFiles/ECS.dir/SoundManager.cpp.o CMakeFiles/ECS.dir/WindowManager.cpp.o
+/usr/bin/ranlib libECS.a

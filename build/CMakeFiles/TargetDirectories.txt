@@ -1,0 +1,6 @@
+/home/bgfis/CMPUT350/project4/project-3-platformer/build/CMakeFiles/edit_cache.dir
+/home/bgfis/CMPUT350/project4/project-3-platformer/build/CMakeFiles/rebuild_cache.dir
+/home/bgfis/CMPUT350/project4/project-3-platformer/build/engine/CMakeFiles/ECS.dir
+/home/bgfis/CMPUT350/project4/project-3-platformer/build/engine/CMakeFiles/ecsp1.dir
+/home/bgfis/CMPUT350/project4/project-3-platformer/build/engine/CMakeFiles/edit_cache.dir
+/home/bgfis/CMPUT350/project4/project-3-platformer/build/engine/CMakeFiles/rebuild_cache.dir
