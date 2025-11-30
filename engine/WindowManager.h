@@ -32,7 +32,18 @@ namespace ECSEngine
 		WindowManager(unsigned int width, unsigned int height, const std::string &title);
 
 		/**
-		 * @brief Destroys the WindowManager and closes the render window.
+		 * @brief Constructs a WindowManager using an existing window.
+		 *
+		 * @param window Pointer to an existing render window.
+		 * @param width Width of the window in pixels.
+		 * @param height Height of the window in pixels.
+		 *
+		 * @note The WindowManager will not delete the window in its destructor.
+		 */
+		WindowManager(sf::RenderWindow *window, unsigned int width, unsigned int height);
+
+		/**
+		 * @brief Destroys the WindowManager and closes the render window if owned.
 		 */
 		~WindowManager();
 
@@ -142,6 +153,7 @@ namespace ECSEngine
 		unsigned int mWidth, mHeight;
 		Point2D mCameraCenter{0.f, 0.f};
 		float mWorldScale = 1.0f; // world units per pixel
+		bool mOwnsWindow = true;  // Whether this WindowManager owns the window
 	};
 
 }

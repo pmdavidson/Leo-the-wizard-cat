@@ -7,25 +7,28 @@
 namespace ECSEngine
 {
 
-    struct LocationComponent {
+    struct LocationComponent
+    {
         Point2D position;
 
         LocationComponent() : position{0.0f, 0.0f} {}
-        explicit LocationComponent(const Point2D& pos) : position(pos) {}
+        explicit LocationComponent(const Point2D &pos) : position(pos) {}
     };
 
-    struct MovementComponent {
+    struct MovementComponent
+    {
         Point2D velocity;
 
         MovementComponent() : velocity{5.0f, 5.0f} {}
-        explicit MovementComponent(const Point2D& vel) : velocity(vel) {}
+        explicit MovementComponent(const Point2D &vel) : velocity(vel) {}
     };
 
-struct GravityComponent {
+    struct GravityComponent
+    {
         Point2D acceleration;
 
         GravityComponent() : acceleration{1.0f, 1.0f} {}
-        explicit GravityComponent(const Point2D& acc) : acceleration(acc) {}
+        explicit GravityComponent(const Point2D &acc) : acceleration(acc) {}
     };
 
 }

@@ -20,10 +20,14 @@ namespace ECSEngine
 	struct IndexOf;
 
 	template <typename T, typename... Ts>
-	struct IndexOf<T, T, Ts...> : std::integral_constant<size_t, 0> {};
+	struct IndexOf<T, T, Ts...> : std::integral_constant<size_t, 0>
+	{
+	};
 
 	template <typename T, typename U, typename... Ts>
-	struct IndexOf<T, U, Ts...> : std::integral_constant<size_t, 1 + IndexOf<T, Ts...>::value> {};
+	struct IndexOf<T, U, Ts...> : std::integral_constant<size_t, 1 + IndexOf<T, Ts...>::value>
+	{
+	};
 
 	/**
 	 * @brief Manages entities and their components for the ECS engine.
@@ -193,17 +197,17 @@ namespace ECSEngine
 		 * @brief Returns a const iterator to the beginning of the entities.
 		 */
 		const_iterator cbegin() const { return mEntities.cbegin(); }
-		
+
 		/**
 		 * @brief Returns a const iterator to the end of the entities.
 		 */
 		const_iterator cend() const { return mEntities.cend(); }
-		
+
 		/**
 		 * @brief Returns an iterator to the beginning of the entities.
 		 */
 		const_iterator begin() { return mEntities.begin(); }
-		
+
 		/**
 		 * @brief Returns an iterator to the end of the entities.
 		 */
@@ -220,15 +224,17 @@ namespace ECSEngine
 		}
 
 		template <typename U, typename... Us>
-		void RemoveComponentsHelper(EntityID entity) {
-			if (HasComponent<U>(entity)) {
+		void RemoveComponentsHelper(EntityID entity)
+		{
+			if (HasComponent<U>(entity))
+			{
 				RemoveComponent<U>(entity);
 			}
 
-			if constexpr (sizeof...(Us) > 0) {
+			if constexpr (sizeof...(Us) > 0)
+			{
 				RemoveComponentsHelper<Us...>(entity);
 			}
 		}
-
 	};
 }

@@ -7,14 +7,19 @@ namespace ECSEngine
 {
 
 	WindowManager::WindowManager(unsigned int width, unsigned int height, const std::string &title)
-		: mWidth(width), mHeight(height)
+		: mWidth(width), mHeight(height), mOwnsWindow(true)
 	{
 		mWindow = new sf::RenderWindow(sf::VideoMode({width, height}), title);
 	}
 
+	WindowManager::WindowManager(sf::RenderWindow *window, unsigned int width, unsigned int height)
+		: mWindow(window), mWidth(width), mHeight(height), mOwnsWindow(false)
+	{
+	}
+
 	WindowManager::~WindowManager()
 	{
-		if (mWindow)
+		if (mWindow && mOwnsWindow)
 		{
 			mWindow->close();
 			delete mWindow;

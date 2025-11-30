@@ -7,16 +7,18 @@
 // but does not have these installed by default.
 // This is a base class for all entities in the ECS system.
 
-namespace ECSEngine {
-    
+namespace ECSEngine
+{
+
     using EntityID = size_t;
 
-    class Entity {
+    class Entity
+    {
     public:
-        Entity(EntityID id, const std::string& name);
+        Entity(EntityID id, const std::string &name);
 
         [[nodiscard]] EntityID getID() const;
-        [[nodiscard]] const std::string& getName() const;
+        [[nodiscard]] const std::string &getName() const;
         [[nodiscard]] bool isActive() const;
 
         void setActive(bool active);
