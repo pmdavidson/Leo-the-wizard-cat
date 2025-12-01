@@ -19,11 +19,18 @@ namespace ECSEngine
         Rect bounds;       // Bounds where the sprite is drawn (relative to entity location)
         bool inWorldSpace; // Whether the sprite is in world or screen space
 
+        int layer = 0;
+
+        // shader name (resolved in ShaderManager)
+        std::string shaderName = "";
+
         SpriteComponent() = default;
 
-        SpriteComponent(SpriteID id, const Rect &drawBounds, bool world = true)
+        SpriteComponent(SpriteID id, const Rect &drawBounds, bool world = true, int layerNum, std::string shadeName)
             : spriteId(id),
               bounds(drawBounds),
-              inWorldSpace(world) {}
+              inWorldSpace(world),
+              layer(layerNum),
+              shaderName(shadeName) {}
     };
 }

@@ -52,9 +52,19 @@ namespace ECSEngine
 		 * be called later. Store SpriteIDs instead.
 		 */
 		sf::Sprite &GetSprite(SpriteID id);
+		sf::Texture &GetTexture() { return mTextureAtlas; }
 
 	private:
-		std::unordered_map<std::string, sf::Texture> mTextures;
+		sf::Texture mTextureAtlas;           // the BIG texture containing all sprites
+		sf::Image   mAtlasImage;        // <-- keep CPU-side atlas copy
+
+		unsigned int mAtlasWidth;            // current width used
+		unsigned int mAtlasHeight;           // current height used
+
+		unsigned int mAtlasCursorX = 0;  // where next sprite will be placed horizontally
+		unsigned int mAtlasCursorY = 0;  // where next sprite row starts
+		unsigned int mCurrentRowHeight = 0;  // height of the tallest sprite in the current row
+
 		std::vector<sf::Sprite> mSprites;
 	};
 

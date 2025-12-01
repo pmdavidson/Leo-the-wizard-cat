@@ -19,107 +19,7 @@ namespace ECSEngine
 	template <typename... Components>
 	class CollisionSystem : public System<Components...>
 	{
-	private:
-		void playerCollisionCheck(Scene<Components...> &scene, const CollisionFlags &collidedSides, const Point2D &preCollisionVelocity)
-		{
-			auto &entityManager = scene.GetEntityManager();
-
-			// Determine if we should shake
-			bool shouldShake = false;
-			Point2D shakeDir(0.0f, 0.0f);
-			float shakeMagnitude = 0.0f;
-
-			// Wall collisions, only shake if hitting wall with large enough velocity
-			if (collidedSides.left || collidedSides.right)
-			{
-				float horizontalVelocity = std::abs(preCollisionVelocity.x);
-				const float minWallShakeVelocity = 50.0f;
-
-				if (horizontalVelocity >= minWallShakeVelocity)
-				{
-					shouldShake = true;
-					if (collidedSides.left)
-					{
-						shakeDir.x = -1.0f;
-					}
-					else if (collidedSides.right)
-					{
-						shakeDir.x = 1.0f;
-					}
-
-					float baseShake = 1.0f;
-					float velocityMultiplier = 0.05f;
-					shakeMagnitude = baseShake + (horizontalVelocity * velocityMultiplier);
-				}
-			}
-			// Floor collision, only shake if we were falling (landing impact)
-			else if (collidedSides.bottom)
-			{
-				const float minLandingShakeVelocity = 200.0f;
-				if (preCollisionVelocity.y > minLandingShakeVelocity)
-				{
-					shouldShake = true;
-					shakeDir.y = 1.0f;
-
-					float verticalVelocity = preCollisionVelocity.y;
-					float baseShake = 1.0f;
-					float velocityMultiplier = 0.05f;
-					shakeMagnitude = baseShake + (verticalVelocity * velocityMultiplier);
-				}
-			}
-			// Ceiling collision shake if we hit it
-			else if (collidedSides.top)
-			{
-				shouldShake = true;
-				shakeDir.y = -1.0f;
-
-				float verticalVelocity = std::abs(preCollisionVelocity.y);
-				const float minCeilingShakeVelocity = 50.0f;
-				if (verticalVelocity < minCeilingShakeVelocity)
-				{
-					verticalVelocity = minCeilingShakeVelocity;
-				}
-				float baseShake = 1.0f;
-				float velocityMultiplier = 0.05f;
-				shakeMagnitude = baseShake + (verticalVelocity * velocityMultiplier);
-			}
-
-			if (!shouldShake)
-			{
-				return;
-			}
-
-			// Find camera entity and apply shake
-			for (auto camIt = entityManager.begin(); camIt != entityManager.end(); ++camIt)
-			{
-				EntityID camEntityId = camIt->getID();
-
-				if (entityManager.template HasComponent<CameraComponent>(camEntityId))
-				{
-					CameraShake shake;
-					shake.framesRemaining = 10;
-					shake.magnitude = Point2D(shakeDir.x * shakeMagnitude,
-											  shakeDir.y * shakeMagnitude);
-
-					if (entityManager.template HasComponent<CameraShake>(camEntityId))
-					{
-						auto &existingShake = entityManager.template GetComponent<CameraShake>(camEntityId);
-						if (shakeMagnitude > std::sqrt(existingShake.magnitude.x * existingShake.magnitude.x +
-													   existingShake.magnitude.y * existingShake.magnitude.y))
-						{
-							existingShake = shake;
-						}
-					}
-					else
-					{
-						entityManager.template AddComponent<CameraShake>(camEntityId, shake);
-					}
-					break;
-				}
-			}
-		}
-
-	public:
+		public:
 		bool Run(Scene<Components...> &scene) override
 		{
 			auto &entityManager = scene.GetEntityManager();
@@ -390,6 +290,106 @@ namespace ECSEngine
 
 			return true;
 		}
-	};
 
+	private:
+		void playerCollisionCheck(Scene<Components...> &scene, const CollisionFlags &collidedSides, const Point2D &preCollisionVelocity)
+		{
+			auto &entityManager = scene.GetEntityManager();
+
+			// Determine if we should shake
+			bool shouldShake = false;
+			Point2D shakeDir(0.0f, 0.0f);
+			float shakeMagnitude = 0.0f;
+
+			// Wall collisions, only shake if hitting wall with large enough velocity
+			if (collidedSides.left || collidedSides.right)
+			{
+				float horizontalVelocity = std::abs(preCollisionVelocity.x);
+				const float minWallShakeVelocity = 50.0f;
+
+				if (horizontalVelocity >= minWallShakeVelocity)
+				{
+					shouldShake = true;
+					if (collidedSides.left)
+					{
+						shakeDir.x = -1.0f;
+					}
+					else if (collidedSides.right)
+					{
+						shakeDir.x = 1.0f;
+					}
+
+					float baseShake = 1.0f;
+					float velocityMultiplier = 0.05f;
+					shakeMagnitude = baseShake + (horizontalVelocity * velocityMultiplier);
+				}
+			}
+			// Floor collision, only shake if we were falling (landing impact)
+			else if (collidedSides.bottom)
+			{
+				const float minLandingShakeVelocity = 200.0f;
+				if (preCollisionVelocity.y > minLandingShakeVelocity)
+				{
+					shouldShake = true;
+					shakeDir.y = 1.0f;
+
+					float verticalVelocity = preCollisionVelocity.y;
+					float baseShake = 1.0f;
+					float velocityMultiplier = 0.05f;
+					shakeMagnitude = baseShake + (verticalVelocity * velocityMultiplier);
+				}
+			}
+			// Ceiling collision shake if we hit it
+			else if (collidedSides.top)
+			{
+				shouldShake = true;
+
+				shakeDir.y = -1.0f;
+
+				float verticalVelocity = std::abs(preCollisionVelocity.y);
+				const float minCeilingShakeVelocity = 50.0f;
+				if (verticalVelocity < minCeilingShakeVelocity)
+				{
+					verticalVelocity = minCeilingShakeVelocity;
+				}
+				float baseShake = 1.0f;
+				float velocityMultiplier = 0.05f;
+				shakeMagnitude = baseShake + (verticalVelocity * velocityMultiplier);
+			}
+
+			if (!shouldShake)
+			{
+				return;
+			}
+
+			// Find camera entity and apply shake
+			for (auto camIt = entityManager.begin(); camIt != entityManager.end(); ++camIt)
+			{
+				EntityID camEntityId = camIt->getID();
+
+				if (entityManager.template HasComponent<CameraComponent>(camEntityId))
+				{
+					CameraShake shake;
+					shake.framesRemaining = 10;
+					shake.magnitude = Point2D(shakeDir.x * shakeMagnitude,
+											  shakeDir.y * shakeMagnitude);
+
+					if (entityManager.template HasComponent<CameraShake>(camEntityId))
+					{
+						auto &existingShake = entityManager.template GetComponent<CameraShake>(camEntityId);
+						if (shakeMagnitude > std::sqrt(existingShake.magnitude.x * existingShake.magnitude.x +
+													   existingShake.magnitude.y * existingShake.magnitude.y))
+						{
+							existingShake = shake;
+						}
+					}
+					else
+					{
+						entityManager.template AddComponent<CameraShake>(camEntityId, shake);
+					}
+					break;
+				}
+			}
+		}
+	};
 } // namespace ECSEngine
