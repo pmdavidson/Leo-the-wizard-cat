@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <vector>
+#include "ShaderManager.h"
 
 namespace ECSEngine
 {

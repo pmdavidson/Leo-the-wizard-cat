@@ -4,6 +4,7 @@
 #include <vector>
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Texture.hpp>
+#include <SFML/Graphics/Image.hpp>
 #include "MathUtil.h"
 
 namespace ECSEngine
@@ -25,7 +26,7 @@ namespace ECSEngine
 	class SpriteManager
 	{
 	public:
-		SpriteManager() = default;
+		SpriteManager();
 		~SpriteManager() = default;
 
 		/**

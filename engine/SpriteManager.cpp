@@ -7,10 +7,23 @@ namespace ECSEngine
 
     SpriteManager::SpriteManager()
     {
-        mAtlasWidth  = 0;
-        mAtlasHeight = 0;
+        constexpr unsigned int ATLAS_SIZE = 4096;
 
-        mTextureAtlas.resize(sf::Vector2u(4096,4096), false); // large texture atlas
+        mAtlasCursorX = 0;
+        mAtlasCursorY = 0;
+        mCurrentRowHeight = 0;
+
+        // 1. Create CPU-side atlas image
+        mAtlasImage.resize(sf::Vector2u(ATLAS_SIZE, ATLAS_SIZE), sf::Color::Transparent);
+
+        // 2. Create GPU texture from the CPU image
+        if (!mTextureAtlas.loadFromImage(mAtlasImage))
+        {
+            std::cerr << "ERROR: Failed to initialize texture atlas.\n";
+        }
+
+        // Sync GPU with CPU-side blank atlas
+        mTextureAtlas.update(mAtlasImage);
     }
 
     SpriteID SpriteManager::RegisterTexture(const std::string& texturePath,
