@@ -75,6 +75,8 @@ void LoadMap(const std::string &path, SceneType &scene, const std::string &resou
 		char symbol;
 		SpriteEntry entry;
 		int sx, sy, sw, sh;
+
+		//remove texture path
 		ss >> symbol >> entry.texturePath >> sx >> sy >> sw >> sh;
 		entry.sourceRect = sf::IntRect(
 			sf::Vector2i(sx, sy),
@@ -237,6 +239,8 @@ void LoadMap(const std::string &path, SceneType &scene, const std::string &resou
 		scene.GetSoundManager().RegisterSound(gResourcePath + "sfx_jump.ogg", "jump");
 		scene.GetSoundManager().RegisterSound(gResourcePath + "footstep_snow_001.ogg", "wall_push");
 		scene.GetSoundManager().RegisterSound(gResourcePath + "sfx_gem.ogg", "star_collect");
+
+		// scene.GetSpriteManager().SaveAtlas(gResourcePath + "atlas_debug_output.png");
 	}
 }
 
@@ -393,6 +397,7 @@ int main(int argc, char *argv[])
 																				 ECSEngine::CameraShake,
 																				 ECSEngine::ScoreComponent>>());
 
+																				 //why does this need these components?
 	scene->GetSystemManager().AddSystem(std::make_unique<ECSEngine::SpawnSystem<ECSEngine::LocationComponent,
 																				ECSEngine::MovementComponent,
 																				ECSEngine::CollisionComponent,
@@ -405,6 +410,25 @@ int main(int argc, char *argv[])
 																				ECSEngine::CameraShake,
 																				ECSEngine::ScoreComponent>>());
 
+	//Taken from lab-10-prep main.cpp
+    // std::vector<std::filesystem::path> paths;
+    // for (const auto& f : std::filesystem::directory_iterator(std::filesystem::path {gResourcePath})) {
+    //     if (std::filesystem::is_regular_file(f) && f.path().extension().string() == ".png") {
+    //         paths.push_back(f.path());
+    //     }
+    // }
+
+    // for (const auto& path : paths) {
+    //     atlas.registerTexture(path);
+    // }
+
+    // sf::Image atlasImg = atlas.getTexture().copyToImage();
+    // if (!atlasImg.saveToFile("atlas.png")) {
+    //     std::cerr << "Failed to save atlas to file\n";
+    // } else {
+    //     std::cout << "Successfully saved atlas.png file (inside build folder)!\n";
+    // }
+	
 	// Load maps into the scene
 	LoadMap("sky.map", *scene, gResourcePath);
 	LoadMap("world.map", *scene, gResourcePath);
