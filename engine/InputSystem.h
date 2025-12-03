@@ -83,14 +83,14 @@ namespace ECSEngine
 							recentlyJumped[entityId] = false;
 						}
 
-						// Play wall push sound when pushing against wall while falling
-						if ((onWallLeft || onWallRight) && wasFalling && !onGround)
+						// Play wall push sound when hitting a wall
+						if ((onWallLeft || onWallRight) && 
+							((onWallLeft && (movingLeft || movementComp.velocity.x < -10.0f)) ||
+							 (onWallRight && (movingRight || movementComp.velocity.x > 10.0f)) ||
+							 (wasFalling && !onGround)))
 						{
-							bool wasPushingWallLastFrame = wasPushingWall[entityId];
-							if (!wasPushingWallLastFrame)
-							{
+							if (!wasPushingWall[entityId])
 								soundManager.PlaySound("wall_push");
-							}
 							wasPushingWall[entityId] = true;
 						}
 						else

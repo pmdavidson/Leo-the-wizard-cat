@@ -1,16 +1,16 @@
 dictionary 2
-n spritesheet-tiles-default.png 128 64 64 64 0 0 64 64
-U spritesheet-tiles-default.png 128 192 64 64 0 0 64 64
-H spritesheet-tiles-default.png 128 128 64 64 0 0 64 64
-S spritesheet-tiles-default.png 0 64 64 64 0 0 64 64
-T spritesheet-tiles-default.png 192 192 64 64 0 0 64 64
-o spritesheet-tiles-default.png 192 0 64 64 0 0 64 64
-( spritesheet-tiles-default.png 192 128 64 64 0 0 64 64
-) spritesheet-tiles-default.png 192 64 64 64 0 0 64 64
-X spritesheet-tiles-default.png 192 384 64 64 0 0 64 64
-[ spritesheet-tiles-default.png 192 320 64 64 0 0 64 64
-] spritesheet-tiles-default.png 192 256 64 64 0 0 64 64
-map origin 0 0 tile 64 64 size 32 12
+n Tileset.png 128 64 32 32 0 0 32 32
+U Tileset.png 128 192 32 32 0 0 32 32
+H Tileset.png 128 128 32 32 0 0 32 32
+S Tileset.png 0 64 32 32 0 0 32 32
+T Tileset.png 192 192 32 32 0 0 32 32
+o Tileset.png 192 0 32 32 0 0 32 32
+( Tileset.png 192 128 32 32 0 0 32 32
+) Tileset.png 192 64 32 32 0 0 32 32
+X Tileset.png 192 384 32 32 0 0 32 32
+[ Tileset.png 192 320 32 32 0 0 32 32
+] Tileset.png 192 256 32 32 0 0 32 32
+map origin 0 0 tile 32 32 size 32 12
 ................................
 ................................
 ................................
