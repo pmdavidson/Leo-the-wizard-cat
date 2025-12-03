@@ -22,7 +22,7 @@ namespace ECSEngine
             auto &soundManager = scene.GetSoundManager();
             float deltaTime = 1.0f / 60.0f;
 
-            // Collect projectiles to remove 
+            // Collect projectiles to remove
             std::vector<EntityID> projectilesToRemove;
 
             for (auto it = entityManager.begin(); it != entityManager.end(); ++it)
@@ -69,7 +69,7 @@ namespace ECSEngine
             // Remove expired/hit projectiles
             for (EntityID id : projectilesToRemove)
             {
-                entityManager.DestroyEntity(id);
+                entityManager.RemoveEntity(id);
             }
 
             return true;
