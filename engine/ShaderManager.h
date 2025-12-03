@@ -1,39 +1,50 @@
 #pragma once
 
-#include <SFML/Graphics.hpp>
+#include <vector>
 #include <string>
 #include <unordered_map>
 
+#include <SFML/Graphics/VertexArray.hpp>
+#include <SFML/Graphics/RenderWindow.hpp>
+#include <SFML/Graphics/Shader.hpp>
+
+#include "SystemManager.h"
+#include "Scene.h"
+#include "SpriteComponent.h"
+#include "LocationComponent.h"
+#include "SpriteManager.h"
+#include "WindowManager.h"
+#include "MathUtil.h"
+
 namespace ECSEngine
 {
+class ShaderManager
+{
+public:
+    void RegisterShader(const std::string &shaderPath, const std::string &shaderName)
+    {
+        if (mShaders.find(shaderName) != mShaders.end())
+            return;
 
-	/**
-	 * @brief Manages shader resources for the ECS engine.
-	 */
-	class ShaderManager
-	{
-	public:
-		ShaderManager() = default;
-		~ShaderManager() = default;
+        auto shader = std::make_unique<sf::Shader>();
 
-		/**
-		 * @brief Registers a shader from a file and stores it under a user-defined name.
-		 *
-		 * @param shaderPath Path to the shader file to load.
-		 * @param shaderName Unique name identifier for the shader.
-		 */
-		void RegisterShader(const std::string &shaderPath, const std::string &shaderName);
+        if (!shader->loadFromFile(shaderPath, sf::Shader::Type::Fragment))
+        {
+            std::cerr << "Failed to load shader: " << shaderPath << "\n";
+            return;
+        }
 
-		/**
-		 * @brief Gets a pointer to a registered shader by name.
-		 *
-		 * @param shaderName The name identifier of the shader.
-		 * @return sf::Shader* Pointer to the shader, or nullptr if not found.
-		 */
-		sf::Shader *GetShader(const std::string &shaderName);
+        mShaders.emplace(shaderName, std::move(shader));
+    }
 
-	private:
-		std::unordered_map<std::string, sf::Shader> mShaders;
-	};
+    sf::Shader *GetShader(const std::string &shaderName)
+    {
+        auto it = mShaders.find(shaderName);
+        return (it != mShaders.end()) ? it->second.get() : nullptr;
+    }
+
+private:
+    std::unordered_map<std::string, std::unique_ptr<sf::Shader>> mShaders;
+};
 
 } // namespace ECSEngine

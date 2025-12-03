@@ -1,61 +1,48 @@
+// SpriteManager.h
 #pragma once
 
+#include <SFML/Graphics.hpp>
 #include <unordered_map>
 #include <vector>
-#include <SFML/Graphics/Sprite.hpp>
-#include <SFML/Graphics/Texture.hpp>
+#include <string>
+#include <limits>
+#include <cassert>
 #include "MathUtil.h"
 
-namespace ECSEngine
-{
+namespace ECSEngine {
 
-	using SpriteID = size_t;
+using SpriteID = size_t;
+using TextureID = size_t;
 
-	/**
-	 * @brief Manages sprite resources and texture loading for the ECS engine.
-	 *
-	 * @section Lifetime and Validity
-	 *
-	 * Textures are stored in an unordered_map and remain valid for the SpriteManager's
-	 * lifetime. Sprites are stored in a vector and SpriteIDs remain valid for the
-	 * SpriteManager's lifetime. GetSprite() returns a reference that remains valid
-	 * until vector reallocation occurs. Storing long-lived references to sprites is
-	 * unsafe if RegisterTexture() may be called later.
-	 */
-	class SpriteManager
-	{
-	public:
-		SpriteManager() = default;
-		~SpriteManager() = default;
+class SpriteManager {
+public:
+    SpriteManager(const sf::Vector2u& atlasSize = {2048, 2048}, uint padding = 0);
 
-		/**
-		 * @brief Registers a texture and creates a sprite from a rectangle.
-		 *
-		 * @param texturePath Path to the texture file to load.
-		 * @param sourceRect Rectangle defining the portion of the texture to use.
-		 * @return SpriteID The ID of the newly created sprite. Returns 0 if loading fails.
-		 *
-		 * @note The returned SpriteID is valid for the SpriteManager's lifetime.
-		 * @warning Calling this function may invalidate previously obtained sprite
-		 * references if the vector reallocates.
-		 */
-		[[nodiscard]] SpriteID RegisterTexture(const std::string &texturePath, const Rect &sourceRect);
+    [[nodiscard]] SpriteID RegisterTexture(const std::string& filepath);
+	sf::Sprite &GetSprite(SpriteID id);
+    const sf::Texture& GetTexture() const;
 
-		/**
-		 * @brief Retrieves a sprite by its ID.
-		 *
-		 * @param id The SpriteID returned by RegisterTexture().
-		 * @return sf::Sprite& Reference to the sprite.
-		 *
-		 * @note The returned reference is valid until vector reallocation occurs.
-		 * @warning Storing long-lived references is unsafe if RegisterTexture() may
-		 * be called later. Store SpriteIDs instead.
-		 */
-		sf::Sprite &GetSprite(SpriteID id);
+    // UVs for vertex array rendering
+    Rect GetUV(SpriteID id) const;
+    sf::Vector2u GetSize(SpriteID id) const;
 
-	private:
-		std::unordered_map<std::string, sf::Texture> mTextures;
-		std::vector<sf::Sprite> mSprites;
-	};
+private:
+    // Packing helpers
+    sf::Image padImage(const sf::Image& img, uint pad) const;
+
+    // Internal atlas texture
+    sf::Texture mTexture;
+    sf::Image mAtlasImage; // used for updates
+    sf::Vector2u mAtlasSize;
+    uint mPadding;
+
+    // Packing algorithm
+    sf::Vector2f mCursor;
+    float mLineHeight;
+    std::vector<Rect> mRects; // packed positions
+    std::unordered_map<SpriteID, sf::Vector2u> mSizes;
+
+    SpriteID mNextID;
+};
 
 }

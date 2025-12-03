@@ -93,6 +93,16 @@ namespace ECSEngine
 								soundManager.PlaySound("wall_push");
 							wasPushingWall[entityId] = true;
 						}
+						// wall push sound but this also registers stars so not good
+						// else if ((onWallLeft || onWallRight) && !wasFalling && onGround)
+						// {
+						// 	bool wasPushingWallLastFrame = wasPushingWall[entityId];
+						// 	if (!wasPushingWallLastFrame)
+						// 	{
+						// 		soundManager.PlaySound("wall_push");
+						// 	}
+						// 	wasPushingWall[entityId] = true;
+						// }
 						else
 						{
 							wasPushingWall[entityId] = false;
