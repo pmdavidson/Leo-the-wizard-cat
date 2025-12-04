@@ -25,6 +25,12 @@
 #include "ProjectileComponent.h"
 #include "SpellSystem.h"
 #include "ProjectileSystem.h"
+#include "EnemyComponent.h"
+#include "EnemySystem.h"
+#include "HpComponent.h"
+#include "HpSystem.h"
+#include "CheckpointComponent.h"
+#include "CheckpointSystem.h"
 #include "AnimationComponent.h"
 #include "SpellSystem.h"
 #include "ProjectileSystem.h"
@@ -36,6 +42,58 @@ using EntityId = size_t;
 using SpriteID = size_t;
 
 std::string gResourcePath = "../../assets/";
+
+// Game Component Type List
+using GameComponents = std::tuple<
+	ECSEngine::LocationComponent,
+	ECSEngine::MovementComponent,
+	ECSEngine::CollisionComponent,
+	ECSEngine::SpriteComponent,
+	ECSEngine::SpawnComponent,
+	ECSEngine::CameraComponent,
+	ECSEngine::CameraFollower,
+	ECSEngine::InputComponent,
+	ECSEngine::GravityComponent,
+	ECSEngine::CameraShake,
+	ECSEngine::ScoreComponent,
+	ECSEngine::SpellComponent,
+	ECSEngine::ProjectileComponent,
+	ECSEngine::EnemyComponent,
+	ECSEngine::HpComponent,
+	ECSEngine::CheckpointComponent,
+	ECSEngine::CampfireComponent>;
+
+// Helper to create ECSEngine from a tuple of components
+template<typename Tuple>
+struct EngineFromTuple;
+
+template<typename... Components>
+struct EngineFromTuple<std::tuple<Components...>>
+{
+	using type = ECSEngine::ECSEngine<Components...>;
+};
+
+using GameEngine = EngineFromTuple<GameComponents>::type;
+
+// Helper to add systems using the GameComponents tuple
+template<template<typename...> class System, typename Tuple>
+struct AddSystemFromTuple;
+
+template<template<typename...> class System, typename... Components>
+struct AddSystemFromTuple<System, std::tuple<Components...>>
+{
+	template<typename SystemManager>
+	static void Add(SystemManager& manager)
+	{
+		manager.AddSystem(std::make_unique<System<Components...>>());
+	}
+};
+
+template<template<typename...> class System, typename SystemManager>
+void AddSystem(SystemManager& manager)
+{
+	AddSystemFromTuple<System, GameComponents>::Add(manager);
+}
 
 struct SpriteEntry
 {
@@ -163,11 +221,12 @@ void LoadMap(const std::string &path, SceneType &scene, const std::string &resou
 																									  FromSFML(entry.boundsRect), true));
 			}
 
-			// Spawner, this isn't in the .map anymore so we have to spawn it later
-			if (tile == 'S'){
-				scene.GetEntityManager().template AddComponent<ECSEngine::SpawnComponent>(id, {id, "star", blueSlime, 10.f, 10.f, 10, static_cast<float>(tileW), static_cast<float>(tileH)});
-				}
+			// Spawner - spawns slimes (96x32)
+			if (tile == 'S')
+			{
+				scene.GetEntityManager().template AddComponent<ECSEngine::SpawnComponent>(id, {id, "slime", blueSlime, 10.f, 10.f, 10, 96.f, 32.f});
 			}
+		}
 	}
 
 	// Make Player after everything else has been made
@@ -356,6 +415,63 @@ void LoadMap(const std::string &path, SceneType &scene, const std::string &resou
 			scoreComp.displayEntityIds.push_back(digitEntity);
 		}
 
+		// Set up HP display system (hearts)
+		// Register heart sprites
+		SpriteID heartFullSpriteId = scene.GetSpriteManager().RegisterTexture(
+			gResourcePath + "sprites/heart_idle_0.png", ECSEngine::Rect(0.f, 0.f, 32.f, 32.f));
+		SpriteID heartEmptySpriteId = scene.GetSpriteManager().RegisterTexture(
+			gResourcePath + "sprites/heart_empty_0.png", ECSEngine::Rect(0.f, 0.f, 32.f, 32.f));
+
+		// Create HpComponent for player
+		ECSEngine::HpComponent hpComp(3, heartFullSpriteId, heartEmptySpriteId);
+
+		// Create 3 heart display entities at top left (below score)
+		const float heartSize = 32.f;
+		const float heartStartX = 20.f;
+		const float heartStartY = 60.f; // Below the score display
+
+		for (int i = 0; i < 3; ++i)
+		{
+			EntityId heartEntity = scene.GetEntityManager().CreateEntity("heart_" + std::to_string(i));
+
+			scene.GetEntityManager().template AddComponent<ECSEngine::LocationComponent>(
+				heartEntity,
+				ECSEngine::LocationComponent(ECSEngine::Point2D(heartStartX + i * heartSize, heartStartY)));
+
+			// Initialize with full heart sprite (inWorldSpace = false for UI)
+			scene.GetEntityManager().template AddComponent<ECSEngine::SpriteComponent>(
+				heartEntity,
+				{heartFullSpriteId, ECSEngine::Rect(0.f, 0.f, heartSize, heartSize), false});
+
+			hpComp.heartDisplayEntityIds.push_back(heartEntity);
+		}
+
+		scene.GetEntityManager().template AddComponent<ECSEngine::HpComponent>(player, hpComp);
+
+		// Set up checkpoint system
+		ECSEngine::CheckpointComponent checkpointComp(ECSEngine::Point2D(spawnX, spawnY));
+		scene.GetEntityManager().template AddComponent<ECSEngine::CheckpointComponent>(player, checkpointComp);
+
+		// Register campfire sprites for checkpoints
+		SpriteID campfireUnlitSpriteId = scene.GetSpriteManager().RegisterTexture(
+			gResourcePath + "sprites/campfire-sprite-unlit-1.png", ECSEngine::Rect(0.f, 0.f, 64.f, 64.f));
+		SpriteID campfireLitSpriteId = scene.GetSpriteManager().RegisterTexture(
+			gResourcePath + "sprites/campfire-sprite-1.png", ECSEngine::Rect(0.f, 0.f, 64.f, 64.f));
+
+		// Create a sample campfire checkpoint (checkpoint 0) at a specific location
+		// You can add more campfires at different positions for different checkpoints
+		EntityId campfire0 = scene.GetEntityManager().CreateEntity("campfire_0");
+		ECSEngine::Point2D campfire0Pos(tileW * 10, tileH * 7); // Adjust position as needed
+
+		scene.GetEntityManager().template AddComponent<ECSEngine::LocationComponent>(
+			campfire0, ECSEngine::LocationComponent(campfire0Pos));
+		scene.GetEntityManager().template AddComponent<ECSEngine::SpriteComponent>(
+			campfire0, {campfireUnlitSpriteId, ECSEngine::Rect(0.f, 0.f, 64.f, 64.f), true});
+		scene.GetEntityManager().template AddComponent<ECSEngine::CollisionComponent>(
+			campfire0, ECSEngine::CollisionComponent(ECSEngine::Rect(0.f, 0.f, 64.f, 64.f), false));
+		scene.GetEntityManager().template AddComponent<ECSEngine::CampfireComponent>(
+			campfire0, ECSEngine::CampfireComponent(0, campfireUnlitSpriteId, campfireLitSpriteId));
+
 		//SOUNDS
 		// Register sounds TODO
 		scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/cat_land1.ogg", "land");
@@ -371,23 +487,28 @@ void LoadMap(const std::string &path, SceneType &scene, const std::string &resou
 		// Fire spell has two whoosh variants for variety
 		scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/fireball_whoosh-1.ogg", "fire_cast_1");
 		scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/fireball_whoosh-2.ogg", "fire_cast_2");
-		scene.GetSoundManager().RegisterSound(gResourcePath + "sfx_jump.ogg", "water_cast");
-		scene.GetSoundManager().RegisterSound(gResourcePath + "sfx_jump.ogg", "wind_cast");
-		scene.GetSoundManager().RegisterSound(gResourcePath + "sfx_jump.ogg", "earth_cast");
+		// scene.GetSoundManager().RegisterSound(gResourcePath + ".ogg", "water_cast");
+		// scene.GetSoundManager().RegisterSound(gResourcePath + ".ogg", "wind_cast");
+		// scene.GetSoundManager().RegisterSound(gResourcePath + ".ogg", "earth_cast");
 
 		// Register spell impact sounds
 		// Fire spell has two impact variants for variety
 		scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/fireball_impact1.ogg", "fire_impact_1");
 		scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/fireball_impact2.ogg", "fire_impact_2");
-		scene.GetSoundManager().RegisterSound(gResourcePath + "sfx_gem.ogg", "water_impact");
-		scene.GetSoundManager().RegisterSound(gResourcePath + "sfx_gem.ogg", "wind_impact");
-		scene.GetSoundManager().RegisterSound(gResourcePath + "sfx_gem.ogg", "earth_impact");
+		// scene.GetSoundManager().RegisterSound(gResourcePath + ".ogg", "water_impact");
+		// scene.GetSoundManager().RegisterSound(gResourcePath + ".ogg", "wind_impact");
+		// scene.GetSoundManager().RegisterSound(gResourcePath + ".ogg", "earth_impact");
 
-		// Register element selection sounds (played when switching elements)
-		scene.GetSoundManager().RegisterSound(gResourcePath + "footstep_grass_003.ogg", "fire_select");
-		scene.GetSoundManager().RegisterSound(gResourcePath + "footstep_grass_003.ogg", "water_select");
-		scene.GetSoundManager().RegisterSound(gResourcePath + "footstep_grass_003.ogg", "wind_select");
-		scene.GetSoundManager().RegisterSound(gResourcePath + "footstep_grass_003.ogg", "earth_select");
+		// // Register element selection sounds (played when switching elements)
+		// scene.GetSoundManager().RegisterSound(gResourcePath + ".ogg", "fire_select");
+		// scene.GetSoundManager().RegisterSound(gResourcePath + ".ogg", "water_select");
+		// scene.GetSoundManager().RegisterSound(gResourcePath + ".ogg", "wind_select");
+		// scene.GetSoundManager().RegisterSound(gResourcePath + ".ogg", "earth_select");
+
+		// Register enemy sounds
+		scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/slime_die1.ogg", "slime_die");
+		scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/slime_take_dmg1.ogg", "slime_damage_1");
+		scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/slime_take_dmg2.ogg", "slime_damage_2");
 	}
 }
 
@@ -425,38 +546,37 @@ int main(int argc, char *argv[])
 		ECSEngine::CameraShake, ECSEngine::ScoreComponent, ECSEngine::SpellComponent, \
 		ECSEngine::ProjectileComponent, ECSEngine::EnemyComponent
 
-	// Initialize engine
-	ECSEngine::ECSEngine<COMPONENT_LIST>
-		engine(1024, 768, "Leo the Cat Wizard");
-
-	//call main frag for drawing
+	// Initialize engine using GameComponents tuple
+	GameEngine engine(1024, 768, "Leo the Wizard Cat");
 
 	// Create a scene
 	auto scene = engine.MakeScene();
 
 	// Add systems to the scene in execution order
-	scene->GetSystemManager().AddSystem(std::make_unique<ECSEngine::ProcessEventsSystem<COMPONENT_LIST>>());
-	scene->GetSystemManager().AddSystem(std::make_unique<ECSEngine::CollisionUpdateSystem<COMPONENT_LIST>>());
-	scene->GetSystemManager().AddSystem(std::make_unique<ECSEngine::InputSystem<COMPONENT_LIST>>());
-	scene->GetSystemManager().AddSystem(std::make_unique<ECSEngine::SpellSystem<COMPONENT_LIST>>());
-	scene->GetSystemManager().AddSystem(std::make_unique<ECSEngine::GravitySystem<COMPONENT_LIST>>());
-	scene->GetSystemManager().AddSystem(std::make_unique<ECSEngine::MovementSystem<COMPONENT_LIST>>());
-	scene->GetSystemManager().AddSystem(std::make_unique<ECSEngine::CollisionSystem<COMPONENT_LIST>>());
-	scene->GetSystemManager().AddSystem(std::make_unique<ECSEngine::ProjectileSystem<COMPONENT_LIST>>());
-	scene->GetSystemManager().AddSystem(std::make_unique<ECSEngine::EnemySystem<COMPONENT_LIST>>());
-	scene->GetSystemManager().AddSystem(std::make_unique<ECSEngine::ScoreSystem<COMPONENT_LIST>>());
-	scene->GetSystemManager().AddSystem(std::make_unique<ECSEngine::CameraSystem<COMPONENT_LIST>>());
-	scene->GetSystemManager().AddSystem(std::make_unique<ECSEngine::SpriteSystem<COMPONENT_LIST>>());
-	scene->GetSystemManager().AddSystem(std::make_unique<ECSEngine::SpawnSystem<COMPONENT_LIST>>());
+	auto& sm = scene->GetSystemManager();
+	AddSystem<ECSEngine::ProcessEventsSystem>(sm);
+	AddSystem<ECSEngine::CollisionUpdateSystem>(sm);
+	AddSystem<ECSEngine::InputSystem>(sm);
+	AddSystem<ECSEngine::SpellSystem>(sm);
+	AddSystem<ECSEngine::GravitySystem>(sm);
+	AddSystem<ECSEngine::MovementSystem>(sm);
+	AddSystem<ECSEngine::CollisionSystem>(sm);
+	AddSystem<ECSEngine::ProjectileSystem>(sm);
+	AddSystem<ECSEngine::EnemySystem>(sm);
+	AddSystem<ECSEngine::HpSystem>(sm);
+	AddSystem<ECSEngine::CheckpointSystem>(sm);
+	AddSystem<ECSEngine::ScoreSystem>(sm);
+	AddSystem<ECSEngine::CameraSystem>(sm);
+	AddSystem<ECSEngine::SpriteSystem>(sm);
+	AddSystem<ECSEngine::SpawnSystem>(sm);
 
-	#undef COMPONENT_LIST
-
-	// std::vector<std::filesystem::path> paths;
-    // for (const auto& f : std::filesystem::directory_iterator(std::filesystem::path {gResourcePath + "sprites/" })) {
-    //     if (std::filesystem::is_regular_file(f) && f.path().extension().string() == ".png") {
-    //         paths.push_back(f.path());
-    //     }
-    // }
+	// Taken from lab-10-prep main.cpp
+	//  std::vector<std::filesystem::path> paths;
+	//  for (const auto& f : std::filesystem::directory_iterator(std::filesystem::path {gResourcePath})) {
+	//      if (std::filesystem::is_regular_file(f) && f.path().extension().string() == ".png") {
+	//          paths.push_back(f.path());
+	//      }
+	//  }
 
 	// for (const auto& path : paths) {
     //     scene->GetSpriteManager().RegisterTexture(path, ECSEngine::Rect(ECSEngine::Point2D(0,0), 32, 32));

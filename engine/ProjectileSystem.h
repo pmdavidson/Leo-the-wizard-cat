@@ -41,8 +41,18 @@ namespace ECSEngine
                 if (projectile.lifetime > 0.0f)
                     projectile.lifetime -= deltaTime;
 
-                // Check if projectile has expired
-                if (projectile.lifetime <= 0.0f || !projectile.active)
+                // Check if projectile has expired (lifetime ran out)
+                if (projectile.lifetime <= 0.0f && projectile.active)
+                {
+                    // Projectile expired - play explosion/impact sound
+                    PlayImpactSound(projectile.spellType, soundManager);
+                    projectile.active = false;
+                    projectilesToRemove.push_back(entityId);
+                    continue;
+                }
+
+                // Check if projectile was deactivated elsewhere
+                if (!projectile.active)
                 {
                     projectilesToRemove.push_back(entityId);
                     continue;
