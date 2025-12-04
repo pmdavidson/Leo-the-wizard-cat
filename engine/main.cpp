@@ -27,6 +27,10 @@
 #include "ProjectileSystem.h"
 #include "EnemyComponent.h"
 #include "EnemySystem.h"
+#include "HpComponent.h"
+#include "HpSystem.h"
+#include "CheckpointComponent.h"
+#include "CheckpointSystem.h"
 #include <fstream>
 
 using EntityId = size_t;
@@ -49,7 +53,10 @@ using GameComponents = std::tuple<
 	ECSEngine::ScoreComponent,
 	ECSEngine::SpellComponent,
 	ECSEngine::ProjectileComponent,
-	ECSEngine::EnemyComponent>;
+	ECSEngine::EnemyComponent,
+	ECSEngine::HpComponent,
+	ECSEngine::CheckpointComponent,
+	ECSEngine::CampfireComponent>;
 
 // Helper to create ECSEngine from a tuple of components
 template<typename Tuple>
@@ -348,6 +355,63 @@ void LoadMap(const std::string &path, SceneType &scene, const std::string &resou
 			scoreComp.displayEntityIds.push_back(digitEntity);
 		}
 
+		// Set up HP display system (hearts)
+		// Register heart sprites
+		SpriteID heartFullSpriteId = scene.GetSpriteManager().RegisterTexture(
+			gResourcePath + "sprites/heart_idle_0.png", ECSEngine::Rect(0.f, 0.f, 32.f, 32.f));
+		SpriteID heartEmptySpriteId = scene.GetSpriteManager().RegisterTexture(
+			gResourcePath + "sprites/heart_empty_0.png", ECSEngine::Rect(0.f, 0.f, 32.f, 32.f));
+
+		// Create HpComponent for player
+		ECSEngine::HpComponent hpComp(3, heartFullSpriteId, heartEmptySpriteId);
+
+		// Create 3 heart display entities at top left (below score)
+		const float heartSize = 32.f;
+		const float heartStartX = 20.f;
+		const float heartStartY = 60.f; // Below the score display
+
+		for (int i = 0; i < 3; ++i)
+		{
+			EntityId heartEntity = scene.GetEntityManager().CreateEntity("heart_" + std::to_string(i));
+
+			scene.GetEntityManager().template AddComponent<ECSEngine::LocationComponent>(
+				heartEntity,
+				ECSEngine::LocationComponent(ECSEngine::Point2D(heartStartX + i * heartSize, heartStartY)));
+
+			// Initialize with full heart sprite (inWorldSpace = false for UI)
+			scene.GetEntityManager().template AddComponent<ECSEngine::SpriteComponent>(
+				heartEntity,
+				{heartFullSpriteId, ECSEngine::Rect(0.f, 0.f, heartSize, heartSize), false});
+
+			hpComp.heartDisplayEntityIds.push_back(heartEntity);
+		}
+
+		scene.GetEntityManager().template AddComponent<ECSEngine::HpComponent>(player, hpComp);
+
+		// Set up checkpoint system
+		ECSEngine::CheckpointComponent checkpointComp(ECSEngine::Point2D(spawnX, spawnY));
+		scene.GetEntityManager().template AddComponent<ECSEngine::CheckpointComponent>(player, checkpointComp);
+
+		// Register campfire sprites for checkpoints
+		SpriteID campfireUnlitSpriteId = scene.GetSpriteManager().RegisterTexture(
+			gResourcePath + "sprites/campfire-sprite-unlit-1.png", ECSEngine::Rect(0.f, 0.f, 64.f, 64.f));
+		SpriteID campfireLitSpriteId = scene.GetSpriteManager().RegisterTexture(
+			gResourcePath + "sprites/campfire-sprite-1.png", ECSEngine::Rect(0.f, 0.f, 64.f, 64.f));
+
+		// Create a sample campfire checkpoint (checkpoint 0) at a specific location
+		// You can add more campfires at different positions for different checkpoints
+		EntityId campfire0 = scene.GetEntityManager().CreateEntity("campfire_0");
+		ECSEngine::Point2D campfire0Pos(tileW * 10, tileH * 7); // Adjust position as needed
+
+		scene.GetEntityManager().template AddComponent<ECSEngine::LocationComponent>(
+			campfire0, ECSEngine::LocationComponent(campfire0Pos));
+		scene.GetEntityManager().template AddComponent<ECSEngine::SpriteComponent>(
+			campfire0, {campfireUnlitSpriteId, ECSEngine::Rect(0.f, 0.f, 64.f, 64.f), true});
+		scene.GetEntityManager().template AddComponent<ECSEngine::CollisionComponent>(
+			campfire0, ECSEngine::CollisionComponent(ECSEngine::Rect(0.f, 0.f, 64.f, 64.f), false));
+		scene.GetEntityManager().template AddComponent<ECSEngine::CampfireComponent>(
+			campfire0, ECSEngine::CampfireComponent(0, campfireUnlitSpriteId, campfireLitSpriteId));
+
 		// Register sounds
 		scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/cat_land1.ogg", "land");
 		scene.GetSoundManager().RegisterSound(gResourcePath + "sfx_jump.ogg", "jump");
@@ -430,6 +494,8 @@ int main(int argc, char *argv[])
 	AddSystem<ECSEngine::CollisionSystem>(sm);
 	AddSystem<ECSEngine::ProjectileSystem>(sm);
 	AddSystem<ECSEngine::EnemySystem>(sm);
+	AddSystem<ECSEngine::HpSystem>(sm);
+	AddSystem<ECSEngine::CheckpointSystem>(sm);
 	AddSystem<ECSEngine::ScoreSystem>(sm);
 	AddSystem<ECSEngine::CameraSystem>(sm);
 	AddSystem<ECSEngine::SpriteSystem>(sm);

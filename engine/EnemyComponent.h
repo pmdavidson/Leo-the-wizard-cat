@@ -40,10 +40,6 @@ namespace ECSEngine
         bool canMove = false;
         float moveSpeed = 50.0f;
 
-        // Invincibility frames after being hit 
-        float invincibilityTimer = 0.0f;
-        float invincibilityDuration = 0.3f;
-
         // Sound names for this enemy
         std::string damageSoundName = "slime_damage";
         std::string deathSoundName = "slime_die";

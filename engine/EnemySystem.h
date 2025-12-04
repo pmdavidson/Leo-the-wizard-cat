@@ -18,7 +18,6 @@ namespace ECSEngine
         {
             auto &entityManager = scene.GetEntityManager();
             auto &soundManager = scene.GetSoundManager();
-            float deltaTime = 1.0f / 60.0f;
 
             // Track enemies to remove (dead enemies)
             std::vector<EntityID> enemiesToRemove;
@@ -33,10 +32,6 @@ namespace ECSEngine
                     continue;
 
                 auto &enemy = entityManager.template GetComponent<EnemyComponent>(entityId);
-
-                // Update invincibility timer
-                if (enemy.invincibilityTimer > 0.0f)
-                    enemy.invincibilityTimer -= deltaTime;
 
                 // Check if enemy should die
                 if (enemy.hp <= 0.0f && enemy.isAlive)

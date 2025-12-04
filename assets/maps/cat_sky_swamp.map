@@ -1,9 +1,9 @@
 dictionary 1
-A swamp_bg1.png 0 0 576 324
-B swamp_bg2.png 0 0 576 324
-C swamp_bg3.png 0 0 576 324
-D swamp_bg4.png 0 0 576 324
-E swamp_bg5.png 0 0 576 324
+A _swamp_bg_1.png 0 0 576 324
+B _swamp_bg_2.png 0 0 576 324
+C _swamp_bg_3.png 0 0 576 324
+D _swamp_bg_4.png 0 0 576 324
+E _swamp_bg_5.png 0 0 576 324
 
 map origin -512 -256 tile 256 256 size 12 5
 AAAAA.......

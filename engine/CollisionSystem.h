@@ -11,6 +11,9 @@
 #include "SoundManager.h"
 #include "ECSEngine.h"
 #include "EnemyComponent.h"
+#include "HpComponent.h"
+#include "ProjectileComponent.h"
+#include "CheckpointComponent.h"
 #include <cmath>
 #include <random>
 
@@ -92,13 +95,21 @@ namespace ECSEngine
 					bool isSpawnerB = entityManager.template HasComponent<SpawnComponent>(idB);
 					bool isEnemyA = entityManager.template HasComponent<EnemyComponent>(idA);
 					bool isEnemyB = entityManager.template HasComponent<EnemyComponent>(idB);
+					bool isProjectileA = entityManager.template HasComponent<ProjectileComponent>(idA);
+					bool isProjectileB = entityManager.template HasComponent<ProjectileComponent>(idB);
+					bool isCampfireA = entityManager.template HasComponent<CampfireComponent>(idA);
+					bool isCampfireB = entityManager.template HasComponent<CampfireComponent>(idB);
 
-					bool isStarA = !isPlayerA && !isSpawnerA && !isEnemyA &&
+					// Skip collision resolution for player-campfire (player walks through campfires)
+					// But still process projectile-campfire later
+					bool isPlayerCampfireCollision = (isPlayerA && isCampfireB) || (isPlayerB && isCampfireA);
+
+					bool isStarA = !isPlayerA && !isSpawnerA && !isEnemyA && !isProjectileA && !isCampfireA &&
 								   entityManager.template HasComponent<CollisionComponent>(idA) &&
 								   !entityManager.template GetComponent<CollisionComponent>(idA).isStatic &&
 								   (entityManager.template HasComponent<GravityComponent>(idA) ||
 									!entityManager.template HasComponent<MovementComponent>(idA));
-					bool isStarB = !isPlayerB && !isSpawnerB && !isEnemyB &&
+					bool isStarB = !isPlayerB && !isSpawnerB && !isEnemyB && !isProjectileB && !isCampfireB &&
 								   entityManager.template HasComponent<CollisionComponent>(idB) &&
 								   !entityManager.template GetComponent<CollisionComponent>(idB).isStatic &&
 								   (entityManager.template HasComponent<GravityComponent>(idB) ||
@@ -112,8 +123,14 @@ namespace ECSEngine
 					if (isPlayerB && entityManager.template HasComponent<MovementComponent>(idB))
 						preCollisionVelocityB = entityManager.template GetComponent<MovementComponent>(idB).velocity;
 
+					// Skip collision resolution for player-campfire (player walks through)
+					// Projectile-campfire is handled separately below
+					if (isPlayerCampfireCollision)
+					{
+						// Don't resolve collision, but still check special interactions below
+					}
 					// Resolve collision
-					if (colB.isStatic)
+					else if (colB.isStatic)
 					{
 						ResolveAABBCollision(
 							BoundsA, BoundsB,
@@ -218,9 +235,25 @@ namespace ECSEngine
 
 						auto &enemy = entityManager.template GetComponent<EnemyComponent>(enemyId);
 
-						// Only damage if enemy is alive and player isn't invincible
-						if (enemy.isAlive && enemy.invincibilityTimer <= 0.0f)
+						// Check if player has HP component and isn't invincible
+						bool playerCanTakeDamage = false;
+						if (entityManager.template HasComponent<HpComponent>(playerId))
 						{
+							auto &playerHp = entityManager.template GetComponent<HpComponent>(playerId);
+							playerCanTakeDamage = playerHp.isAlive && playerHp.invincibilityTimer <= 0.0f;
+						}
+
+						// Only damage if enemy is alive and player can take damage
+						if (enemy.isAlive && playerCanTakeDamage)
+						{
+							// Deal damage to player through HpComponent
+							if (entityManager.template HasComponent<HpComponent>(playerId))
+							{
+								auto &playerHp = entityManager.template GetComponent<HpComponent>(playerId);
+								playerHp.currentHp -= static_cast<int>(enemy.contactDamage);
+								playerHp.invincibilityTimer = playerHp.invincibilityDuration;
+							}
+
 							// Apply knockback to player
 							if (entityManager.template HasComponent<MovementComponent>(playerId))
 							{
@@ -236,11 +269,135 @@ namespace ECSEngine
 								playerMovement.velocity.y = -enemy.knockbackForce * 0.5f; // Slight upward knockback
 							}
 
-							// Play player damage sound
+							// Play player hurt sound
+							soundManager.PlaySound("take_damage");
+						}
+					}
+
+					// Handle projectile-enemy collisions (player projectiles hitting enemies)
+					if ((isProjectileA && isEnemyB) || (isProjectileB && isEnemyA))
+					{
+						EntityID projectileId = isProjectileA ? idA : idB;
+						EntityID enemyId = isEnemyA ? idA : idB;
+
+						auto &projectile = entityManager.template GetComponent<ProjectileComponent>(projectileId);
+						auto &enemy = entityManager.template GetComponent<EnemyComponent>(enemyId);
+
+						// Skip if projectile was fired by this enemy (no self-damage)
+						// Also skip if projectile was fired by any enemy (no friendly fire between enemies)
+						bool isEnemyProjectile = entityManager.template HasComponent<EnemyComponent>(projectile.ownerEntityId);
+
+						// Only damage if projectile is active, enemy is alive, and it's not an enemy's projectile
+						if (projectile.active && enemy.isAlive && !isEnemyProjectile)
+						{
+							// Deal damage to enemy
+							enemy.hp -= projectile.damage;
+
+							// Play enemy damage sound 
+							static std::mt19937 rng(std::random_device{}());
+							std::uniform_int_distribution<int> dist(1, 2);
+							std::string damageSoundName = enemy.damageSoundName + "_" + std::to_string(dist(rng));
+							soundManager.PlaySound(damageSoundName);
+
+							// Remove the projectile
+							projectile.active = false;
+
+							// Add score for hitting an enemy
+							for (auto scoreIt = entityManager.begin(); scoreIt != entityManager.end(); ++scoreIt)
+							{
+								EntityID scoreEntityId = scoreIt->getID();
+								if (entityManager.template HasComponent<ScoreComponent>(scoreEntityId))
+								{
+									entityManager.template GetComponent<ScoreComponent>(scoreEntityId).currentScore += 5;
+									break;
+								}
+							}
+						}
+					}
+
+					// Handle projectile-player collisions (enemy projectiles hitting player)
+					if ((isProjectileA && isPlayerB) || (isProjectileB && isPlayerA))
+					{
+						EntityID projectileId = isProjectileA ? idA : idB;
+						EntityID playerId = isPlayerA ? idA : idB;
+
+						auto &projectile = entityManager.template GetComponent<ProjectileComponent>(projectileId);
+
+						// Only process enemy projectiles (skip player's own projectiles)
+						bool isEnemyProjectile = entityManager.template HasComponent<EnemyComponent>(projectile.ownerEntityId);
+
+						// Check if player can take damage
+						bool playerCanTakeDamage = false;
+						if (entityManager.template HasComponent<HpComponent>(playerId))
+						{
+							auto &playerHp = entityManager.template GetComponent<HpComponent>(playerId);
+							playerCanTakeDamage = playerHp.isAlive && playerHp.invincibilityTimer <= 0.0f;
+						}
+
+						// Only damage if projectile is active, it's an enemy projectile, and player can take damage
+						if (projectile.active && isEnemyProjectile && playerCanTakeDamage)
+						{
+							// Deal damage to player
+							if (entityManager.template HasComponent<HpComponent>(playerId))
+							{
+								auto &playerHp = entityManager.template GetComponent<HpComponent>(playerId);
+								playerHp.currentHp -= static_cast<int>(projectile.damage);
+								playerHp.invincibilityTimer = playerHp.invincibilityDuration;
+							}
+
+							// Play player hurt sound
 							soundManager.PlaySound("take_damage");
 
-							// Brief cooldown to prevent rapid damage
-							enemy.invincibilityTimer = 0.5f;
+							// Deactivate the projectile
+							projectile.active = false;
+						}
+					}
+
+					// Handle projectile-campfire collisions (player fire spells lights campfires)
+					if ((isProjectileA && isCampfireB) || (isProjectileB && isCampfireA))
+					{
+						EntityID projectileId = isProjectileA ? idA : idB;
+						EntityID campfireId = isCampfireA ? idA : idB;
+
+						auto &projectile = entityManager.template GetComponent<ProjectileComponent>(projectileId);
+						auto &campfire = entityManager.template GetComponent<CampfireComponent>(campfireId);
+
+						// Only player fire projectiles can light campfires
+						bool isPlayerProjectile = entityManager.template HasComponent<InputComponent>(projectile.ownerEntityId);
+						bool isFireSpell = projectile.spellType == SpellType::Fire;
+
+						if (projectile.active && !campfire.isLit && isPlayerProjectile && isFireSpell)
+						{
+							// Light the campfire
+							campfire.isLit = true;
+
+							// Update campfire sprite to lit version
+							if (entityManager.template HasComponent<SpriteComponent>(campfireId))
+							{
+								auto &sprite = entityManager.template GetComponent<SpriteComponent>(campfireId);
+								sprite.spriteId = campfire.litSpriteId;
+							}
+
+							// Get campfire position for checkpoint
+							auto &campLoc = entityManager.template GetComponent<LocationComponent>(campfireId);
+							Point2D checkpointPos = campLoc.position;
+
+							// Activate checkpoint for the player
+							for (auto playerIt = entityManager.begin(); playerIt != entityManager.end(); ++playerIt)
+							{
+								if (!playerIt->isActive())
+									continue;
+								EntityID playerId = playerIt->getID();
+
+								if (!entityManager.template HasComponent<CheckpointComponent>(playerId))
+									continue;
+
+								auto &checkpoint = entityManager.template GetComponent<CheckpointComponent>(playerId);
+								checkpoint.ActivateCheckpoint(campfire.checkpointIndex, checkpointPos);
+							}
+
+							// Deactivate the projectile
+							projectile.active = false;
 						}
 					}
 
