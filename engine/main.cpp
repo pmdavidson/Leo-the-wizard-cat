@@ -34,6 +34,55 @@ using SpriteID = size_t;
 
 std::string gResourcePath = "../../assets/";
 
+// Game Component Type List
+using GameComponents = std::tuple<
+	ECSEngine::LocationComponent,
+	ECSEngine::MovementComponent,
+	ECSEngine::CollisionComponent,
+	ECSEngine::SpriteComponent,
+	ECSEngine::SpawnComponent,
+	ECSEngine::CameraComponent,
+	ECSEngine::CameraFollower,
+	ECSEngine::InputComponent,
+	ECSEngine::GravityComponent,
+	ECSEngine::CameraShake,
+	ECSEngine::ScoreComponent,
+	ECSEngine::SpellComponent,
+	ECSEngine::ProjectileComponent,
+	ECSEngine::EnemyComponent>;
+
+// Helper to create ECSEngine from a tuple of components
+template<typename Tuple>
+struct EngineFromTuple;
+
+template<typename... Components>
+struct EngineFromTuple<std::tuple<Components...>>
+{
+	using type = ECSEngine::ECSEngine<Components...>;
+};
+
+using GameEngine = EngineFromTuple<GameComponents>::type;
+
+// Helper to add systems using the GameComponents tuple
+template<template<typename...> class System, typename Tuple>
+struct AddSystemFromTuple;
+
+template<template<typename...> class System, typename... Components>
+struct AddSystemFromTuple<System, std::tuple<Components...>>
+{
+	template<typename SystemManager>
+	static void Add(SystemManager& manager)
+	{
+		manager.AddSystem(std::make_unique<System<Components...>>());
+	}
+};
+
+template<template<typename...> class System, typename SystemManager>
+void AddSystem(SystemManager& manager)
+{
+	AddSystemFromTuple<System, GameComponents>::Add(manager);
+}
+
 struct SpriteEntry
 {
 	std::string texturePath;
@@ -364,51 +413,27 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 
-	// Initialize engine
-	ECSEngine::ECSEngine<
-		ECSEngine::LocationComponent,
-		ECSEngine::MovementComponent,
-		ECSEngine::CollisionComponent,
-		ECSEngine::SpriteComponent,
-		ECSEngine::SpawnComponent,
-		ECSEngine::CameraComponent,
-		ECSEngine::CameraFollower,
-		ECSEngine::InputComponent,
-		ECSEngine::GravityComponent,
-		ECSEngine::CameraShake,
-		ECSEngine::ScoreComponent,
-		ECSEngine::SpellComponent,
-		ECSEngine::ProjectileComponent,
-		ECSEngine::EnemyComponent>
-		engine(1024, 768, "Spell Caster");
+	// Initialize engine using GameComponents tuple
+	GameEngine engine(1024, 768, "Leo the Wizard Cat");
 
 	// Create a scene
 	auto scene = engine.MakeScene();
 
-	// Component list macro for cleaner system registration
-	#define COMPONENT_LIST \
-		ECSEngine::LocationComponent, ECSEngine::MovementComponent, ECSEngine::CollisionComponent, \
-		ECSEngine::SpriteComponent, ECSEngine::SpawnComponent, ECSEngine::CameraComponent, \
-		ECSEngine::CameraFollower, ECSEngine::InputComponent, ECSEngine::GravityComponent, \
-		ECSEngine::CameraShake, ECSEngine::ScoreComponent, ECSEngine::SpellComponent, \
-		ECSEngine::ProjectileComponent, ECSEngine::EnemyComponent
-
 	// Add systems to the scene in execution order
-	scene->GetSystemManager().AddSystem(std::make_unique<ECSEngine::ProcessEventsSystem<COMPONENT_LIST>>());
-	scene->GetSystemManager().AddSystem(std::make_unique<ECSEngine::CollisionUpdateSystem<COMPONENT_LIST>>());
-	scene->GetSystemManager().AddSystem(std::make_unique<ECSEngine::InputSystem<COMPONENT_LIST>>());
-	scene->GetSystemManager().AddSystem(std::make_unique<ECSEngine::SpellSystem<COMPONENT_LIST>>());
-	scene->GetSystemManager().AddSystem(std::make_unique<ECSEngine::GravitySystem<COMPONENT_LIST>>());
-	scene->GetSystemManager().AddSystem(std::make_unique<ECSEngine::MovementSystem<COMPONENT_LIST>>());
-	scene->GetSystemManager().AddSystem(std::make_unique<ECSEngine::CollisionSystem<COMPONENT_LIST>>());
-	scene->GetSystemManager().AddSystem(std::make_unique<ECSEngine::ProjectileSystem<COMPONENT_LIST>>());
-	scene->GetSystemManager().AddSystem(std::make_unique<ECSEngine::EnemySystem<COMPONENT_LIST>>());
-	scene->GetSystemManager().AddSystem(std::make_unique<ECSEngine::ScoreSystem<COMPONENT_LIST>>());
-	scene->GetSystemManager().AddSystem(std::make_unique<ECSEngine::CameraSystem<COMPONENT_LIST>>());
-	scene->GetSystemManager().AddSystem(std::make_unique<ECSEngine::SpriteSystem<COMPONENT_LIST>>());
-	scene->GetSystemManager().AddSystem(std::make_unique<ECSEngine::SpawnSystem<COMPONENT_LIST>>());
-
-	#undef COMPONENT_LIST
+	auto& sm = scene->GetSystemManager();
+	AddSystem<ECSEngine::ProcessEventsSystem>(sm);
+	AddSystem<ECSEngine::CollisionUpdateSystem>(sm);
+	AddSystem<ECSEngine::InputSystem>(sm);
+	AddSystem<ECSEngine::SpellSystem>(sm);
+	AddSystem<ECSEngine::GravitySystem>(sm);
+	AddSystem<ECSEngine::MovementSystem>(sm);
+	AddSystem<ECSEngine::CollisionSystem>(sm);
+	AddSystem<ECSEngine::ProjectileSystem>(sm);
+	AddSystem<ECSEngine::EnemySystem>(sm);
+	AddSystem<ECSEngine::ScoreSystem>(sm);
+	AddSystem<ECSEngine::CameraSystem>(sm);
+	AddSystem<ECSEngine::SpriteSystem>(sm);
+	AddSystem<ECSEngine::SpawnSystem>(sm);
 
 	// Taken from lab-10-prep main.cpp
 	//  std::vector<std::filesystem::path> paths;
