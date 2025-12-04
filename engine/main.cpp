@@ -433,6 +433,9 @@ int main(int argc, char *argv[])
 	LoadMap("sky.map", *scene, gResourcePath);
 	LoadMap("world.map", *scene, gResourcePath);
 
+
+	//shaderManager.RegisterShader("main.frag", "default");
+
 	// Push scene to engine and run
 	engine.PushScene(scene);
 	engine.Run();

@@ -8,7 +8,7 @@ namespace ECSEngine {
         : mAtlasSize(atlasSize), mPadding(padding), mCursor(0.f, 0.f), mLineHeight(0.f), mNextID(0)
     {
         mTexture.resize(atlasSize, false);
-        mTexture.setSmooth(false); // Optional
+        mTexture.setSmooth(false);
     }
 
     sf::Image SpriteManager::padImage(const sf::Image& img, uint pad) const {
@@ -63,13 +63,6 @@ namespace ECSEngine {
             std::cerr << "Failed to upload image: " << filepath << "to Atlas in copy section\n";
             return 0;
         }
-
-        // mTexture.update(
-        //     padded.getPixelsPtr(),             // const Uint8* pixels
-        //     sf::Vector2u(padded.getSize().x, padded.getSize().y), // width and height
-        //     sf::Vector2u(static_cast<unsigned int>(rect.topLeft.x),  // x offset
-        //     static_cast<unsigned int>(rect.topLeft.y))    // y offset
-        // );
         
         mSizes[mNextID] = original.getSize();
 
