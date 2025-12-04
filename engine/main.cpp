@@ -262,7 +262,9 @@ void LoadMap(const std::string &path, SceneType &scene, const std::string &resou
 			std::stringstream ss(filename);
 			std::string part;
 
-			std::filesystem::path fullpath = std::filesystem::path("../../assets/sprites/") / path.filename();
+			std::filesystem::path spritesDir = "../../assets/sprites";
+			std::filesystem::path fullpath = spritesDir / path.filename();
+
 			sf::Image original;
 			if (!original.loadFromFile(fullpath)) {
 				std::cerr << "Failed to load image: " << fullpath << "\n";
