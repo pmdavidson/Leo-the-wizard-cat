@@ -6,6 +6,7 @@
 #include "LocationComponent.h"
 #include "CollisionComponent.h"
 #include "SpriteComponent.h"
+#include "EnemyComponent.h"
 #include <cmath>
 #include <random>
 
@@ -51,30 +52,44 @@ namespace ECSEngine
 											  static_cast<float>(textureRect.size.x),
 											  static_cast<float>(textureRect.size.y));
 
+							// Slimes are 96x32, collision box matches sprite
 							Rect collisionBounds = {0.0f, 0.0f, spawnComp.tileW, spawnComp.tileH};
 
-							EntityID starId = entityManager.CreateEntity("star");
+							EntityID slimeId = entityManager.CreateEntity("slime");
 
-							entityManager.template AddComponent<LocationComponent>(starId, LocationComponent(spawnerLocation.position));
+							entityManager.template AddComponent<LocationComponent>(slimeId, LocationComponent(spawnerLocation.position));
 
-							float angle = angleDist(gen);
-							float speed = speedDist(gen);
-							MovementComponent starMovement;
-							starMovement.velocity = Point2D(std::cos(angle) * speed, std::sin(angle) * speed);
-							entityManager.template AddComponent<MovementComponent>(starId, starMovement);
+							// Slimes don't move for now, but have gravity
+							MovementComponent slimeMovement;
+							slimeMovement.velocity = Point2D(0.0f, 0.0f);
+							entityManager.template AddComponent<MovementComponent>(slimeId, slimeMovement);
 
-							entityManager.template AddComponent<GravityComponent>(starId, GravityComponent(Point2D(0, 600.0f)));
+							// Add gravity so slimes fall
+							entityManager.template AddComponent<GravityComponent>(slimeId, GravityComponent(Point2D(0, 600.0f)));
 
-							CollisionComponent starCollision(collisionBounds, false);
-							starCollision.currentBounds = collisionBounds;
-							starCollision.previousBounds = collisionBounds;
-							entityManager.template AddComponent<CollisionComponent>(starId, starCollision);
+							CollisionComponent slimeCollision(collisionBounds, false);
+							slimeCollision.currentBounds = collisionBounds;
+							slimeCollision.previousBounds = collisionBounds;
+							entityManager.template AddComponent<CollisionComponent>(slimeId, slimeCollision);
 
-							SpriteComponent starSprite;
-							starSprite.spriteId = spawnComp.spriteId;
-							starSprite.bounds = spriteBounds;
-							starSprite.inWorldSpace = true;
-							entityManager.template AddComponent<SpriteComponent>(starId, starSprite);
+							SpriteComponent slimeSprite;
+							slimeSprite.spriteId = spawnComp.spriteId;
+							slimeSprite.bounds = spriteBounds;
+							slimeSprite.inWorldSpace = true;
+							entityManager.template AddComponent<SpriteComponent>(slimeId, slimeSprite);
+
+							// Add EnemyComponent for slime
+							EnemyComponent enemy;
+							enemy.type = EnemyType::Slime;
+							enemy.hp = 10.0f;
+							enemy.maxHp = 10.0f;
+							enemy.contactDamage = 10.0f;
+							enemy.knockbackForce = 300.0f;
+							enemy.isAlive = true;
+							enemy.canMove = false;
+							enemy.damageSoundName = "slime_damage_1";
+							enemy.deathSoundName = "slime_die";
+							entityManager.template AddComponent<EnemyComponent>(slimeId, enemy);
 
 							spawnComp.timeToNextSpawn = spawnComp.timeBetweenSpawns;
 							spawnComp.totalSpawnEvents--;

@@ -25,6 +25,8 @@
 #include "ProjectileComponent.h"
 #include "SpellSystem.h"
 #include "ProjectileSystem.h"
+#include "EnemyComponent.h"
+#include "EnemySystem.h"
 #include <fstream>
 
 using EntityId = size_t;
@@ -111,9 +113,10 @@ void LoadMap(const std::string &path, SceneType &scene, const std::string &resou
 		ss >> dummy >> mapW >> mapH;
 	}
 
-	// Register star sprite
-	SpriteID starSpriteId = scene.GetSpriteManager().RegisterTexture(
-		resourceRoot + "spritesheet-tiles-default.png", ECSEngine::Rect(640.f, 320.f, 32.f, 32.f));
+	// Register slime sprite (96x32 pixels)
+	// TODO: Update sprite location to actual slime sprite in the spritesheet
+	SpriteID slimeSpriteId = scene.GetSpriteManager().RegisterTexture(
+		resourceRoot + "spritesheet-enemies-default.png", ECSEngine::Rect(0.f, 0.f, 96.f, 32.f));
 
 	// Parse map rows
 	for (int y = 0; y < mapH; ++y)
@@ -152,10 +155,10 @@ void LoadMap(const std::string &path, SceneType &scene, const std::string &resou
 																									  FromSFML(entry.boundsRect), true));
 			}
 
-			// Spawner
+			// Spawner - spawns slimes (96x32)
 			if (tile == 'S')
 			{
-				scene.GetEntityManager().template AddComponent<ECSEngine::SpawnComponent>(id, {id, "star", starSpriteId, 10.f, 10.f, 10, static_cast<float>(tileW), static_cast<float>(tileH)});
+				scene.GetEntityManager().template AddComponent<ECSEngine::SpawnComponent>(id, {id, "slime", slimeSpriteId, 10.f, 10.f, 10, 96.f, 32.f});
 			}
 		}
 	}
@@ -310,23 +313,28 @@ void LoadMap(const std::string &path, SceneType &scene, const std::string &resou
 		// Fire spell has two whoosh variants for variety
 		scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/fireball_whoosh-1.ogg", "fire_cast_1");
 		scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/fireball_whoosh-2.ogg", "fire_cast_2");
-		scene.GetSoundManager().RegisterSound(gResourcePath + "sfx_jump.ogg", "water_cast");
-		scene.GetSoundManager().RegisterSound(gResourcePath + "sfx_jump.ogg", "wind_cast");
-		scene.GetSoundManager().RegisterSound(gResourcePath + "sfx_jump.ogg", "earth_cast");
+		// scene.GetSoundManager().RegisterSound(gResourcePath + ".ogg", "water_cast");
+		// scene.GetSoundManager().RegisterSound(gResourcePath + ".ogg", "wind_cast");
+		// scene.GetSoundManager().RegisterSound(gResourcePath + ".ogg", "earth_cast");
 
 		// Register spell impact sounds
 		// Fire spell has two impact variants for variety
 		scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/fireball_impact1.ogg", "fire_impact_1");
 		scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/fireball_impact2.ogg", "fire_impact_2");
-		scene.GetSoundManager().RegisterSound(gResourcePath + "sfx_gem.ogg", "water_impact");
-		scene.GetSoundManager().RegisterSound(gResourcePath + "sfx_gem.ogg", "wind_impact");
-		scene.GetSoundManager().RegisterSound(gResourcePath + "sfx_gem.ogg", "earth_impact");
+		// scene.GetSoundManager().RegisterSound(gResourcePath + ".ogg", "water_impact");
+		// scene.GetSoundManager().RegisterSound(gResourcePath + ".ogg", "wind_impact");
+		// scene.GetSoundManager().RegisterSound(gResourcePath + ".ogg", "earth_impact");
 
-		// Register element selection sounds (played when switching elements)
-		scene.GetSoundManager().RegisterSound(gResourcePath + "footstep_grass_003.ogg", "fire_select");
-		scene.GetSoundManager().RegisterSound(gResourcePath + "footstep_grass_003.ogg", "water_select");
-		scene.GetSoundManager().RegisterSound(gResourcePath + "footstep_grass_003.ogg", "wind_select");
-		scene.GetSoundManager().RegisterSound(gResourcePath + "footstep_grass_003.ogg", "earth_select");
+		// // Register element selection sounds (played when switching elements)
+		// scene.GetSoundManager().RegisterSound(gResourcePath + ".ogg", "fire_select");
+		// scene.GetSoundManager().RegisterSound(gResourcePath + ".ogg", "water_select");
+		// scene.GetSoundManager().RegisterSound(gResourcePath + ".ogg", "wind_select");
+		// scene.GetSoundManager().RegisterSound(gResourcePath + ".ogg", "earth_select");
+
+		// Register enemy sounds
+		scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/slime_die1.ogg", "slime_die");
+		scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/slime_take_dmg1.ogg", "slime_damage_1");
+		scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/slime_take_dmg2.ogg", "slime_damage_2");
 	}
 }
 
@@ -370,115 +378,37 @@ int main(int argc, char *argv[])
 		ECSEngine::CameraShake,
 		ECSEngine::ScoreComponent,
 		ECSEngine::SpellComponent,
-		ECSEngine::ProjectileComponent>
+		ECSEngine::ProjectileComponent,
+		ECSEngine::EnemyComponent>
 		engine(1024, 768, "Spell Caster");
 
 	// Create a scene
 	auto scene = engine.MakeScene();
 
-	// Define component list type alias for cleaner code
-	using ComponentList = std::tuple<
-		ECSEngine::LocationComponent,
-		ECSEngine::MovementComponent,
-		ECSEngine::CollisionComponent,
-		ECSEngine::SpriteComponent,
-		ECSEngine::SpawnComponent,
-		ECSEngine::CameraComponent,
-		ECSEngine::CameraFollower,
-		ECSEngine::InputComponent,
-		ECSEngine::GravityComponent,
-		ECSEngine::CameraShake,
-		ECSEngine::ScoreComponent,
-		ECSEngine::SpellComponent,
-		ECSEngine::ProjectileComponent>;
+	// Component list macro for cleaner system registration
+	#define COMPONENT_LIST \
+		ECSEngine::LocationComponent, ECSEngine::MovementComponent, ECSEngine::CollisionComponent, \
+		ECSEngine::SpriteComponent, ECSEngine::SpawnComponent, ECSEngine::CameraComponent, \
+		ECSEngine::CameraFollower, ECSEngine::InputComponent, ECSEngine::GravityComponent, \
+		ECSEngine::CameraShake, ECSEngine::ScoreComponent, ECSEngine::SpellComponent, \
+		ECSEngine::ProjectileComponent, ECSEngine::EnemyComponent
 
-	// Add systems to the scene in the correct order
-	scene->GetSystemManager().AddSystem(std::make_unique<ECSEngine::ProcessEventsSystem<
-											ECSEngine::LocationComponent, ECSEngine::MovementComponent, ECSEngine::CollisionComponent,
-											ECSEngine::SpriteComponent, ECSEngine::SpawnComponent, ECSEngine::CameraComponent,
-											ECSEngine::CameraFollower, ECSEngine::InputComponent, ECSEngine::GravityComponent,
-											ECSEngine::CameraShake, ECSEngine::ScoreComponent, ECSEngine::SpellComponent,
-											ECSEngine::ProjectileComponent>>());
+	// Add systems to the scene in execution order
+	scene->GetSystemManager().AddSystem(std::make_unique<ECSEngine::ProcessEventsSystem<COMPONENT_LIST>>());
+	scene->GetSystemManager().AddSystem(std::make_unique<ECSEngine::CollisionUpdateSystem<COMPONENT_LIST>>());
+	scene->GetSystemManager().AddSystem(std::make_unique<ECSEngine::InputSystem<COMPONENT_LIST>>());
+	scene->GetSystemManager().AddSystem(std::make_unique<ECSEngine::SpellSystem<COMPONENT_LIST>>());
+	scene->GetSystemManager().AddSystem(std::make_unique<ECSEngine::GravitySystem<COMPONENT_LIST>>());
+	scene->GetSystemManager().AddSystem(std::make_unique<ECSEngine::MovementSystem<COMPONENT_LIST>>());
+	scene->GetSystemManager().AddSystem(std::make_unique<ECSEngine::CollisionSystem<COMPONENT_LIST>>());
+	scene->GetSystemManager().AddSystem(std::make_unique<ECSEngine::ProjectileSystem<COMPONENT_LIST>>());
+	scene->GetSystemManager().AddSystem(std::make_unique<ECSEngine::EnemySystem<COMPONENT_LIST>>());
+	scene->GetSystemManager().AddSystem(std::make_unique<ECSEngine::ScoreSystem<COMPONENT_LIST>>());
+	scene->GetSystemManager().AddSystem(std::make_unique<ECSEngine::CameraSystem<COMPONENT_LIST>>());
+	scene->GetSystemManager().AddSystem(std::make_unique<ECSEngine::SpriteSystem<COMPONENT_LIST>>());
+	scene->GetSystemManager().AddSystem(std::make_unique<ECSEngine::SpawnSystem<COMPONENT_LIST>>());
 
-	scene->GetSystemManager().AddSystem(std::make_unique<ECSEngine::CollisionUpdateSystem<
-											ECSEngine::LocationComponent, ECSEngine::MovementComponent, ECSEngine::CollisionComponent,
-											ECSEngine::SpriteComponent, ECSEngine::SpawnComponent, ECSEngine::CameraComponent,
-											ECSEngine::CameraFollower, ECSEngine::InputComponent, ECSEngine::GravityComponent,
-											ECSEngine::CameraShake, ECSEngine::ScoreComponent, ECSEngine::SpellComponent,
-											ECSEngine::ProjectileComponent>>());
-
-	scene->GetSystemManager().AddSystem(std::make_unique<ECSEngine::InputSystem<
-											ECSEngine::LocationComponent, ECSEngine::MovementComponent, ECSEngine::CollisionComponent,
-											ECSEngine::SpriteComponent, ECSEngine::SpawnComponent, ECSEngine::CameraComponent,
-											ECSEngine::CameraFollower, ECSEngine::InputComponent, ECSEngine::GravityComponent,
-											ECSEngine::CameraShake, ECSEngine::ScoreComponent, ECSEngine::SpellComponent,
-											ECSEngine::ProjectileComponent>>());
-
-	// Spell system - process spell casting input
-	scene->GetSystemManager().AddSystem(std::make_unique<ECSEngine::SpellSystem<
-											ECSEngine::LocationComponent, ECSEngine::MovementComponent, ECSEngine::CollisionComponent,
-											ECSEngine::SpriteComponent, ECSEngine::SpawnComponent, ECSEngine::CameraComponent,
-											ECSEngine::CameraFollower, ECSEngine::InputComponent, ECSEngine::GravityComponent,
-											ECSEngine::CameraShake, ECSEngine::ScoreComponent, ECSEngine::SpellComponent,
-											ECSEngine::ProjectileComponent>>());
-
-	scene->GetSystemManager().AddSystem(std::make_unique<ECSEngine::GravitySystem<
-											ECSEngine::LocationComponent, ECSEngine::MovementComponent, ECSEngine::CollisionComponent,
-											ECSEngine::SpriteComponent, ECSEngine::SpawnComponent, ECSEngine::CameraComponent,
-											ECSEngine::CameraFollower, ECSEngine::InputComponent, ECSEngine::GravityComponent,
-											ECSEngine::CameraShake, ECSEngine::ScoreComponent, ECSEngine::SpellComponent,
-											ECSEngine::ProjectileComponent>>());
-
-	scene->GetSystemManager().AddSystem(std::make_unique<ECSEngine::MovementSystem<
-											ECSEngine::LocationComponent, ECSEngine::MovementComponent, ECSEngine::CollisionComponent,
-											ECSEngine::SpriteComponent, ECSEngine::SpawnComponent, ECSEngine::CameraComponent,
-											ECSEngine::CameraFollower, ECSEngine::InputComponent, ECSEngine::GravityComponent,
-											ECSEngine::CameraShake, ECSEngine::ScoreComponent, ECSEngine::SpellComponent,
-											ECSEngine::ProjectileComponent>>());
-
-	scene->GetSystemManager().AddSystem(std::make_unique<ECSEngine::CollisionSystem<
-											ECSEngine::LocationComponent, ECSEngine::MovementComponent, ECSEngine::CollisionComponent,
-											ECSEngine::SpriteComponent, ECSEngine::SpawnComponent, ECSEngine::CameraComponent,
-											ECSEngine::CameraFollower, ECSEngine::InputComponent, ECSEngine::GravityComponent,
-											ECSEngine::CameraShake, ECSEngine::ScoreComponent, ECSEngine::SpellComponent,
-											ECSEngine::ProjectileComponent>>());
-
-	// Projectile system - update projectile lifetime and handle impacts
-	scene->GetSystemManager().AddSystem(std::make_unique<ECSEngine::ProjectileSystem<
-											ECSEngine::LocationComponent, ECSEngine::MovementComponent, ECSEngine::CollisionComponent,
-											ECSEngine::SpriteComponent, ECSEngine::SpawnComponent, ECSEngine::CameraComponent,
-											ECSEngine::CameraFollower, ECSEngine::InputComponent, ECSEngine::GravityComponent,
-											ECSEngine::CameraShake, ECSEngine::ScoreComponent, ECSEngine::SpellComponent,
-											ECSEngine::ProjectileComponent>>());
-
-	scene->GetSystemManager().AddSystem(std::make_unique<ECSEngine::ScoreSystem<
-											ECSEngine::LocationComponent, ECSEngine::MovementComponent, ECSEngine::CollisionComponent,
-											ECSEngine::SpriteComponent, ECSEngine::SpawnComponent, ECSEngine::CameraComponent,
-											ECSEngine::CameraFollower, ECSEngine::InputComponent, ECSEngine::GravityComponent,
-											ECSEngine::CameraShake, ECSEngine::ScoreComponent, ECSEngine::SpellComponent,
-											ECSEngine::ProjectileComponent>>());
-
-	scene->GetSystemManager().AddSystem(std::make_unique<ECSEngine::CameraSystem<
-											ECSEngine::LocationComponent, ECSEngine::MovementComponent, ECSEngine::CollisionComponent,
-											ECSEngine::SpriteComponent, ECSEngine::SpawnComponent, ECSEngine::CameraComponent,
-											ECSEngine::CameraFollower, ECSEngine::InputComponent, ECSEngine::GravityComponent,
-											ECSEngine::CameraShake, ECSEngine::ScoreComponent, ECSEngine::SpellComponent,
-											ECSEngine::ProjectileComponent>>());
-
-	scene->GetSystemManager().AddSystem(std::make_unique<ECSEngine::SpriteSystem<
-											ECSEngine::LocationComponent, ECSEngine::MovementComponent, ECSEngine::CollisionComponent,
-											ECSEngine::SpriteComponent, ECSEngine::SpawnComponent, ECSEngine::CameraComponent,
-											ECSEngine::CameraFollower, ECSEngine::InputComponent, ECSEngine::GravityComponent,
-											ECSEngine::CameraShake, ECSEngine::ScoreComponent, ECSEngine::SpellComponent,
-											ECSEngine::ProjectileComponent>>());
-
-	// why does this need these components?
-	scene->GetSystemManager().AddSystem(std::make_unique<ECSEngine::SpawnSystem<
-											ECSEngine::LocationComponent, ECSEngine::MovementComponent, ECSEngine::CollisionComponent,
-											ECSEngine::SpriteComponent, ECSEngine::SpawnComponent, ECSEngine::CameraComponent,
-											ECSEngine::CameraFollower, ECSEngine::InputComponent, ECSEngine::GravityComponent,
-											ECSEngine::CameraShake, ECSEngine::ScoreComponent, ECSEngine::SpellComponent,
-											ECSEngine::ProjectileComponent>>());
+	#undef COMPONENT_LIST
 
 	// Taken from lab-10-prep main.cpp
 	//  std::vector<std::filesystem::path> paths;

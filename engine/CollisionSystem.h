@@ -10,6 +10,7 @@
 #include "CameraComponent.h"
 #include "SoundManager.h"
 #include "ECSEngine.h"
+#include "EnemyComponent.h"
 #include <cmath>
 #include <random>
 
@@ -89,13 +90,15 @@ namespace ECSEngine
 					bool isPlayerB = entityManager.template HasComponent<InputComponent>(idB);
 					bool isSpawnerA = entityManager.template HasComponent<SpawnComponent>(idA);
 					bool isSpawnerB = entityManager.template HasComponent<SpawnComponent>(idB);
+					bool isEnemyA = entityManager.template HasComponent<EnemyComponent>(idA);
+					bool isEnemyB = entityManager.template HasComponent<EnemyComponent>(idB);
 
-					bool isStarA = !isPlayerA && !isSpawnerA &&
+					bool isStarA = !isPlayerA && !isSpawnerA && !isEnemyA &&
 								   entityManager.template HasComponent<CollisionComponent>(idA) &&
 								   !entityManager.template GetComponent<CollisionComponent>(idA).isStatic &&
 								   (entityManager.template HasComponent<GravityComponent>(idA) ||
 									!entityManager.template HasComponent<MovementComponent>(idA));
-					bool isStarB = !isPlayerB && !isSpawnerB &&
+					bool isStarB = !isPlayerB && !isSpawnerB && !isEnemyB &&
 								   entityManager.template HasComponent<CollisionComponent>(idB) &&
 								   !entityManager.template GetComponent<CollisionComponent>(idB).isStatic &&
 								   (entityManager.template HasComponent<GravityComponent>(idB) ||
@@ -204,6 +207,40 @@ namespace ECSEngine
 						{
 							entityManager.RemoveEntity(idB);
 							removedB = true;
+						}
+					}
+
+					// Handle player-enemy collisions
+					if ((isPlayerA && isEnemyB) || (isPlayerB && isEnemyA))
+					{
+						EntityID playerId = isPlayerA ? idA : idB;
+						EntityID enemyId = isEnemyA ? idA : idB;
+
+						auto &enemy = entityManager.template GetComponent<EnemyComponent>(enemyId);
+
+						// Only damage if enemy is alive and player isn't invincible
+						if (enemy.isAlive && enemy.invincibilityTimer <= 0.0f)
+						{
+							// Apply knockback to player
+							if (entityManager.template HasComponent<MovementComponent>(playerId))
+							{
+								auto &playerMovement = entityManager.template GetComponent<MovementComponent>(playerId);
+								auto &playerLoc = entityManager.template GetComponent<LocationComponent>(playerId);
+								auto &enemyLoc = entityManager.template GetComponent<LocationComponent>(enemyId);
+
+								// Knockback direction: away from enemy
+								float knockbackDirX = (playerLoc.position.x > enemyLoc.position.x) ? 1.0f : -1.0f;
+
+								// Apply knockback velocity
+								playerMovement.velocity.x = knockbackDirX * enemy.knockbackForce;
+								playerMovement.velocity.y = -enemy.knockbackForce * 0.5f; // Slight upward knockback
+							}
+
+							// Play player damage sound
+							soundManager.PlaySound("take_damage");
+
+							// Brief cooldown to prevent rapid damage
+							enemy.invincibilityTimer = 0.5f;
 						}
 					}
 
