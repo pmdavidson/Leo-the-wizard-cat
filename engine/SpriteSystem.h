@@ -149,7 +149,7 @@ public:
             }
 
             sf::RenderStates states;
-            states.texture = &atlasTexture;
+            states.texture = &atlasTexture; //atlas texture is the entire texture
             states.shader = shader;
 
             window->draw(vertices, states);

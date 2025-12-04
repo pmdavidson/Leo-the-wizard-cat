@@ -16,11 +16,11 @@ using TextureID = size_t;
 
 class SpriteManager {
 public:
-    SpriteManager(const sf::Vector2u& atlasSize = {2048, 2048}, uint padding = 0);
+    SpriteManager(const sf::Vector2u& atlasSize = {4096, 4096}, uint padding = 0);
 
-    [[nodiscard]] SpriteID RegisterTexture(const std::string& filepath);
+    [[nodiscard]] SpriteID RegisterTexture(const std::string& filepath, const Rect &sourceRect);
 	sf::Sprite &GetSprite(SpriteID id);
-    const sf::Texture& GetTexture() const;
+    sf::Texture& GetTexture(){return mTexture;}
 
     // UVs for vertex array rendering
     Rect GetUV(SpriteID id) const;
