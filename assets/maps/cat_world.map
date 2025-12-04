@@ -1,13 +1,10 @@
 dictionary 2
-
 G Tile_swamp_2.png 0 0 32 32 0 0 32 32
 H Tile_swamp_1.png 32 0 32 32 0 0 32 32
-
 b swamp_bush1.png 0 0 31 15 0 0 0 0
 g swamp_grass1.png 0 0 17 18 0 0 0 0
 m swamp_pointer1.png 0 0 16 21 0 0 0 0
 w swamp_willow1.png 0 0 104 135 0 0 0 0
-
 map origin 0 0 tile 32 32 size 32 12
 ................................
 ................................

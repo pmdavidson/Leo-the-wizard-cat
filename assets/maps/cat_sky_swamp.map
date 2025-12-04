@@ -4,7 +4,6 @@ B swamp_bg2.png 0 0 576 324
 C swamp_bg3.png 0 0 576 324
 D swamp_bg4.png 0 0 576 324
 E swamp_bg5.png 0 0 576 324
-
 map origin -512 -256 tile 256 256 size 12 5
 AAAAA.......
 BBBBB.......
