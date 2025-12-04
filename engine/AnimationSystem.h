@@ -15,7 +15,7 @@ public:
     bool Run(Scene<Components...> &scene) override
     {
         auto &entityManager = scene.GetEntityManager();
-        float dt = scene.GetDeltaTime();
+        float dt = scene.GetDeltaSeconds();
 
         for (auto it = entityManager.begin(); it != entityManager.end(); ++it)
         {

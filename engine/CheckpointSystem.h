@@ -5,7 +5,6 @@
 #include "CheckpointComponent.h"
 #include "HpComponent.h"
 #include "LocationComponent.h"
-#include "MovementComponent.h"
 
 namespace ECSEngine
 {

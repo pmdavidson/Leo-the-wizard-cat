@@ -44,13 +44,12 @@ namespace ECSEngine
 		 */
 		void Run(ECSEngine<Components...> &engine)
 		{
-			// Update scene time
-			sf::Time deltaTime = mClock.restart();
-			mTotalTime += deltaTime;
+			mDeltaTime = mClock.restart();   // update deltaTime
+			mTotalTime += mDeltaTime;        // accumulate total time
 
-			// Run all systems
-			mSystemManager.Run(*this);
+			mSystemManager.Run(*this);       // run systems with correct dt
 		}
+
 
 		/**
 		 * @brief Gets a reference to the SoundManager.
@@ -122,6 +121,12 @@ namespace ECSEngine
 			return mTotalTime;
 		}
 
+		float GetDeltaSeconds()
+		{
+			sf::Time dt = mClock.restart();
+			return dt.asSeconds();
+		}
+
 		/**
 		 * @brief Marks the scene as complete.
 		 *
@@ -162,6 +167,7 @@ namespace ECSEngine
 		SystemManager<Components...> mSystemManager;
 
 		sf::Clock mClock;
+		sf::Time mDeltaTime = sf::Time::Zero;
 		sf::Time mTotalTime;
 		bool mIsComplete = false;
 	};

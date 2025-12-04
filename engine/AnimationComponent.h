@@ -23,8 +23,7 @@ namespace ECSEngine
 
         AnimationComponent() = default;
 
-        void AddAnimation(const std::string& name, const SpriteID& frame)
-        {
+        AnimationComponent(const std::string& name, const SpriteID& frame){
             animations[name].emplace_back(frame);
         }
 

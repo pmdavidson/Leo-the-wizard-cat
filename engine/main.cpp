@@ -32,10 +32,10 @@
 #include "CheckpointComponent.h"
 #include "CheckpointSystem.h"
 #include "AnimationComponent.h"
+#include "AnimationSystem.h"
 #include "SpellSystem.h"
 #include "ProjectileSystem.h"
-// #include "EnemyComponent.h"
-// #include "EnemySystem.h"
+
 #include <fstream>
 
 using EntityId = size_t;
@@ -61,7 +61,8 @@ using GameComponents = std::tuple<
 	ECSEngine::EnemyComponent,
 	ECSEngine::HpComponent,
 	ECSEngine::CheckpointComponent,
-	ECSEngine::CampfireComponent>;
+	ECSEngine::CampfireComponent,
+	ECSEngine::AnimationComponent>;
 
 // Helper to create ECSEngine from a tuple of components
 template<typename Tuple>
@@ -160,12 +161,18 @@ void LoadMap(const std::string &path, SceneType &scene, const std::string &resou
 				sf::Vector2i(bx, by),
 				sf::Vector2i(bw, bh));
 
-			entry.hasCollision = true;
+			if (bx == 0 && by == 0 && bw == 0 && bh == 0)
+			{
+				entry.hasCollision = false;
+			}
+			else{
+				entry.hasCollision = true;
+			}
 		}
 
 		dictionary[symbol] = entry;
 
-		scene->GetSpriteManager().RegisterTexture(entry.texturePath, entry.sourceRect);
+		scene.GetSpriteManager().RegisterTexture(entry.texturePath, FromSFML(entry.sourceRect));
 	}
 
 	// Parse map origin and size
@@ -254,8 +261,12 @@ void LoadMap(const std::string &path, SceneType &scene, const std::string &resou
 			std::stringstream ss(filename);
 			std::string part;
 
+			sf::Image original;
+			if (!original.loadFromFile(path)) {
+				std::cerr << "Failed to load image: " << path << "\n";
+			}
 			SpriteID SpriteId = scene.GetSpriteManager().RegisterTexture(
-				path, ECSEngine::Rect(0.f, 0.f, 32.f, 32.f)); //this was 0, 32, 32, 32
+				path, ECSEngine::Rect(ECSEngine::Point2D(0,0), original.getSize().x, original.getSize().y));
 
 			while (std::getline(ss, part, '_')) {
 				parts.push_back(part);
@@ -269,19 +280,20 @@ void LoadMap(const std::string &path, SceneType &scene, const std::string &resou
 				std::string animation = parts[1];    // "idle"
 				std::string frame = parts[2];        // "0"
 
-				std::cout << "name: " << name << "\n";
-				std::cout << "animation: " << animation << "\n";
-				std::cout << "frame: " << frame << "\n";
+				// std::cout << "name: " << name << "\n";
+				// std::cout << "animation: " << animation << "\n";
+				// std::cout << "frame: " << frame << "\n";
 
 				if (name == "cat"){
 					scene.GetEntityManager().template AddComponent<ECSEngine::SpriteComponent>(player, {SpriteId, ECSEngine::Rect(0.f, 0.f, 32.f, 32.f), true});
 					
-					scene.GetEntityManager().template AddComponent<ECSEngine::AddAnimation>(player, ECSEngine::AnimationComponent (animation, int(frame)));
+					scene.GetEntityManager().template AddComponent<ECSEngine::AnimationComponent>(player, ECSEngine::AnimationComponent (animation, std::stoi(frame)));
 				}
-				else {
-					std::cerr << "Filename format is invalid\n";
-				}
-		}
+			}
+			else {
+				std::cerr << "Filename format is invalid\n";
+			}
+	}
 
 		//need to set parallax factor TODO
 		
@@ -537,14 +549,6 @@ int main(int argc, char *argv[])
 		std::cout << e.GetComponent<int>(e1) << "\n";
 		return 0;
 	}
-	
-	// Component list macro for cleaner system registration
-	#define COMPONENT_LIST \
-		ECSEngine::LocationComponent, ECSEngine::MovementComponent, ECSEngine::CollisionComponent, \
-		ECSEngine::SpriteComponent, ECSEngine::SpawnComponent, ECSEngine::CameraComponent, \
-		ECSEngine::CameraFollower, ECSEngine::InputComponent, ECSEngine::GravityComponent, \
-		ECSEngine::CameraShake, ECSEngine::ScoreComponent, ECSEngine::SpellComponent, \
-		ECSEngine::ProjectileComponent, ECSEngine::EnemyComponent
 
 	// Initialize engine using GameComponents tuple
 	GameEngine engine(1024, 768, "Leo the Wizard Cat");
@@ -567,24 +571,13 @@ int main(int argc, char *argv[])
 	AddSystem<ECSEngine::CheckpointSystem>(sm);
 	AddSystem<ECSEngine::ScoreSystem>(sm);
 	AddSystem<ECSEngine::CameraSystem>(sm);
+	AddSystem<ECSEngine::AnimationSystem>(sm); //double check TODO
 	AddSystem<ECSEngine::SpriteSystem>(sm);
 	AddSystem<ECSEngine::SpawnSystem>(sm);
 
-	// Taken from lab-10-prep main.cpp
-	//  std::vector<std::filesystem::path> paths;
-	//  for (const auto& f : std::filesystem::directory_iterator(std::filesystem::path {gResourcePath})) {
-	//      if (std::filesystem::is_regular_file(f) && f.path().extension().string() == ".png") {
-	//          paths.push_back(f.path());
-	//      }
-	//  }
-
-	// for (const auto& path : paths) {
-    //     scene->GetSpriteManager().RegisterTexture(path, ECSEngine::Rect(ECSEngine::Point2D(0,0), 32, 32));
-    // }
-
 	// Load maps into the scene
-	LoadMap(gResourcePath + "maps/cat_sky_swamp.map", *scene, gResourcePath);
-	LoadMap(gResourcePath + "maps/cat_world.map", *scene, gResourcePath);
+	LoadMap("maps/cat_sky_swamp.map", *scene, gResourcePath);
+	LoadMap("maps/cat_world.map", *scene, gResourcePath);
 	
 	sf::Image atlasImg = scene->GetSpriteManager().GetTexture().copyToImage();
 
