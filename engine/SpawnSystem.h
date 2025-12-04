@@ -45,7 +45,7 @@ namespace ECSEngine
 						if (entityManager.template HasComponent<LocationComponent>(entityId))
 						{
 							auto &spawnerLocation = entityManager.template GetComponent<LocationComponent>(entityId);
-							sf::Sprite &sprite = spriteManager.GetSprite(spawnComp.spriteId);
+							sf::Sprite sprite = spriteManager.GetSprite(spawnComp.spriteId);
 							sf::IntRect textureRect = sprite.getTextureRect();
 
 							Rect spriteBounds(0.0f, 0.0f,

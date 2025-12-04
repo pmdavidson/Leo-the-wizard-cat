@@ -19,7 +19,8 @@ public:
     SpriteManager(const sf::Vector2u& atlasSize = {4096, 4096}, uint padding = 0);
 
     [[nodiscard]] SpriteID RegisterTexture(const std::string& filepath, const Rect &sourceRect);
-	sf::Sprite &GetSprite(SpriteID id);
+	sf::Sprite GetSprite(SpriteID id);
+    void FinalizeAtlas();
     sf::Texture& GetTexture(){return mTexture;}
 
     // UVs for vertex array rendering

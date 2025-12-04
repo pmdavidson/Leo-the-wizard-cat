@@ -65,10 +65,10 @@ using GameComponents = std::tuple<
 	ECSEngine::AnimationComponent>;
 
 // Helper to create ECSEngine from a tuple of components
-template<typename Tuple>
+template <typename Tuple>
 struct EngineFromTuple;
 
-template<typename... Components>
+template <typename... Components>
 struct EngineFromTuple<std::tuple<Components...>>
 {
 	using type = ECSEngine::ECSEngine<Components...>;
@@ -77,21 +77,21 @@ struct EngineFromTuple<std::tuple<Components...>>
 using GameEngine = EngineFromTuple<GameComponents>::type;
 
 // Helper to add systems using the GameComponents tuple
-template<template<typename...> class System, typename Tuple>
+template <template <typename...> class System, typename Tuple>
 struct AddSystemFromTuple;
 
-template<template<typename...> class System, typename... Components>
+template <template <typename...> class System, typename... Components>
 struct AddSystemFromTuple<System, std::tuple<Components...>>
 {
-	template<typename SystemManager>
-	static void Add(SystemManager& manager)
+	template <typename SystemManager>
+	static void Add(SystemManager &manager)
 	{
 		manager.AddSystem(std::make_unique<System<Components...>>());
 	}
 };
 
-template<template<typename...> class System, typename SystemManager>
-void AddSystem(SystemManager& manager)
+template <template <typename...> class System, typename SystemManager>
+void AddSystem(SystemManager &manager)
 {
 	AddSystemFromTuple<System, GameComponents>::Add(manager);
 }
@@ -112,7 +112,7 @@ ECSEngine::Rect FromSFML(const sf::IntRect &r)
 		r.size.y};
 }
 
-//check bounding box in world map first, if its all 0s then has collision = false, set layer = 2 with parallax factor
+// check bounding box in world map first, if its all 0s then has collision = false, set layer = 2 with parallax factor
 
 template <typename SceneType>
 void LoadMap(const std::string &path, SceneType &scene, const std::string &resourceRoot)
@@ -141,14 +141,20 @@ void LoadMap(const std::string &path, SceneType &scene, const std::string &resou
 		if (line.starts_with("map origin"))
 			break;
 
+		// Skip empty lines
+		if (line.empty() || line.find_first_not_of(" \t") == std::string::npos)
+			continue;
+
 		std::istringstream ss(line);
 		char symbol;
 		SpriteEntry entry;
 		int sx, sy, sw, sh;
 
 		// remove texture path
-		ss >> symbol >> entry.texturePath >> sx >> sy >> sw >> sh;
-		entry.texturePath = "sprites" + entry.texturePath;
+		if (!(ss >> symbol >> entry.texturePath >> sx >> sy >> sw >> sh))
+			continue; // Skip malformed lines
+
+		entry.texturePath = "sprites/" + entry.texturePath;
 		entry.sourceRect = sf::IntRect(
 			sf::Vector2i(sx, sy),
 			sf::Vector2i(sw, sh));
@@ -166,14 +172,15 @@ void LoadMap(const std::string &path, SceneType &scene, const std::string &resou
 			{
 				entry.hasCollision = false;
 			}
-			else{
+			else
+			{
 				entry.hasCollision = true;
 			}
 		}
 
 		dictionary[symbol] = entry;
 
-		scene.GetSpriteManager().RegisterTexture(entry.texturePath, FromSFML(entry.sourceRect));
+		scene.GetSpriteManager().RegisterTexture(resourceRoot + entry.texturePath, FromSFML(entry.sourceRect));
 	}
 
 	// Parse map origin and size
@@ -186,11 +193,9 @@ void LoadMap(const std::string &path, SceneType &scene, const std::string &resou
 		ss >> dummy >> mapW >> mapH;
 	}
 
-	EntityId blueSlime = scene.GetEntityManager().CreateEntity("blueSlime");
-	
-	// EntityId redSlime = scene.GetEntityManager().CreateEntity("redSlime");
-	// EntityId greenSlime = scene.GetEntityManager().CreateEntity("greenSlime");
-	// EntityId brownSlime = scene.GetEntityManager().CreateEntity("brownlime");
+	// Register blueSlime sprite for spawning
+	SpriteID blueSlimeSpriteId = scene.GetSpriteManager().RegisterTexture(
+		resourceRoot + "sprites/blueSlime_idle_0.png", ECSEngine::Rect(0, 0, 96, 32));
 
 	// Parse map rows
 	for (int y = 0; y < mapH; ++y)
@@ -232,7 +237,7 @@ void LoadMap(const std::string &path, SceneType &scene, const std::string &resou
 			// Spawner - spawns slimes (96x32)
 			if (tile == 'S')
 			{
-				scene.GetEntityManager().template AddComponent<ECSEngine::SpawnComponent>(id, {id, "slime", blueSlime, 10.f, 10.f, 10, 96.f, 32.f});
+				scene.GetEntityManager().template AddComponent<ECSEngine::SpawnComponent>(id, {id, "slime", blueSlimeSpriteId, 10.f, 10.f, 10, 96.f, 32.f});
 			}
 		}
 	}
@@ -240,13 +245,15 @@ void LoadMap(const std::string &path, SceneType &scene, const std::string &resou
 	// Make Player after everything else has been made
 	if (dictionaryType == 2)
 	{
-		// Spawn position assuming (1,8) is safe
-		float spawnX = tileW * 1;
-		float spawnY = tileH * 1;
+		// Spawn position
+		float spawnX = tileW * 8;
+		float spawnY = tileH * 3;
 
 		std::vector<std::filesystem::path> paths;
-		for (const auto& f : std::filesystem::directory_iterator(std::filesystem::path {gResourcePath + "sprites/" })) {
-			if (std::filesystem::is_regular_file(f) && f.path().extension().string() == ".png") {
+		for (const auto &f : std::filesystem::directory_iterator(std::filesystem::path{gResourcePath + "sprites/"}))
+		{
+			if (std::filesystem::is_regular_file(f) && f.path().extension().string() == ".png")
+			{
 				paths.push_back(f.path());
 			}
 		}
@@ -255,52 +262,74 @@ void LoadMap(const std::string &path, SceneType &scene, const std::string &resou
 		// campfire is in map too so no need to handle here, projectiles are made dynamically not pre-made
 		EntityId player = scene.GetEntityManager().CreateEntity("player");
 
-		for (const auto& path : paths) {
+		// Create animation component to collect all cat sprite frames
+		ECSEngine::AnimationComponent playerAnim;
+		SpriteID firstCatSpriteId = 0;
+		bool playerSpriteSet = false;
 
+		for (const auto &path : paths)
+		{
 			std::string filename = path.stem().string(); // no .png extension
-    		std::vector<std::string> parts;
+			std::vector<std::string> parts;
 			std::stringstream ss(filename);
 			std::string part;
 
-			std::filesystem::path spritesDir = "../../assets/sprites";
+			std::filesystem::path spritesDir = resourceRoot + "sprites";
 			std::filesystem::path fullpath = spritesDir / path.filename();
 
 			sf::Image original;
-			if (!original.loadFromFile(fullpath)) {
+			if (!original.loadFromFile(fullpath))
+			{
 				std::cerr << "Failed to load image: " << fullpath << "\n";
+				continue;
 			}
-			SpriteID SpriteId = scene.GetSpriteManager().RegisterTexture(
-				fullpath, ECSEngine::Rect(ECSEngine::Point2D(0,0), original.getSize().x, original.getSize().y));
+			SpriteID spriteId = scene.GetSpriteManager().RegisterTexture(
+				fullpath, ECSEngine::Rect(ECSEngine::Point2D(0, 0), original.getSize().x, original.getSize().y));
 
-			while (std::getline(ss, part, '_')) {
+			while (std::getline(ss, part, '_'))
+			{
 				parts.push_back(part);
 			}
 
-			//blueSlime_idle_0
-			//background things have _ at the front _swamp_bg_1.png
+			// blueSlime_idle_0
+			// background things have _ at the front _swamp_bg_1.png
 
-			if (parts.size() >= 3) { //all of them have 3
-				std::string name = parts[0];         // "cat"
-				std::string animation = parts[1];    // "idle"
-				std::string frame = parts[2];        // "0"
+			if (parts.size() >= 3)
+			{
+				std::string name = parts[0];	  // "cat"
+				std::string animation = parts[1]; // "idleA", "run", etc.
 
-				// std::cout << "name: " << name << "\n";
-				// std::cout << "animation: " << animation << "\n";
-				// std::cout << "frame: " << frame << "\n";
-
-				if (name == "cat"){
-					scene.GetEntityManager().template AddComponent<ECSEngine::SpriteComponent>(player, {SpriteId, ECSEngine::Rect(0.f, 0.f, 32.f, 32.f), true});
+				if (name == "cat")
+				{
+					// Add this frame to the animation
+					playerAnim.animations[animation].push_back(spriteId);
 					
-					scene.GetEntityManager().template AddComponent<ECSEngine::AnimationComponent>(player, ECSEngine::AnimationComponent (animation, std::stoi(frame)));
+					// Store first cat sprite for initial display
+					if (!playerSpriteSet)
+					{
+						firstCatSpriteId = spriteId;
+						playerSpriteSet = true;
+					}
 				}
 			}
-			else {
-				std::cerr << "Filename format is invalid\n";
-			}
-	}
+		}
 
-		//need to set parallax factor TODO
-		
+		// Add components to player only once
+		if (playerSpriteSet)
+		{
+			scene.GetEntityManager().template AddComponent<ECSEngine::SpriteComponent>(player, {firstCatSpriteId, ECSEngine::Rect(0.f, 0.f, 32.f, 32.f), true});
+			
+			// Set default animation to idleA if it exists
+			if (playerAnim.animations.count("idleA") > 0)
+			{
+				playerAnim.currentAnimation = "idleA";
+				playerAnim.playing = true;
+			}
+			scene.GetEntityManager().template AddComponent<ECSEngine::AnimationComponent>(player, playerAnim);
+		}
+
+		// need to set parallax factor TODO
+
 		// // Register player sprite
 		// SpriteID playerSpriteId = scene.GetSpriteManager().RegisterTexture(
 		// 	gResourcePath + "sprite-sheet-character.png", ECSEngine::Rect(0.f, 32.f, 32.f, 32.f));
@@ -378,19 +407,17 @@ void LoadMap(const std::string &path, SceneType &scene, const std::string &resou
 
 		// scene.GetEntityManager().template AddComponent<ECSEngine::SpellComponent>(player, spellComp);
 
-
-		//CAMERA
-		// Create camera entity that follows the player
+		// CAMERA
+		//  Create camera entity that follows the player
 		EntityId camera = scene.GetEntityManager().CreateEntity("camera");
 		ECSEngine::CameraComponent cameraComp;
 		cameraComp.position = ECSEngine::Point2D(spawnX, spawnY);
 		cameraComp.scale = 1.0f;
 		scene.GetEntityManager().template AddComponent<ECSEngine::CameraComponent>(camera, cameraComp);
 
-
-		//SCORE
-		// Set up score display system
-		// Get the ScoreComponent attached to the player entity
+		// SCORE
+		//  Set up score display system
+		//  Get the ScoreComponent attached to the player entity
 		auto &scoreComp = scene.GetEntityManager().template GetComponent<ECSEngine::ScoreComponent>(player);
 
 		// Register digit sprites (0-9) from the spritesheet
@@ -488,9 +515,9 @@ void LoadMap(const std::string &path, SceneType &scene, const std::string &resou
 		// scene.GetEntityManager().template AddComponent<ECSEngine::CampfireComponent>(
 		// 	campfire0, ECSEngine::CampfireComponent(0, campfireUnlitSpriteId, campfireLitSpriteId));
 
-		//TODO LAYERING WITH WORLD
-		//SOUNDS
-		// Register sounds TODO
+		// TODO LAYERING WITH WORLD
+		// SOUNDS
+		//  Register sounds TODO
 		scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/cat_land1.ogg", "land");
 		// scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/sfx_jump.ogg", "jump");
 		// scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/footstep_snow_001.ogg", "wall_push");
@@ -562,7 +589,7 @@ int main(int argc, char *argv[])
 	auto scene = engine.MakeScene();
 
 	// Add systems to the scene in execution order
-	auto& sm = scene->GetSystemManager();
+	auto &sm = scene->GetSystemManager();
 	AddSystem<ECSEngine::ProcessEventsSystem>(sm);
 	AddSystem<ECSEngine::CollisionUpdateSystem>(sm);
 	AddSystem<ECSEngine::InputSystem>(sm);
@@ -576,21 +603,27 @@ int main(int argc, char *argv[])
 	AddSystem<ECSEngine::CheckpointSystem>(sm);
 	AddSystem<ECSEngine::ScoreSystem>(sm);
 	AddSystem<ECSEngine::CameraSystem>(sm);
-	AddSystem<ECSEngine::AnimationSystem>(sm); //double check TODO
+	AddSystem<ECSEngine::AnimationSystem>(sm); // double check TODO
 	AddSystem<ECSEngine::SpriteSystem>(sm);
 	AddSystem<ECSEngine::SpawnSystem>(sm);
 
 	// Load maps into the scene
 	LoadMap("maps/cat_sky_swamp.map", *scene, gResourcePath);
 	LoadMap("maps/cat_world.map", *scene, gResourcePath);
-	
+
+	// Upload atlas image to GPU texture
+	scene->GetSpriteManager().FinalizeAtlas();
+
 	sf::Image atlasImg = scene->GetSpriteManager().GetTexture().copyToImage();
 
-    if (!atlasImg.saveToFile("atlas.png")) {
-        std::cerr << "Failed to save atlas to file\n";
-    } else {
-        std::cout << "Successfully saved atlas.png file (inside build folder)!\n";
-    }
+	if (!atlasImg.saveToFile("atlas.png"))
+	{
+		std::cerr << "Failed to save atlas to file\n";
+	}
+	else
+	{
+		std::cout << "Successfully saved atlas.png file (inside build folder)!\n";
+	}
 
 	// Push scene to engine and run
 	engine.PushScene(scene);

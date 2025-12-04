@@ -121,8 +121,15 @@ namespace ECSEngine
 									}
 								}
 
-								const float levelY = 512.0f;
-								cameraComp.position.y = levelY;
+								// Follow player on Y axis with smooth interpolation
+								float targetCameraY = trackedLocation.position.y;
+								float cameraDeltaY = targetCameraY - cameraComp.position.y;
+								if (std::abs(cameraDeltaY) > 0.01f)
+								{
+									float yTrackingSpeed = 5.0f;
+									float lerpFactorY = 1.0f - std::exp(-yTrackingSpeed * deltaTime);
+									cameraComp.position.y += cameraDeltaY * lerpFactorY;
+								}
 
 								if (entityManager.template HasComponent<CameraShake>(camEntityId))
 								{

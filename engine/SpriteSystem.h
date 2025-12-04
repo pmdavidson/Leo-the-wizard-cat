@@ -86,7 +86,7 @@ public:
                 screenRect = spriteComp.bounds;
             }
 
-            sf::Sprite &sfSprite = spriteManager.GetSprite(spriteComp.spriteId);
+            sf::Sprite sfSprite = spriteManager.GetSprite(spriteComp.spriteId);
             sf::IntRect texRect = sfSprite.getTextureRect();
 
             DrawItem item;

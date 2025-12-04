@@ -89,14 +89,21 @@ namespace ECSEngine {
         return mNextID++;
     }
 
-    sf::Sprite& SpriteManager::GetSprite(SpriteID id) {
+    void SpriteManager::FinalizeAtlas() {
+        if (!mTexture.loadFromImage(mAtlasImage)) {
+            std::cerr << "Failed to upload atlas image to GPU texture\n";
+        }
+    }
+
+    sf::Sprite SpriteManager::GetSprite(SpriteID id) {
         sf::Sprite sprite(mTexture);
         Rect bounds(mRects.at(id));
+        sf::Vector2u originalSize = mSizes.at(id);
 
         sprite.setTextureRect(
         sf::IntRect(
                 { static_cast<int>(bounds.topLeft.x), static_cast<int>(bounds.topLeft.y) },
-                { static_cast<int>(bounds.width),   static_cast<int>(bounds.height) }
+                { static_cast<int>(originalSize.x),   static_cast<int>(originalSize.y) }
             )
         );
 
