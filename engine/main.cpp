@@ -148,6 +148,7 @@ void LoadMap(const std::string &path, SceneType &scene, const std::string &resou
 
 		// remove texture path
 		ss >> symbol >> entry.texturePath >> sx >> sy >> sw >> sh;
+		entry.texturePath = "sprites" + entry.texturePath;
 		entry.sourceRect = sf::IntRect(
 			sf::Vector2i(sx, sy),
 			sf::Vector2i(sw, sh));
@@ -261,12 +262,13 @@ void LoadMap(const std::string &path, SceneType &scene, const std::string &resou
 			std::stringstream ss(filename);
 			std::string part;
 
+			std::filesystem::path fullpath = std::filesystem::path("../../assets/sprites/") / path.filename();
 			sf::Image original;
-			if (!original.loadFromFile(path)) {
-				std::cerr << "Failed to load image: " << path << "\n";
+			if (!original.loadFromFile(fullpath)) {
+				std::cerr << "Failed to load image: " << fullpath << "\n";
 			}
 			SpriteID SpriteId = scene.GetSpriteManager().RegisterTexture(
-				path, ECSEngine::Rect(ECSEngine::Point2D(0,0), original.getSize().x, original.getSize().y));
+				fullpath, ECSEngine::Rect(ECSEngine::Point2D(0,0), original.getSize().x, original.getSize().y));
 
 			while (std::getline(ss, part, '_')) {
 				parts.push_back(part);
@@ -318,61 +320,61 @@ void LoadMap(const std::string &path, SceneType &scene, const std::string &resou
 		// SPELLS
 		// Register spell sprites (using placeholder positions - adjust based on your spritesheet)
 		// You can replace these with actual spell sprite positions from your spritesheet
-		SpriteID fireSpellSpriteId = scene.GetSpriteManager().RegisterTexture(
-			gResourcePath + "spritesheet-tiles-default.png", ECSEngine::Rect(0.f, 0.f, 32.f, 32.f));
-		SpriteID waterSpellSpriteId = scene.GetSpriteManager().RegisterTexture(
-			gResourcePath + "spritesheet-tiles-default.png", ECSEngine::Rect(32.f, 0.f, 32.f, 32.f));
-		SpriteID windSpellSpriteId = scene.GetSpriteManager().RegisterTexture(
-			gResourcePath + "spritesheet-tiles-default.png", ECSEngine::Rect(64.f, 0.f, 32.f, 32.f));
-		SpriteID earthSpellSpriteId = scene.GetSpriteManager().RegisterTexture(
-			gResourcePath + "spritesheet-tiles-default.png", ECSEngine::Rect(96.f, 0.f, 32.f, 32.f));
+		// SpriteID fireSpellSpriteId = scene.GetSpriteManager().RegisterTexture(
+		// 	gResourcePath + "spritesheet-tiles-default.png", ECSEngine::Rect(0.f, 0.f, 32.f, 32.f));
+		// SpriteID waterSpellSpriteId = scene.GetSpriteManager().RegisterTexture(
+		// 	gResourcePath + "spritesheet-tiles-default.png", ECSEngine::Rect(32.f, 0.f, 32.f, 32.f));
+		// SpriteID windSpellSpriteId = scene.GetSpriteManager().RegisterTexture(
+		// 	gResourcePath + "spritesheet-tiles-default.png", ECSEngine::Rect(64.f, 0.f, 32.f, 32.f));
+		// SpriteID earthSpellSpriteId = scene.GetSpriteManager().RegisterTexture(
+		// 	gResourcePath + "spritesheet-tiles-default.png", ECSEngine::Rect(96.f, 0.f, 32.f, 32.f));
 
-		// Create SpellComponent for player (pure data)
-		ECSEngine::SpellComponent spellComp;
+		// // Create SpellComponent for player (pure data)
+		// ECSEngine::SpellComponent spellComp;
 
-		// Fire spell: high damage, fast, short cooldown
-		spellComp.spellProperties[static_cast<size_t>(ECSEngine::SpellType::Fire)] = {
-			15.0f,	// damage
-			400.0f, // speed
-			0.5f,	// cooldown
-			2.0f,	// lifetime
-			32.0f,	// size
-			fireSpellSpriteId};
+		// // Fire spell: high damage, fast, short cooldown
+		// spellComp.spellProperties[static_cast<size_t>(ECSEngine::SpellType::Fire)] = {
+		// 	15.0f,	// damage
+		// 	400.0f, // speed
+		// 	0.5f,	// cooldown
+		// 	2.0f,	// lifetime
+		// 	32.0f,	// size
+		// 	fireSpellSpriteId};
 
-		// Water spell: medium damage, medium speed, medium cooldown
-		spellComp.spellProperties[static_cast<size_t>(ECSEngine::SpellType::Water)] = {
-			10.0f,	// damage
-			300.0f, // speed
-			0.8f,	// cooldown
-			3.0f,	// lifetime
-			32.0f,	// size
-			waterSpellSpriteId};
+		// // Water spell: medium damage, medium speed, medium cooldown
+		// spellComp.spellProperties[static_cast<size_t>(ECSEngine::SpellType::Water)] = {
+		// 	10.0f,	// damage
+		// 	300.0f, // speed
+		// 	0.8f,	// cooldown
+		// 	3.0f,	// lifetime
+		// 	32.0f,	// size
+		// 	waterSpellSpriteId};
 
-		// Wind spell: low damage, very fast, very short cooldown
-		spellComp.spellProperties[static_cast<size_t>(ECSEngine::SpellType::Wind)] = {
-			5.0f,	// damage
-			500.0f, // speed
-			0.3f,	// cooldown
-			1.5f,	// lifetime
-			32.0f,	// size
-			windSpellSpriteId};
+		// // Wind spell: low damage, very fast, very short cooldown
+		// spellComp.spellProperties[static_cast<size_t>(ECSEngine::SpellType::Wind)] = {
+		// 	5.0f,	// damage
+		// 	500.0f, // speed
+		// 	0.3f,	// cooldown
+		// 	1.5f,	// lifetime
+		// 	32.0f,	// size
+		// 	windSpellSpriteId};
 
-		// Earth spell: very high damage, slow, long cooldown
-		spellComp.spellProperties[static_cast<size_t>(ECSEngine::SpellType::Earth)] = {
-			25.0f,	// damage
-			200.0f, // speed
-			1.5f,	// cooldown
-			4.0f,	// lifetime
-			32.0f,	// size
-			earthSpellSpriteId};
+		// // Earth spell: very high damage, slow, long cooldown
+		// spellComp.spellProperties[static_cast<size_t>(ECSEngine::SpellType::Earth)] = {
+		// 	25.0f,	// damage
+		// 	200.0f, // speed
+		// 	1.5f,	// cooldown
+		// 	4.0f,	// lifetime
+		// 	32.0f,	// size
+		// 	earthSpellSpriteId};
 
-		// Configure element switch cooldown (time between switching elements)
-		spellComp.switchCooldownDuration = 0.5f;
+		// // Configure element switch cooldown (time between switching elements)
+		// spellComp.switchCooldownDuration = 0.5f;
 
-		// Start with Fire element selected
-		spellComp.selectedSpell = ECSEngine::SpellType::Fire;
+		// // Start with Fire element selected
+		// spellComp.selectedSpell = ECSEngine::SpellType::Fire;
 
-		scene.GetEntityManager().template AddComponent<ECSEngine::SpellComponent>(player, spellComp);
+		// scene.GetEntityManager().template AddComponent<ECSEngine::SpellComponent>(player, spellComp);
 
 
 		//CAMERA
@@ -394,102 +396,103 @@ void LoadMap(const std::string &path, SceneType &scene, const std::string &resou
 		const float digitX = 13.f * tileSize;	  // X position of digit column in spritesheet
 		const float digitStartY = 4.f * tileSize; // Y position where digit 0 starts
 
-		for (int digit = 0; digit < 10; ++digit)
-		{
-			// Calculate Y position: digits are arranged top-to-bottom (0 at top, 9 at bottom)
-			float digitY = digitStartY + (9 - digit) * tileSize;
-			SpriteID digitSpriteId = scene.GetSpriteManager().RegisterTexture(
-				gResourcePath + "spritesheet-tiles-default.png",
-				ECSEngine::Rect(digitX, digitY, tileSize, tileSize));
-			scoreComp.digitSpriteIds.push_back(digitSpriteId);
-		}
+		// for (int digit = 0; digit < 10; ++digit)
+		// {
+		// 	// Calculate Y position: digits are arranged top-to-bottom (0 at top, 9 at bottom)
+		// 	float digitY = digitStartY + (9 - digit) * tileSize;
+		// 	SpriteID digitSpriteId = scene.GetSpriteManager().RegisterTexture(
+		// 		gResourcePath + "spritesheet-tiles-default.png",
+		// 		ECSEngine::Rect(digitX, digitY, tileSize, tileSize));
+		// 	scoreComp.digitSpriteIds.push_back(digitSpriteId);
+		// }
 
 		// Create 3 display entities for the score
 		const float digitSize = 32.f;
 		const float startX = 20.f;
 		const float startY = 20.f;
 
-		for (int i = 0; i < 3; ++i)
-		{
-			// Create an entity for each digit position
-			EntityId digitEntity = scene.GetEntityManager().CreateEntity("score_digit_" + std::to_string(i));
+		// for (int i = 0; i < 3; ++i)
+		// {
+		// 	// Create an entity for each digit position
+		// 	EntityId digitEntity = scene.GetEntityManager().CreateEntity("score_digit_" + std::to_string(i));
 
-			// Space by digitSize
-			scene.GetEntityManager().template AddComponent<ECSEngine::LocationComponent>(
-				digitEntity,
-				ECSEngine::LocationComponent(ECSEngine::Point2D(startX + i * digitSize, startY)));
+		// 	// Space by digitSize
+		// 	scene.GetEntityManager().template AddComponent<ECSEngine::LocationComponent>(
+		// 		digitEntity,
+		// 		ECSEngine::LocationComponent(ECSEngine::Point2D(startX + i * digitSize, startY)));
 
-			// Initialize sprite component with digit 0 sprite
-			scene.GetEntityManager().template AddComponent<ECSEngine::SpriteComponent>(
-				digitEntity,
-				{scoreComp.digitSpriteIds[0], ECSEngine::Rect(0.f, 0.f, digitSize, digitSize), false});
+		// 	// Initialize sprite component with digit 0 sprite
+		// 	scene.GetEntityManager().template AddComponent<ECSEngine::SpriteComponent>(
+		// 		digitEntity,
+		// 		{scoreComp.digitSpriteIds[0], ECSEngine::Rect(0.f, 0.f, digitSize, digitSize), false});
 
-			scoreComp.displayEntityIds.push_back(digitEntity);
-		}
+		// 	scoreComp.displayEntityIds.push_back(digitEntity);
+		// }
 
 		// Set up HP display system (hearts)
 		// Register heart sprites
-		SpriteID heartFullSpriteId = scene.GetSpriteManager().RegisterTexture(
-			gResourcePath + "sprites/heart_idle_0.png", ECSEngine::Rect(0.f, 0.f, 32.f, 32.f));
-		SpriteID heartEmptySpriteId = scene.GetSpriteManager().RegisterTexture(
-			gResourcePath + "sprites/heart_empty_0.png", ECSEngine::Rect(0.f, 0.f, 32.f, 32.f));
+		// SpriteID heartFullSpriteId = scene.GetSpriteManager().RegisterTexture(
+		// 	gResourcePath + "sprites/heart_idle_0.png", ECSEngine::Rect(0.f, 0.f, 32.f, 32.f));
+		// SpriteID heartEmptySpriteId = scene.GetSpriteManager().RegisterTexture(
+		// 	gResourcePath + "sprites/heart_empty_0.png", ECSEngine::Rect(0.f, 0.f, 32.f, 32.f));
 
-		// Create HpComponent for player
-		ECSEngine::HpComponent hpComp(3, heartFullSpriteId, heartEmptySpriteId);
+		// // Create HpComponent for player
+		// ECSEngine::HpComponent hpComp(3, heartFullSpriteId, heartEmptySpriteId);
 
-		// Create 3 heart display entities at top left (below score)
-		const float heartSize = 32.f;
-		const float heartStartX = 20.f;
-		const float heartStartY = 60.f; // Below the score display
+		// // Create 3 heart display entities at top left (below score)
+		// const float heartSize = 32.f;
+		// const float heartStartX = 20.f;
+		// const float heartStartY = 60.f; // Below the score display
 
-		for (int i = 0; i < 3; ++i)
-		{
-			EntityId heartEntity = scene.GetEntityManager().CreateEntity("heart_" + std::to_string(i));
+		// for (int i = 0; i < 3; ++i)
+		// {
+		// 	EntityId heartEntity = scene.GetEntityManager().CreateEntity("heart_" + std::to_string(i));
 
-			scene.GetEntityManager().template AddComponent<ECSEngine::LocationComponent>(
-				heartEntity,
-				ECSEngine::LocationComponent(ECSEngine::Point2D(heartStartX + i * heartSize, heartStartY)));
+		// 	scene.GetEntityManager().template AddComponent<ECSEngine::LocationComponent>(
+		// 		heartEntity,
+		// 		ECSEngine::LocationComponent(ECSEngine::Point2D(heartStartX + i * heartSize, heartStartY)));
 
-			// Initialize with full heart sprite (inWorldSpace = false for UI)
-			scene.GetEntityManager().template AddComponent<ECSEngine::SpriteComponent>(
-				heartEntity,
-				{heartFullSpriteId, ECSEngine::Rect(0.f, 0.f, heartSize, heartSize), false});
+		// 	// Initialize with full heart sprite (inWorldSpace = false for UI)
+		// 	scene.GetEntityManager().template AddComponent<ECSEngine::SpriteComponent>(
+		// 		heartEntity,
+		// 		{heartFullSpriteId, ECSEngine::Rect(0.f, 0.f, heartSize, heartSize), false});
 
-			hpComp.heartDisplayEntityIds.push_back(heartEntity);
-		}
+		// 	hpComp.heartDisplayEntityIds.push_back(heartEntity);
+		// }
 
-		scene.GetEntityManager().template AddComponent<ECSEngine::HpComponent>(player, hpComp);
+		// scene.GetEntityManager().template AddComponent<ECSEngine::HpComponent>(player, hpComp);
 
-		// Set up checkpoint system
-		ECSEngine::CheckpointComponent checkpointComp(ECSEngine::Point2D(spawnX, spawnY));
-		scene.GetEntityManager().template AddComponent<ECSEngine::CheckpointComponent>(player, checkpointComp);
+		// // Set up checkpoint system
+		// ECSEngine::CheckpointComponent checkpointComp(ECSEngine::Point2D(spawnX, spawnY));
+		// scene.GetEntityManager().template AddComponent<ECSEngine::CheckpointComponent>(player, checkpointComp);
 
 		// Register campfire sprites for checkpoints
-		SpriteID campfireUnlitSpriteId = scene.GetSpriteManager().RegisterTexture(
-			gResourcePath + "sprites/campfire-sprite-unlit-1.png", ECSEngine::Rect(0.f, 0.f, 64.f, 64.f));
-		SpriteID campfireLitSpriteId = scene.GetSpriteManager().RegisterTexture(
-			gResourcePath + "sprites/campfire-sprite-1.png", ECSEngine::Rect(0.f, 0.f, 64.f, 64.f));
+		// SpriteID campfireUnlitSpriteId = scene.GetSpriteManager().RegisterTexture(
+		// 	gResourcePath + "sprites/campfire-sprite-unlit-1.png", ECSEngine::Rect(0.f, 0.f, 64.f, 64.f));
+		// SpriteID campfireLitSpriteId = scene.GetSpriteManager().RegisterTexture(
+		// 	gResourcePath + "sprites/campfire-sprite-1.png", ECSEngine::Rect(0.f, 0.f, 64.f, 64.f));
 
 		// Create a sample campfire checkpoint (checkpoint 0) at a specific location
 		// You can add more campfires at different positions for different checkpoints
-		EntityId campfire0 = scene.GetEntityManager().CreateEntity("campfire_0");
-		ECSEngine::Point2D campfire0Pos(tileW * 10, tileH * 7); // Adjust position as needed
+		// EntityId campfire0 = scene.GetEntityManager().CreateEntity("campfire_0");
+		// ECSEngine::Point2D campfire0Pos(tileW * 10, tileH * 7); // Adjust position as needed
 
-		scene.GetEntityManager().template AddComponent<ECSEngine::LocationComponent>(
-			campfire0, ECSEngine::LocationComponent(campfire0Pos));
-		scene.GetEntityManager().template AddComponent<ECSEngine::SpriteComponent>(
-			campfire0, {campfireUnlitSpriteId, ECSEngine::Rect(0.f, 0.f, 64.f, 64.f), true});
-		scene.GetEntityManager().template AddComponent<ECSEngine::CollisionComponent>(
-			campfire0, ECSEngine::CollisionComponent(ECSEngine::Rect(0.f, 0.f, 64.f, 64.f), false));
-		scene.GetEntityManager().template AddComponent<ECSEngine::CampfireComponent>(
-			campfire0, ECSEngine::CampfireComponent(0, campfireUnlitSpriteId, campfireLitSpriteId));
+		// scene.GetEntityManager().template AddComponent<ECSEngine::LocationComponent>(
+		// 	campfire0, ECSEngine::LocationComponent(campfire0Pos));
+		// scene.GetEntityManager().template AddComponent<ECSEngine::SpriteComponent>(
+		// 	campfire0, {campfireUnlitSpriteId, ECSEngine::Rect(0.f, 0.f, 64.f, 64.f), true});
+		// scene.GetEntityManager().template AddComponent<ECSEngine::CollisionComponent>(
+		// 	campfire0, ECSEngine::CollisionComponent(ECSEngine::Rect(0.f, 0.f, 64.f, 64.f), false));
+		// scene.GetEntityManager().template AddComponent<ECSEngine::CampfireComponent>(
+		// 	campfire0, ECSEngine::CampfireComponent(0, campfireUnlitSpriteId, campfireLitSpriteId));
 
+		//TODO LAYERING WITH WORLD
 		//SOUNDS
 		// Register sounds TODO
 		scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/cat_land1.ogg", "land");
-		scene.GetSoundManager().RegisterSound(gResourcePath + "sfx_jump.ogg", "jump");
-		scene.GetSoundManager().RegisterSound(gResourcePath + "footstep_snow_001.ogg", "wall_push");
-		scene.GetSoundManager().RegisterSound(gResourcePath + "sfx_gem.ogg", "star_collect");
+		// scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/sfx_jump.ogg", "jump");
+		// scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/footstep_snow_001.ogg", "wall_push");
+		scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/sfx_gem.ogg", "star_collect");
 		scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/Walking and Running on Grass Sound Effect [Minecraft] [TubeRipper.cc].ogg", "walk");
 		scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/cat_take_damage1.ogg", "take_damage");
 
