@@ -7,6 +7,7 @@
 #include "CollisionComponent.h"
 #include "SoundManager.h"
 #include <unordered_map>
+#include <cmath>
 
 namespace ECSEngine
 {
@@ -25,6 +26,7 @@ namespace ECSEngine
 			static std::unordered_map<EntityID, bool> recentlyJumped;
 			static std::unordered_map<EntityID, bool> wasPushingWall;
 			static std::unordered_map<EntityID, bool> wasJumpPressed;
+			static std::unordered_map<EntityID, float> walkSoundTimer;
 
 			for (auto it = entityManager.begin(); it != entityManager.end(); ++it)
 			{
@@ -137,6 +139,26 @@ namespace ECSEngine
 							if (movementComp.velocity.x > 0)
 								movementComp.velocity.x = 0;
 						}
+					}
+
+					// Play walking sound when moving on ground
+					const float walkSoundInterval = 0.35f; // Time between footstep sounds
+					bool isWalking = onGround && (movingLeft || movingRight) && 
+									 std::abs(movementComp.velocity.x) > 50.0f;
+					
+					if (isWalking)
+					{
+						walkSoundTimer[entityId] -= deltaTime;
+						if (walkSoundTimer[entityId] <= 0.0f)
+						{
+							soundManager.PlaySound("walk");
+							walkSoundTimer[entityId] = walkSoundInterval;
+						}
+					}
+					else
+					{
+						// Reset timer when not walking so sound plays immediately when starting to walk
+						walkSoundTimer[entityId] = 0.0f;
 					}
 
 					// Handle jumping (W/Space), only if on ground

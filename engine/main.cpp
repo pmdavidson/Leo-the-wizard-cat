@@ -297,21 +297,27 @@ void LoadMap(const std::string &path, SceneType &scene, const std::string &resou
 		}
 
 		// Register sounds
-		scene.GetSoundManager().RegisterSound(gResourcePath + "footstep_grass_003.ogg", "land");
+		scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/cat_land1.ogg", "land");
 		scene.GetSoundManager().RegisterSound(gResourcePath + "sfx_jump.ogg", "jump");
 		scene.GetSoundManager().RegisterSound(gResourcePath + "footstep_snow_001.ogg", "wall_push");
 		scene.GetSoundManager().RegisterSound(gResourcePath + "sfx_gem.ogg", "star_collect");
+		scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/Walking and Running on Grass Sound Effect [Minecraft] [TubeRipper.cc].ogg", "walk");
+		scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/cat_take_damage1.ogg", "take_damage");
 
 		// scene.GetSpriteManager().SaveAtlas(gResourcePath + "atlas_debug_output.png");
 
-		// Register spell cast sounds (using existing sounds as placeholders - replace with actual spell sounds)
-		scene.GetSoundManager().RegisterSound(gResourcePath + "sfx_jump.ogg", "fire_cast");
+		// Register spell cast sounds
+		// Fire spell has two whoosh variants for variety
+		scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/fireball_whoosh-1.ogg", "fire_cast_1");
+		scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/fireball_whoosh-2.ogg", "fire_cast_2");
 		scene.GetSoundManager().RegisterSound(gResourcePath + "sfx_jump.ogg", "water_cast");
 		scene.GetSoundManager().RegisterSound(gResourcePath + "sfx_jump.ogg", "wind_cast");
 		scene.GetSoundManager().RegisterSound(gResourcePath + "sfx_jump.ogg", "earth_cast");
 
 		// Register spell impact sounds
-		scene.GetSoundManager().RegisterSound(gResourcePath + "sfx_gem.ogg", "fire_impact");
+		// Fire spell has two impact variants for variety
+		scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/fireball_impact1.ogg", "fire_impact_1");
+		scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/fireball_impact2.ogg", "fire_impact_2");
 		scene.GetSoundManager().RegisterSound(gResourcePath + "sfx_gem.ogg", "water_impact");
 		scene.GetSoundManager().RegisterSound(gResourcePath + "sfx_gem.ogg", "wind_impact");
 		scene.GetSoundManager().RegisterSound(gResourcePath + "sfx_gem.ogg", "earth_impact");

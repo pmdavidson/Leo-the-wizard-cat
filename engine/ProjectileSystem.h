@@ -8,6 +8,7 @@
 #include "CollisionComponent.h"
 #include "SoundManager.h"
 #include <vector>
+#include <random>
 
 namespace ECSEngine
 {
@@ -82,7 +83,13 @@ namespace ECSEngine
             switch (type)
             {
             case SpellType::Fire:
-                soundManager.PlaySound("fire_impact");
+                // Randomly pick between two fire impact sounds for variety
+                {
+                    static std::mt19937 rng(std::random_device{}());
+                    std::uniform_int_distribution<int> dist(1, 2);
+                    std::string soundName = "fire_impact_" + std::to_string(dist(rng));
+                    soundManager.PlaySound(soundName);
+                }
                 break;
             case SpellType::Water:
                 soundManager.PlaySound("water_impact");

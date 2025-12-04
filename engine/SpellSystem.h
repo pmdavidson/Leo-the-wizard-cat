@@ -11,6 +11,7 @@
 #include "SoundManager.h"
 #include <unordered_map>
 #include <array>
+#include <random>
 
 namespace ECSEngine
 {
@@ -289,7 +290,13 @@ namespace ECSEngine
             switch (type)
             {
             case SpellType::Fire:
-                soundManager.PlaySound("fire_cast");
+                // Randomly pick between two fire whoosh sounds for variety
+                {
+                    static std::mt19937 rng(std::random_device{}());
+                    std::uniform_int_distribution<int> dist(1, 2);
+                    std::string soundName = "fire_cast_" + std::to_string(dist(rng));
+                    soundManager.PlaySound(soundName);
+                }
                 break;
             case SpellType::Water:
                 soundManager.PlaySound("water_cast");
