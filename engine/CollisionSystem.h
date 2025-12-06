@@ -140,7 +140,8 @@ namespace ECSEngine
 						LocA.position = BoundsA.topLeft - colA.localBounds.topLeft;
 						colA.currentBounds = BoundsA;
 
-						if (isPlayerA && entityManager.template HasComponent<MovementComponent>(idA))
+						// Zero velocity for any entity with MovementComponent when colliding with static geometry
+						if (entityManager.template HasComponent<MovementComponent>(idA))
 						{
 							auto &vel = entityManager.template GetComponent<MovementComponent>(idA);
 							if (colA.collidedSides.bottom || colA.collidedSides.top)
@@ -159,7 +160,8 @@ namespace ECSEngine
 						LocB.position = BoundsB.topLeft - colB.localBounds.topLeft;
 						colB.currentBounds = BoundsB;
 
-						if (isPlayerB && entityManager.template HasComponent<MovementComponent>(idB))
+						// Zero velocity for any entity with MovementComponent when colliding with static geometry
+						if (entityManager.template HasComponent<MovementComponent>(idB))
 						{
 							auto &vel = entityManager.template GetComponent<MovementComponent>(idB);
 							if (colB.collidedSides.bottom || colB.collidedSides.top)

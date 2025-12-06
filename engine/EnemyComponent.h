@@ -25,6 +25,7 @@ namespace ECSEngine
         // Health
         float hp = 50.0f;
         float maxHp = 50.0f;
+        float previousHp = 50.0f; // Track HP changes for hurt animation
 
         // Damage dealt to player when touched
         float contactDamage = 1.0f;
@@ -32,6 +33,8 @@ namespace ECSEngine
         float knockbackForce = 300.0f;
 
         bool isAlive = true;
+        bool isDying = false; // Playing death animation
+        float deathAnimTimer = 0.0f; // Time until removal after death
 
         // For wizards - which element they use
         SpellType element = SpellType::Fire;

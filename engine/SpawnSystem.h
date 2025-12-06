@@ -7,6 +7,7 @@
 #include "CollisionComponent.h"
 #include "SpriteComponent.h"
 #include "EnemyComponent.h"
+#include "AnimationComponent.h"
 #include <cmath>
 #include <random>
 
@@ -52,8 +53,8 @@ namespace ECSEngine
 											  static_cast<float>(textureRect.size.x),
 											  static_cast<float>(textureRect.size.y));
 
-							// Slimes are 96x32, collision box matches sprite
-							Rect collisionBounds = {0.0f, 0.0f, spawnComp.tileW, spawnComp.tileH};
+							// Slimes are 96x32, collision box is narrower and centered
+							Rect collisionBounds = {19.0f, 0.0f, 58.0f, 32.0f};
 
 							EntityID slimeId = entityManager.CreateEntity("slime");
 
@@ -81,15 +82,33 @@ namespace ECSEngine
 							// Add EnemyComponent for slime
 							EnemyComponent enemy;
 							enemy.type = EnemyType::Slime;
-							enemy.hp = 10.0f;
-							enemy.maxHp = 10.0f;
+							enemy.hp = 30.0f;
+							enemy.maxHp = 30.0f;
+							enemy.previousHp = 30.0f;
 							enemy.contactDamage = 10.0f;
 							enemy.knockbackForce = 300.0f;
 							enemy.isAlive = true;
 							enemy.canMove = false;
-							enemy.damageSoundName = "slime_damage_1";
+							enemy.damageSoundName = "slime_damage";
 							enemy.deathSoundName = "slime_die";
 							entityManager.template AddComponent<EnemyComponent>(slimeId, enemy);
+
+							// Add AnimationComponent for slime if animations are available
+							if (!spawnComp.animations.empty())
+							{
+								AnimationComponent slimeAnim;
+								slimeAnim.animations = spawnComp.animations;
+								slimeAnim.frameDuration = 0.05f; // Faster animations
+								
+								// Start with idle animation if available
+								if (slimeAnim.animations.count("idle") > 0)
+								{
+									slimeAnim.currentAnimation = "idle";
+									slimeAnim.playing = true;
+									slimeAnim.looping = true;
+								}
+								entityManager.template AddComponent<AnimationComponent>(slimeId, slimeAnim);
+							}
 
 							spawnComp.timeToNextSpawn = spawnComp.timeBetweenSpawns;
 							spawnComp.totalSpawnEvents--;

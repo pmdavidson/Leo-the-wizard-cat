@@ -2,7 +2,9 @@
 
 #include "MathUtil.h"
 #include "SpellComponent.h"
+#include "SpriteManager.h"
 #include "Entity.h"
+#include <vector>
 
 namespace ECSEngine
 {
@@ -16,6 +18,11 @@ namespace ECSEngine
         float maxLifetime = 0.0f;                // Original lifetime for effects
         EntityID ownerEntityId = 0;              // Entity that cast the spell (to avoid self-damage)
         bool active = true;                      // Whether the projectile is still active
+        float gracePeriod = 0.1f;                // Brief period where collisions are ignored (to avoid spawning inside things)
+        
+        // Explosion animation data
+        std::vector<SpriteID> explosionFrames;
+        float explosionSize = 32.0f;
     };
 
 }

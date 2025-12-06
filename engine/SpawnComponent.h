@@ -1,6 +1,7 @@
 #pragma once
 
 #include <unordered_map>
+#include <vector>
 #include "MathUtil.h"
 #include "SpriteManager.h"
 #include "Entity.h"
@@ -21,6 +22,9 @@ namespace ECSEngine
                 int totalSpawnEvents;         // Total number of spawning events that will be performed
                 float tileW;                  // Tile width for AABB size
                 float tileH;                  // Tile height for AABB size
+
+                // Animation data for spawned entities
+                std::unordered_map<std::string, std::vector<SpriteID>> animations;
 
                 SpawnComponent() = default;
 

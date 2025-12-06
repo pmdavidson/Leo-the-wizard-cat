@@ -3,6 +3,7 @@
 #include "MathUtil.h"
 #include "SpriteManager.h"
 #include <array>
+#include <vector>
 
 namespace ECSEngine
 {
@@ -26,6 +27,10 @@ namespace ECSEngine
         float lifetime = 3.0f;
         float size = 32.0f;
         SpriteID spriteId = 0;
+        
+        // Explosion animation frames
+        std::vector<SpriteID> explosionFrames;
+        float explosionSize = 32.0f;
     };
 
     // Used on player to track spell state

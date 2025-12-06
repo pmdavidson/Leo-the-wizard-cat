@@ -26,7 +26,7 @@ namespace ECSEngine
 
         SpriteComponent() = default;
 
-        SpriteComponent(SpriteID id, const Rect &drawBounds, bool world = true, int layerNum = 0, std::string shadeName = "")
+        SpriteComponent(SpriteID id, const Rect &drawBounds, bool world = true, int layerNum = 1, std::string shadeName = "")
             : spriteId(id),
               bounds(drawBounds),
               inWorldSpace(world),

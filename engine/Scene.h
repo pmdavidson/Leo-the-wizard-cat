@@ -45,7 +45,18 @@ namespace ECSEngine
 		void Run(ECSEngine<Components...> &engine)
 		{
 			mDeltaTime = mClock.restart();   // update deltaTime
+			
+			// Clamp delta time to prevent physics explosions on first frame or lag spikes
+			const float maxDeltaTime = 1.0f / 30.0f; // Cap at ~30fps worth of time
+			if (mDeltaTime.asSeconds() > maxDeltaTime)
+			{
+				mDeltaTime = sf::seconds(maxDeltaTime);
+			}
+			
 			mTotalTime += mDeltaTime;        // accumulate total time
+
+			// Clear the window before drawing
+			mWindow->clear(sf::Color::Black);
 
 			mSystemManager.Run(*this);       // run systems with correct dt
 		}
@@ -121,10 +132,9 @@ namespace ECSEngine
 			return mTotalTime;
 		}
 
-		float GetDeltaSeconds()
+		float GetDeltaSeconds() const
 		{
-			sf::Time dt = mClock.restart();
-			return dt.asSeconds();
+			return mDeltaTime.asSeconds();
 		}
 
 		/**

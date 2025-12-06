@@ -96,6 +96,19 @@ void AddSystem(SystemManager &manager)
 	AddSystemFromTuple<System, GameComponents>::Add(manager);
 }
 
+// Helper to get system type from a tuple of components
+template <template <typename...> class System, typename Tuple>
+struct SystemTypeFromTuple;
+
+template <template <typename...> class System, typename... Components>
+struct SystemTypeFromTuple<System, std::tuple<Components...>>
+{
+	using type = System<Components...>;
+};
+
+// Type alias for SpriteSystem with GameComponents
+using GameSpriteSystem = SystemTypeFromTuple<ECSEngine::SpriteSystem, GameComponents>::type;
+
 struct SpriteEntry
 {
 	std::string texturePath;
@@ -113,7 +126,6 @@ ECSEngine::Rect FromSFML(const sf::IntRect &r)
 }
 
 // check bounding box in world map first, if its all 0s then has collision = false, set layer = 2 with parallax factor
-
 template <typename SceneType>
 void LoadMap(const std::string &path, SceneType &scene, const std::string &resourceRoot)
 {
@@ -179,8 +191,6 @@ void LoadMap(const std::string &path, SceneType &scene, const std::string &resou
 		}
 
 		dictionary[symbol] = entry;
-
-		scene.GetSpriteManager().RegisterTexture(resourceRoot + entry.texturePath, FromSFML(entry.sourceRect));
 	}
 
 	// Parse map origin and size
@@ -225,7 +235,10 @@ void LoadMap(const std::string &path, SceneType &scene, const std::string &resou
 			auto spriteId = scene.GetSpriteManager().RegisterTexture(
 				resourceRoot + entry.texturePath, FromSFML(entry.sourceRect));
 
-			scene.GetEntityManager().template AddComponent<ECSEngine::SpriteComponent>(id, {spriteId, FromSFML(entry.boundsRect), true});
+			ECSEngine::Rect drawBounds(0.f, 0.f,
+									   static_cast<float>(entry.sourceRect.size.x),
+									   static_cast<float>(entry.sourceRect.size.y));
+			scene.GetEntityManager().template AddComponent<ECSEngine::SpriteComponent>(id, {spriteId, drawBounds, true, -2});
 
 			// Every object in the world map should be subject to collision
 			if (entry.hasCollision)
@@ -267,6 +280,12 @@ void LoadMap(const std::string &path, SceneType &scene, const std::string &resou
 		SpriteID firstCatSpriteId = 0;
 		bool playerSpriteSet = false;
 
+		// Also collect blueSlime animations for enemies
+		ECSEngine::AnimationComponent blueSlimeAnim;
+		
+		// Collect fireball explosion animations
+		ECSEngine::AnimationComponent fireballExplosionAnim;
+
 		for (const auto &path : paths)
 		{
 			std::string filename = path.stem().string(); // no .png extension
@@ -296,20 +315,46 @@ void LoadMap(const std::string &path, SceneType &scene, const std::string &resou
 
 			if (parts.size() >= 3)
 			{
-				std::string name = parts[0];	  // "cat"
-				std::string animation = parts[1]; // "idleA", "run", etc.
+				std::string name = parts[0];	  // "cat" or "blueSlime"
+				std::string animation = parts[1]; // "idleA", "run", "idle", "hurt", "death", etc.
 
 				if (name == "cat")
 				{
 					// Add this frame to the animation
 					playerAnim.animations[animation].push_back(spriteId);
-					
+
 					// Store first cat sprite for initial display
 					if (!playerSpriteSet)
 					{
 						firstCatSpriteId = spriteId;
 						playerSpriteSet = true;
 					}
+				}
+				else if (name == "blueSlime")
+				{
+					// Add blueSlime animation frames
+					blueSlimeAnim.animations[animation].push_back(spriteId);
+				}
+				else if (name == "fireball")
+				{
+					// Add fireball animation frames (explosion, flying)
+					fireballExplosionAnim.animations[animation].push_back(spriteId);
+				}
+			}
+		}
+
+		// Update all SpawnComponents with blueSlime animations
+		for (auto it = scene.GetEntityManager().begin(); it != scene.GetEntityManager().end(); ++it)
+		{
+			if (!it->isActive())
+				continue;
+			EntityId spawnerId = it->getID();
+			if (scene.GetEntityManager().template HasComponent<ECSEngine::SpawnComponent>(spawnerId))
+			{
+				auto &spawnComp = scene.GetEntityManager().template GetComponent<ECSEngine::SpawnComponent>(spawnerId);
+				if (spawnComp.spawnDescription == "slime")
+				{
+					spawnComp.animations = blueSlimeAnim.animations;
 				}
 			}
 		}
@@ -318,7 +363,7 @@ void LoadMap(const std::string &path, SceneType &scene, const std::string &resou
 		if (playerSpriteSet)
 		{
 			scene.GetEntityManager().template AddComponent<ECSEngine::SpriteComponent>(player, {firstCatSpriteId, ECSEngine::Rect(0.f, 0.f, 32.f, 32.f), true});
-			
+
 			// Set default animation to idleA if it exists
 			if (playerAnim.animations.count("idleA") > 0)
 			{
@@ -349,63 +394,36 @@ void LoadMap(const std::string &path, SceneType &scene, const std::string &resou
 		// scene.GetEntityManager().template AddComponent<ECSEngine::SpriteComponent>(player, {playerSpriteId, ECSEngine::Rect(0.f, 0.f, 32.f, 32.f), true});
 
 		// SPELLS
-		// Register spell sprites (using placeholder positions - adjust based on your spritesheet)
-		// You can replace these with actual spell sprite positions from your spritesheet
-		// SpriteID fireSpellSpriteId = scene.GetSpriteManager().RegisterTexture(
-		// 	gResourcePath + "spritesheet-tiles-default.png", ECSEngine::Rect(0.f, 0.f, 32.f, 32.f));
-		// SpriteID waterSpellSpriteId = scene.GetSpriteManager().RegisterTexture(
-		// 	gResourcePath + "spritesheet-tiles-default.png", ECSEngine::Rect(32.f, 0.f, 32.f, 32.f));
-		// SpriteID windSpellSpriteId = scene.GetSpriteManager().RegisterTexture(
-		// 	gResourcePath + "spritesheet-tiles-default.png", ECSEngine::Rect(64.f, 0.f, 32.f, 32.f));
-		// SpriteID earthSpellSpriteId = scene.GetSpriteManager().RegisterTexture(
-		// 	gResourcePath + "spritesheet-tiles-default.png", ECSEngine::Rect(96.f, 0.f, 32.f, 32.f));
+		// Register fireball sprite (actual size is 28x22)
+		SpriteID fireSpellSpriteId = scene.GetSpriteManager().RegisterTexture(
+			gResourcePath + "sprites/fireball_flying_1.png", ECSEngine::Rect(0.f, 0.f, 28.f, 22.f));
 
-		// // Create SpellComponent for player (pure data)
-		// ECSEngine::SpellComponent spellComp;
+		// Create SpellComponent for player
+		ECSEngine::SpellComponent spellComp;
 
-		// // Fire spell: high damage, fast, short cooldown
-		// spellComp.spellProperties[static_cast<size_t>(ECSEngine::SpellType::Fire)] = {
-		// 	15.0f,	// damage
-		// 	400.0f, // speed
-		// 	0.5f,	// cooldown
-		// 	2.0f,	// lifetime
-		// 	32.0f,	// size
-		// 	fireSpellSpriteId};
+		// Fire spell: high damage, fast, short cooldown
+		auto &fireProps = spellComp.spellProperties[static_cast<size_t>(ECSEngine::SpellType::Fire)];
+		fireProps.damage = 15.0f;
+		fireProps.speed = 400.0f;
+		fireProps.cooldown = 0.5f;
+		fireProps.lifetime = 240.0f;
+		fireProps.size = 28.0f;
+		fireProps.spriteId = fireSpellSpriteId;
+		
+		// Add explosion animation frames
+		if (fireballExplosionAnim.animations.count("explosion") > 0)
+		{
+			fireProps.explosionFrames = fireballExplosionAnim.animations["explosion"];
+			fireProps.explosionSize = 32.0f;
+		}
 
-		// // Water spell: medium damage, medium speed, medium cooldown
-		// spellComp.spellProperties[static_cast<size_t>(ECSEngine::SpellType::Water)] = {
-		// 	10.0f,	// damage
-		// 	300.0f, // speed
-		// 	0.8f,	// cooldown
-		// 	3.0f,	// lifetime
-		// 	32.0f,	// size
-		// 	waterSpellSpriteId};
+		// Configure element switch cooldown (time between switching elements)
+		spellComp.switchCooldownDuration = 0.5f;
 
-		// // Wind spell: low damage, very fast, very short cooldown
-		// spellComp.spellProperties[static_cast<size_t>(ECSEngine::SpellType::Wind)] = {
-		// 	5.0f,	// damage
-		// 	500.0f, // speed
-		// 	0.3f,	// cooldown
-		// 	1.5f,	// lifetime
-		// 	32.0f,	// size
-		// 	windSpellSpriteId};
+		// Start with Fire element selected
+		spellComp.selectedSpell = ECSEngine::SpellType::Fire;
 
-		// // Earth spell: very high damage, slow, long cooldown
-		// spellComp.spellProperties[static_cast<size_t>(ECSEngine::SpellType::Earth)] = {
-		// 	25.0f,	// damage
-		// 	200.0f, // speed
-		// 	1.5f,	// cooldown
-		// 	4.0f,	// lifetime
-		// 	32.0f,	// size
-		// 	earthSpellSpriteId};
-
-		// // Configure element switch cooldown (time between switching elements)
-		// spellComp.switchCooldownDuration = 0.5f;
-
-		// // Start with Fire element selected
-		// spellComp.selectedSpell = ECSEngine::SpellType::Fire;
-
-		// scene.GetEntityManager().template AddComponent<ECSEngine::SpellComponent>(player, spellComp);
+		scene.GetEntityManager().template AddComponent<ECSEngine::SpellComponent>(player, spellComp);
 
 		// CAMERA
 		//  Create camera entity that follows the player
@@ -519,8 +537,7 @@ void LoadMap(const std::string &path, SceneType &scene, const std::string &resou
 		// SOUNDS
 		//  Register sounds TODO
 		scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/cat_land1.ogg", "land");
-		// scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/sfx_jump.ogg", "jump");
-		// scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/footstep_snow_001.ogg", "wall_push");
+		scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/cat_jump1.ogg", "jump");
 		scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/sfx_gem.ogg", "star_collect");
 		scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/Walking and Running on Grass Sound Effect [Minecraft] [TubeRipper.cc].ogg", "walk");
 		scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/cat_take_damage1.ogg", "take_damage");
@@ -606,6 +623,16 @@ int main(int argc, char *argv[])
 	AddSystem<ECSEngine::AnimationSystem>(sm); // double check TODO
 	AddSystem<ECSEngine::SpriteSystem>(sm);
 	AddSystem<ECSEngine::SpawnSystem>(sm);
+
+	// Set up parallax factors for different layers
+	auto &spriteSystem = sm.template GetSystem<GameSpriteSystem>();
+	spriteSystem.SetParallaxFactor(-3, 0.85f);
+	spriteSystem.SetParallaxFactor(-2, 0.90f);
+	spriteSystem.SetParallaxFactor(-1, 0.95f);
+	spriteSystem.SetParallaxFactor(0, 0.98f);
+	spriteSystem.SetParallaxFactor(1, 1.0f);
+	spriteSystem.SetParallaxFactor(2, 1.1f);
+	spriteSystem.SetParallaxFactor(3, 1.2f);
 
 	// Load maps into the scene
 	LoadMap("maps/cat_sky_swamp.map", *scene, gResourcePath);

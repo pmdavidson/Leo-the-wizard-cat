@@ -6,9 +6,12 @@
 #include "SpellComponent.h"
 #include "LocationComponent.h"
 #include "CollisionComponent.h"
+#include "SpriteComponent.h"
+#include "AnimationComponent.h"
 #include "SoundManager.h"
 #include <vector>
 #include <random>
+#include <unordered_map>
 
 namespace ECSEngine
 {
@@ -23,8 +26,33 @@ namespace ECSEngine
             auto &soundManager = scene.GetSoundManager();
             float deltaTime = 1.0f / 60.0f;
 
-            // Collect projectiles to remove
-            std::vector<EntityID> projectilesToRemove;
+            // Track explosion lifetimes (entity ID -> remaining time)
+            static std::unordered_map<EntityID, float> explosionTimers;
+
+            // Collect entities to remove and explosions to spawn
+            std::vector<EntityID> entitiesToRemove;
+            struct ExplosionSpawn {
+                Point2D position;
+                std::vector<SpriteID> frames;
+                float size;
+                SpellType type;
+            };
+            std::vector<ExplosionSpawn> explosionsToSpawn;
+
+            // Update explosion timers and remove expired ones
+            for (auto it = explosionTimers.begin(); it != explosionTimers.end();)
+            {
+                it->second -= deltaTime;
+                if (it->second <= 0.0f)
+                {
+                    entitiesToRemove.push_back(it->first);
+                    it = explosionTimers.erase(it);
+                }
+                else
+                {
+                    ++it;
+                }
+            }
 
             for (auto it = entityManager.begin(); it != entityManager.end(); ++it)
             {
@@ -37,29 +65,52 @@ namespace ECSEngine
 
                 auto &projectile = entityManager.template GetComponent<ProjectileComponent>(entityId);
 
+                // Update grace period (ignore collisions briefly after spawn)
+                if (projectile.gracePeriod > 0.0f)
+                    projectile.gracePeriod -= deltaTime;
+
                 // Update projectile lifetime
                 if (projectile.lifetime > 0.0f)
                     projectile.lifetime -= deltaTime;
 
+                // Get projectile position for explosion spawn
+                Point2D explosionPos(0, 0);
+                if (entityManager.template HasComponent<LocationComponent>(entityId))
+                {
+                    explosionPos = entityManager.template GetComponent<LocationComponent>(entityId).position;
+                }
+
                 // Check if projectile has expired (lifetime ran out)
                 if (projectile.lifetime <= 0.0f && projectile.active)
                 {
-                    // Projectile expired - play explosion/impact sound
                     PlayImpactSound(projectile.spellType, soundManager);
                     projectile.active = false;
-                    projectilesToRemove.push_back(entityId);
+                    
+                    // Queue explosion spawn
+                    if (!projectile.explosionFrames.empty())
+                    {
+                        explosionsToSpawn.push_back({explosionPos, projectile.explosionFrames, projectile.explosionSize, projectile.spellType});
+                    }
+                    
+                    entitiesToRemove.push_back(entityId);
                     continue;
                 }
 
-                // Check if projectile was deactivated elsewhere
+                // Check if projectile was deactivated elsewhere (hit enemy)
                 if (!projectile.active)
                 {
-                    projectilesToRemove.push_back(entityId);
+                    // Queue explosion spawn
+                    if (!projectile.explosionFrames.empty())
+                    {
+                        explosionsToSpawn.push_back({explosionPos, projectile.explosionFrames, projectile.explosionSize, projectile.spellType});
+                    }
+                    
+                    entitiesToRemove.push_back(entityId);
                     continue;
                 }
 
-                // Check collision flags set by CollisionSystem
-                if (entityManager.template HasComponent<CollisionComponent>(entityId))
+                // Check collision flags set by CollisionSystem (only after grace period)
+                if (projectile.gracePeriod <= 0.0f && entityManager.template HasComponent<CollisionComponent>(entityId))
                 {
                     auto &collision = entityManager.template GetComponent<CollisionComponent>(entityId);
 
@@ -67,18 +118,51 @@ namespace ECSEngine
                     if (collision.collidedSides.left || collision.collidedSides.right ||
                         collision.collidedSides.top || collision.collidedSides.bottom)
                     {
-                        // Deactivate projectile
                         projectile.active = false;
-                        projectilesToRemove.push_back(entityId);
-
-                        // Play impact sound
                         PlayImpactSound(projectile.spellType, soundManager);
+                        
+                        // Queue explosion spawn
+                        if (!projectile.explosionFrames.empty())
+                        {
+                            explosionsToSpawn.push_back({explosionPos, projectile.explosionFrames, projectile.explosionSize, projectile.spellType});
+                        }
+                        
+                        entitiesToRemove.push_back(entityId);
                     }
                 }
             }
 
-            // Remove expired/hit projectiles
-            for (EntityID id : projectilesToRemove)
+            // Spawn explosion entities
+            for (const auto &exp : explosionsToSpawn)
+            {
+                EntityID explosionId = entityManager.CreateEntity("explosion");
+                
+                // Position explosion at projectile location
+                entityManager.template AddComponent<LocationComponent>(explosionId, LocationComponent(exp.position));
+                
+                // Add sprite component
+                SpriteComponent explosionSprite;
+                explosionSprite.spriteId = exp.frames[0];
+                explosionSprite.bounds = Rect(0.0f, 0.0f, exp.size, exp.size);
+                explosionSprite.inWorldSpace = true;
+                entityManager.template AddComponent<SpriteComponent>(explosionId, explosionSprite);
+                
+                // Add animation component
+                AnimationComponent explosionAnim;
+                explosionAnim.animations["explosion"] = exp.frames;
+                explosionAnim.currentAnimation = "explosion";
+                explosionAnim.frameDuration = 0.05f;
+                explosionAnim.playing = true;
+                explosionAnim.looping = false;
+                entityManager.template AddComponent<AnimationComponent>(explosionId, explosionAnim);
+                
+                // Track explosion lifetime
+                float lifetime = explosionAnim.frameDuration * exp.frames.size();
+                explosionTimers[explosionId] = lifetime;
+            }
+
+            // Remove expired projectiles and explosions
+            for (EntityID id : entitiesToRemove)
             {
                 entityManager.RemoveEntity(id);
             }

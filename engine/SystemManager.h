@@ -65,6 +65,17 @@ namespace ECSEngine
 			return true;
 		}
 
+		template <typename T>
+		T &GetSystem()
+		{
+			for (auto &system : mSystems)
+			{
+				if (auto *casted = dynamic_cast<T *>(system.get()))
+					return *casted;
+			}
+			throw std::runtime_error("Requested system not found in SystemManager.");
+		}
+
 	private:
 		std::vector<std::unique_ptr<System<Components...>>> mSystems;
 	};

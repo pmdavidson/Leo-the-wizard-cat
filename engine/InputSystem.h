@@ -5,9 +5,14 @@
 #include "InputComponent.h"
 #include "LocationComponent.h"
 #include "CollisionComponent.h"
+#include "AnimationComponent.h"
+#include "SpellComponent.h"
+#include "ProjectileComponent.h"
+#include "SpriteComponent.h"
 #include "SoundManager.h"
 #include <unordered_map>
 #include <cmath>
+#include <random>
 
 namespace ECSEngine
 {
@@ -22,11 +27,13 @@ namespace ECSEngine
 			auto &soundManager = scene.GetSoundManager();
 			float deltaTime = 1.0f / 60.0f;
 
-			// Track if we jumped recently for landing detection
+				// Track if we jumped recently for landing detection
 			static std::unordered_map<EntityID, bool> recentlyJumped;
 			static std::unordered_map<EntityID, bool> wasPushingWall;
 			static std::unordered_map<EntityID, bool> wasJumpPressed;
 			static std::unordered_map<EntityID, float> walkSoundTimer;
+			static std::unordered_map<EntityID, bool> wasCastPressed;
+			static std::unordered_map<EntityID, float> castAnimTimer;
 
 			for (auto it = entityManager.begin(); it != entityManager.end(); ++it)
 			{
@@ -182,6 +189,7 @@ namespace ECSEngine
 					bool wasJumpPressedLastFrame = wasJumpPressed[entityId];
 					wasJumpPressed[entityId] = jumpPressed;
 
+					bool justJumped = false;
 					if (jumpPressed && !wasJumpPressedLastFrame)
 					{
 						if (onGround)
@@ -189,6 +197,23 @@ namespace ECSEngine
 							movementComp.velocity.y = jumpVelocity;
 							soundManager.PlaySound("jump");
 							recentlyJumped[entityId] = true;
+							justJumped = true;
+							
+							// Trigger jump animation immediately
+							if (entityManager.template HasComponent<AnimationComponent>(entityId))
+							{
+								auto &anim = entityManager.template GetComponent<AnimationComponent>(entityId);
+								if (anim.animations.count("jump") > 0)
+								{
+									anim.Play("jump", false); // Don't loop jump animation
+									// Set sprite immediately to first frame
+									if (entityManager.template HasComponent<SpriteComponent>(entityId))
+									{
+										auto &sprite = entityManager.template GetComponent<SpriteComponent>(entityId);
+										sprite.spriteId = anim.animations["jump"][0];
+									}
+								}
+							}
 						}
 						else if (wasFalling && (onWallLeft || onWallRight))
 						{
@@ -204,6 +229,22 @@ namespace ECSEngine
 							movementComp.velocity.y = wallJumpVelocityY;
 							soundManager.PlaySound("wall_push");
 							recentlyJumped[entityId] = true;
+							justJumped = true;
+							
+							// Trigger jump animation for wall jump too
+							if (entityManager.template HasComponent<AnimationComponent>(entityId))
+							{
+								auto &anim = entityManager.template GetComponent<AnimationComponent>(entityId);
+								if (anim.animations.count("jump") > 0)
+								{
+									anim.Play("jump", false);
+									if (entityManager.template HasComponent<SpriteComponent>(entityId))
+									{
+										auto &sprite = entityManager.template GetComponent<SpriteComponent>(entityId);
+										sprite.spriteId = anim.animations["jump"][0];
+									}
+								}
+							}
 						}
 					}
 
@@ -216,6 +257,166 @@ namespace ECSEngine
 					if (downPressed && !onGround && movementComp.velocity.y > 0)
 					{
 						movementComp.velocity.y += 200.0f * deltaTime;
+					}
+
+					// Handle spell casting (E key)
+					sf::Keyboard::Scancode scancodeE = sf::Keyboard::delocalize(sf::Keyboard::Key::E);
+					bool castPressed = (scancodeE != sf::Keyboard::Scan::Unknown &&
+										static_cast<size_t>(scancodeE) < sf::Keyboard::ScancodeCount)
+										   ? inputComp.keydown[static_cast<size_t>(scancodeE)]
+										   : false;
+
+					bool wasCastPressedLastFrame = wasCastPressed[entityId];
+					wasCastPressed[entityId] = castPressed;
+
+					// Update cast animation timer
+					if (castAnimTimer[entityId] > 0.0f)
+					{
+						castAnimTimer[entityId] -= deltaTime;
+					}
+
+					// Cast spell on E key press
+					bool justCast = false;
+					if (castPressed && !wasCastPressedLastFrame)
+					{
+						justCast = true;
+						// Play magic animation immediately
+						if (entityManager.template HasComponent<AnimationComponent>(entityId))
+						{
+							auto &anim = entityManager.template GetComponent<AnimationComponent>(entityId);
+							if (anim.animations.count("magic") > 0)
+							{
+								anim.Play("magic", false); // Don't loop magic animation
+								castAnimTimer[entityId] = anim.frameDuration * anim.animations["magic"].size();
+								// Set sprite immediately to first frame
+								if (entityManager.template HasComponent<SpriteComponent>(entityId))
+								{
+									auto &sprite = entityManager.template GetComponent<SpriteComponent>(entityId);
+									sprite.spriteId = anim.animations["magic"][0];
+								}
+							}
+						}
+
+						// Spawn fireball
+						if (entityManager.template HasComponent<LocationComponent>(entityId))
+						{
+							auto &playerLoc = entityManager.template GetComponent<LocationComponent>(entityId);
+							
+							// Determine facing direction based on movement or last direction
+							int facingDir = 1; // Default right
+							if (movingLeft && !movingRight)
+								facingDir = -1;
+							else if (movingRight && !movingLeft)
+								facingDir = 1;
+							
+							// Store facing direction for entities with SpellComponent
+							if (entityManager.template HasComponent<SpellComponent>(entityId))
+							{
+								auto &spellComp = entityManager.template GetComponent<SpellComponent>(entityId);
+								if (movingLeft && !movingRight)
+									spellComp.facingDirection = -1;
+								else if (movingRight && !movingLeft)
+									spellComp.facingDirection = 1;
+								facingDir = spellComp.facingDirection;
+								
+								// Check cooldown
+								if (spellComp.castCooldown <= 0.0f)
+								{
+									const auto &props = spellComp.spellProperties[static_cast<size_t>(SpellType::Fire)];
+									
+									// Calculate spawn position - spawn far enough to avoid colliding with player
+									// Player is 32x32, fireball collision is 28x28, need at least 32 offset
+									float spawnOffsetX = facingDir * 40.0f;
+									Point2D spawnPos = {
+										playerLoc.position.x + spawnOffsetX,
+										playerLoc.position.y
+									};
+
+									// Create fireball entity
+									EntityID fireballId = entityManager.CreateEntity("fireball");
+
+									entityManager.template AddComponent<LocationComponent>(fireballId, LocationComponent(spawnPos));
+
+									MovementComponent fireballMovement;
+									fireballMovement.velocity = Point2D(facingDir * props.speed, 0.0f);
+									entityManager.template AddComponent<MovementComponent>(fireballId, fireballMovement);
+
+									ProjectileComponent projectile;
+									projectile.spellType = SpellType::Fire;
+									projectile.damage = props.damage;
+									projectile.lifetime = props.lifetime;
+									projectile.maxLifetime = props.lifetime;
+									projectile.ownerEntityId = entityId;
+									projectile.active = true;
+									projectile.explosionFrames = props.explosionFrames;
+									projectile.explosionSize = props.explosionSize;
+									entityManager.template AddComponent<ProjectileComponent>(fireballId, projectile);
+
+									Rect collisionBounds(0.0f, 0.0f, props.size, props.size);
+									CollisionComponent collision(collisionBounds, false);
+									entityManager.template AddComponent<CollisionComponent>(fireballId, collision);
+
+									// Create fireball sprite
+									SpriteComponent fireballSprite;
+									fireballSprite.spriteId = props.spriteId;
+									fireballSprite.bounds = Rect(0.0f, 0.0f, 28.0f, 22.0f); // Actual fireball size
+									fireballSprite.inWorldSpace = true;
+									entityManager.template AddComponent<SpriteComponent>(fireballId, fireballSprite);
+
+									// Start cooldown
+									spellComp.castCooldown = props.cooldown;
+
+									// Play fire cast sound
+									static std::mt19937 rng(std::random_device{}());
+									std::uniform_int_distribution<int> dist(1, 2);
+									std::string soundName = "fire_cast_" + std::to_string(dist(rng));
+									soundManager.PlaySound(soundName);
+								}
+							}
+						}
+					}
+
+					// Handle animation transitions back to idle/run
+					// Skip if we just triggered an action this frame
+					if (!justJumped && !justCast && entityManager.template HasComponent<AnimationComponent>(entityId))
+					{
+						auto &anim = entityManager.template GetComponent<AnimationComponent>(entityId);
+						
+						// If casting animation is done
+						bool castingDone = castAnimTimer[entityId] <= 0.0f;
+						bool isCasting = anim.currentAnimation == "magic" && !castingDone;
+						// Consider jumping if in air OR if we recently jumped (to catch first frame)
+						bool isJumping = anim.currentAnimation == "jump" && (!onGround || recentlyJumped[entityId]);
+						
+						// Don't interrupt casting or jumping animations
+						if (!isCasting && !isJumping)
+						{
+							// Transition to appropriate animation based on state
+							if (!onGround)
+							{
+								// In air - show jump animation
+								if (anim.currentAnimation != "jump" && anim.animations.count("jump") > 0)
+								{
+									anim.Play("jump", false);
+								}
+							}
+							else if (movingLeft || movingRight)
+							{
+								// Running on ground
+								if (anim.currentAnimation != "run" && anim.animations.count("run") > 0)
+								{
+									anim.Play("run", true);
+								}
+							}
+							else
+							{
+								// Idle on ground
+								if (anim.currentAnimation != "idleA" && anim.animations.count("idleA") > 0)
+								{
+									anim.Play("idleA", true);
+								}
+							}
+						}
 					}
 				}
 			}

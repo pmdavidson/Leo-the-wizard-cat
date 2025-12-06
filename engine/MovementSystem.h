@@ -14,7 +14,7 @@ namespace ECSEngine
 		bool Run(Scene<Components...> &scene) override
 		{
 			auto &entityManager = scene.GetEntityManager();
-			float deltaTime = 1.0f / 60.0f; // assuming 60FPS?
+			float deltaTime = 1.0f / 60.0f;
 
 			// Update locations based on velocity
 			for (auto it = entityManager.begin(); it != entityManager.end(); ++it)
