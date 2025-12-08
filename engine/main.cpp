@@ -125,11 +125,141 @@ ECSEngine::Rect FromSFML(const sf::IntRect &r)
 		r.size.y};
 }
 
-// check bounding box in world map first, if its all 0s then has collision = false, set layer = 2 with parallax factor
+// set layer = 2 with parallax factor
 template <typename SceneType>
-void LoadMap(const std::string &path, SceneType &scene, const std::string &resourceRoot)
+void LoadMap(const std::string &path, SceneType &scene)
 {
-	std::ifstream file(resourceRoot + path);
+
+	//REGISTER NON-MAP THINGS
+	std::vector<std::filesystem::path> paths;
+	for (const auto &f : std::filesystem::directory_iterator(std::filesystem::path{gResourcePath + "sprites/"}))
+	{
+		if (std::filesystem::is_regular_file(f) && f.path().extension().string() == ".png")
+		{
+			paths.push_back(f.path());
+		}
+	}
+
+	// campfire is in map too so no need to handle here, projectiles are made dynamically not pre-made
+	EntityId player = scene.GetEntityManager().CreateEntity("player");
+	EntityId blueSlime = scene.GetEntityManager().CreateEntity("blueSlime");
+	EntityId redSlime = scene.GetEntityManager().CreateEntity("redSlime");
+	EntityId greenSlime = scene.GetEntityManager().CreateEntity("greenSlime");
+	EntityId brownSlime = scene.GetEntityManager().CreateEntity("brownSlime");
+	// EntityId campfire = scene.GetEntityManager().CreateEntity("campfire");
+
+	SpriteID blueSlimeSpriteId = 0;
+	bool first = true;
+
+	for (const auto &path : paths)
+		{
+			std::string filename = path.stem().string(); // no .png extension
+			std::vector<std::string> parts;
+			std::stringstream ss(filename);
+			std::string part;
+
+			std::filesystem::path spritesDir = gResourcePath + "sprites";
+			std::filesystem::path fullpath = spritesDir / path.filename();
+
+			sf::Image original;
+			if (!original.loadFromFile(fullpath))
+			{
+				std::cerr << "Failed to load image: " << fullpath << "\n";
+				continue;
+			}
+
+			while (std::getline(ss, part, '_'))
+			{
+				parts.push_back(part);
+			}
+
+			// blueSlime_idle_0
+			// background things have _ at the front _swamp_bg_1.png
+
+			if (parts.size() >= 3)
+			{
+				std::string name = parts[0];	  // "cat" or "blueSlime"
+				std::string animation = parts[1]; // "idleA", "run", "idle", "hurt", "death", etc.
+
+				if (name == "cat")
+				{
+					SpriteID spriteId = scene.GetSpriteManager().RegisterTexture(
+					fullpath, ECSEngine::Rect(ECSEngine::Point2D(0, 0), 32.f, 32.f));
+					//is this always 32x32 or should i use original.getSize()?
+
+					scene.GetEntityManager().template AddComponent<ECSEngine::SpriteComponent>(player, ECSEngine::SpriteComponent(spriteId, ECSEngine::Rect(ECSEngine::Point2D(0, 0), 32.f, 32.f), true, 1));
+
+					// Add this frame to the animation
+					scene.GetEntityManager().template AddComponent<ECSEngine::AnimationComponent>(player, ECSEngine::AnimationComponent(animation, SpriteID));
+
+				}
+				else if (name == "blueSlime")
+				{
+					SpriteID spriteId = scene.GetSpriteManager().RegisterTexture(
+					fullpath, ECSEngine::Rect(ECSEngine::Point2D(0, 0), 32.f, 32.f));
+					//is this always 32x32 or should i use original.getSize()?
+
+					scene.GetEntityManager().template AddComponent<ECSEngine::SpriteComponent>(blueSlime, ECSEngine::SpriteComponent(spriteId, ECSEngine::Rect(ECSEngine::Point2D(0, 0), 32.f, 32.f), true, 1));
+
+					scene.GetEntityManager().template AddComponent<ECSEngine::AnimationComponent>(blueSlime, ECSEngine::AnimationComponent(animation, SpriteID));
+
+					if (first){
+						blueSlimeSpriteId = spriteId;
+						first = false;
+					}
+
+					//refresh in every else if since redSlime is alphabetically after blueSlime
+				}
+				else if (name == "redSlime")
+				{
+					SpriteID spriteId = scene.GetSpriteManager().RegisterTexture(
+					fullpath, ECSEngine::Rect(ECSEngine::Point2D(0, 0), 32.f, 32.f));
+					//is this always 32x32 or should i use original.getSize()?
+
+					scene.GetEntityManager().template AddComponent<ECSEngine::SpriteComponent>(redSlime, ECSEngine::SpriteComponent(spriteId, ECSEngine::Rect(ECSEngine::Point2D(0, 0), 32.f, 32.f), true, 1));
+
+					scene.GetEntityManager().template AddComponent<ECSEngine::AnimationComponent>(redSlime, ECSEngine::AnimationComponent(animation, SpriteID));
+				}
+				else if (name == "greenSlime")
+				{
+					SpriteID spriteId = scene.GetSpriteManager().RegisterTexture(
+					fullpath, ECSEngine::Rect(ECSEngine::Point2D(0, 0), 32.f, 32.f));
+					//is this always 32x32 or should i use original.getSize()?
+
+					scene.GetEntityManager().template AddComponent<ECSEngine::SpriteComponent>(greenSlime, ECSEngine::SpriteComponent(spriteId, ECSEngine::Rect(ECSEngine::Point2D(0, 0), 32.f, 32.f), true, 1));
+
+					scene.GetEntityManager().template AddComponent<ECSEngine::AnimationComponent>(greenSlime, ECSEngine::AnimationComponent(animation, SpriteID));
+				}
+				else if (name == "brownSlime")
+				{
+					SpriteID spriteId = scene.GetSpriteManager().RegisterTexture(
+					fullpath, ECSEngine::Rect(ECSEngine::Point2D(0, 0), 32.f, 32.f));
+					//is this always 32x32 or should i use original.getSize()?
+
+					scene.GetEntityManager().template AddComponent<ECSEngine::SpriteComponent>(brownSlime, ECSEngine::SpriteComponent(spriteId, ECSEngine::Rect(ECSEngine::Point2D(0, 0), 32.f, 32.f), true, 1));
+
+					scene.GetEntityManager().template AddComponent<ECSEngine::AnimationComponent>(brownSlime, ECSEngine::AnimationComponent(animation, SpriteID));
+				}
+				//will this be in map? if so then it shouldnt be here
+				// else if (name == "campfire")
+				// {
+				// 	scene.GetEntityManager().template AddComponent<ECSEngine::AnimationComponent>(campfire, ECSEngine::AnimationComponent(animation, SpriteID));
+				// }
+
+				//this is dynamic not static
+				// else if (name == "fireball")
+				// {
+				// 	// Add fireball animation frames (explosion, flying)
+				// 	fireballExplosionAnim.animations[animation].push_back(spriteId);
+				// }
+				else {
+					continue;
+				}
+			}
+		}
+	
+	//REGISTER MAP THINGS HERE
+	std::ifstream file(gResourcePath + path);
 	if (!file)
 	{
 		std::cerr << "Failed to open map: " << path << "\n";
@@ -166,7 +296,7 @@ void LoadMap(const std::string &path, SceneType &scene, const std::string &resou
 		if (!(ss >> symbol >> entry.texturePath >> sx >> sy >> sw >> sh))
 			continue; // Skip malformed lines
 
-		entry.texturePath = "sprites/" + entry.texturePath;
+		entry.texturePath = gResourcePath + "sprites/" + entry.texturePath;
 		entry.sourceRect = sf::IntRect(
 			sf::Vector2i(sx, sy),
 			sf::Vector2i(sw, sh));
@@ -204,8 +334,8 @@ void LoadMap(const std::string &path, SceneType &scene, const std::string &resou
 	}
 
 	// Register blueSlime sprite for spawning
-	SpriteID blueSlimeSpriteId = scene.GetSpriteManager().RegisterTexture(
-		resourceRoot + "sprites/blueSlime_idle_0.png", ECSEngine::Rect(0, 0, 96, 32));
+	// SpriteID blueSlimeSpriteId = scene.GetSpriteManager().RegisterTexture(
+	// 	resourceRoot + "sprites/blueSlime_idle_0.png", ECSEngine::Rect(0, 0, 96, 32));
 
 	// Parse map rows
 	for (int y = 0; y < mapH; ++y)
@@ -227,13 +357,13 @@ void LoadMap(const std::string &path, SceneType &scene, const std::string &resou
 				static_cast<float>(originX + x * tileW),
 				static_cast<float>(originY + y * tileH)};
 
-			EntityId id = scene.GetEntityManager().CreateEntity("tile_" + std::string(1, tile));
+			EntityId id = scene.GetEntityManager().CreateEntity("tile_" + std::string(1, tile)); //what is this
 
 			scene.GetEntityManager().template AddComponent<ECSEngine::LocationComponent>(id, ECSEngine::LocationComponent(position));
 
 			// Drawing Sprites
 			auto spriteId = scene.GetSpriteManager().RegisterTexture(
-				resourceRoot + entry.texturePath, FromSFML(entry.sourceRect));
+				entry.texturePath, FromSFML(entry.sourceRect));
 
 			ECSEngine::Rect drawBounds(0.f, 0.f,
 									   static_cast<float>(entry.sourceRect.size.x),
@@ -247,10 +377,10 @@ void LoadMap(const std::string &path, SceneType &scene, const std::string &resou
 																									  FromSFML(entry.boundsRect), true));
 			}
 
-			// Spawner - spawns slimes (96x32)
+			// Spawner - spawns slimes (96x32) default is blue for now, add more for red
 			if (tile == 'S')
 			{
-				scene.GetEntityManager().template AddComponent<ECSEngine::SpawnComponent>(id, {id, "slime", blueSlimeSpriteId, 10.f, 10.f, 10, 96.f, 32.f});
+				scene.GetEntityManager().template AddComponent<ECSEngine::SpawnComponent>(id, {id, "blueSlime", blueSlimeSpriteId, 10.f, 10.f, 10, 96.f, 32.f});
 			}
 		}
 	}
@@ -262,87 +392,6 @@ void LoadMap(const std::string &path, SceneType &scene, const std::string &resou
 		float spawnX = tileW * 8;
 		float spawnY = tileH * 3;
 
-		std::vector<std::filesystem::path> paths;
-		for (const auto &f : std::filesystem::directory_iterator(std::filesystem::path{gResourcePath + "sprites/"}))
-		{
-			if (std::filesystem::is_regular_file(f) && f.path().extension().string() == ".png")
-			{
-				paths.push_back(f.path());
-			}
-		}
-
-		// Create non-map Entities HERE
-		// campfire is in map too so no need to handle here, projectiles are made dynamically not pre-made
-		EntityId player = scene.GetEntityManager().CreateEntity("player");
-
-		// Create animation component to collect all cat sprite frames
-		ECSEngine::AnimationComponent playerAnim;
-		SpriteID firstCatSpriteId = 0;
-		bool playerSpriteSet = false;
-
-		// Also collect blueSlime animations for enemies
-		ECSEngine::AnimationComponent blueSlimeAnim;
-		
-		// Collect fireball explosion animations
-		ECSEngine::AnimationComponent fireballExplosionAnim;
-
-		for (const auto &path : paths)
-		{
-			std::string filename = path.stem().string(); // no .png extension
-			std::vector<std::string> parts;
-			std::stringstream ss(filename);
-			std::string part;
-
-			std::filesystem::path spritesDir = resourceRoot + "sprites";
-			std::filesystem::path fullpath = spritesDir / path.filename();
-
-			sf::Image original;
-			if (!original.loadFromFile(fullpath))
-			{
-				std::cerr << "Failed to load image: " << fullpath << "\n";
-				continue;
-			}
-			SpriteID spriteId = scene.GetSpriteManager().RegisterTexture(
-				fullpath, ECSEngine::Rect(ECSEngine::Point2D(0, 0), original.getSize().x, original.getSize().y));
-
-			while (std::getline(ss, part, '_'))
-			{
-				parts.push_back(part);
-			}
-
-			// blueSlime_idle_0
-			// background things have _ at the front _swamp_bg_1.png
-
-			if (parts.size() >= 3)
-			{
-				std::string name = parts[0];	  // "cat" or "blueSlime"
-				std::string animation = parts[1]; // "idleA", "run", "idle", "hurt", "death", etc.
-
-				if (name == "cat")
-				{
-					// Add this frame to the animation
-					playerAnim.animations[animation].push_back(spriteId);
-
-					// Store first cat sprite for initial display
-					if (!playerSpriteSet)
-					{
-						firstCatSpriteId = spriteId;
-						playerSpriteSet = true;
-					}
-				}
-				else if (name == "blueSlime")
-				{
-					// Add blueSlime animation frames
-					blueSlimeAnim.animations[animation].push_back(spriteId);
-				}
-				else if (name == "fireball")
-				{
-					// Add fireball animation frames (explosion, flying)
-					fireballExplosionAnim.animations[animation].push_back(spriteId);
-				}
-			}
-		}
-
 		// Update all SpawnComponents with blueSlime animations
 		for (auto it = scene.GetEntityManager().begin(); it != scene.GetEntityManager().end(); ++it)
 		{
@@ -352,48 +401,23 @@ void LoadMap(const std::string &path, SceneType &scene, const std::string &resou
 			if (scene.GetEntityManager().template HasComponent<ECSEngine::SpawnComponent>(spawnerId))
 			{
 				auto &spawnComp = scene.GetEntityManager().template GetComponent<ECSEngine::SpawnComponent>(spawnerId);
-				if (spawnComp.spawnDescription == "slime")
+				if (spawnComp.spawnDescription == "blueSlime")
 				{
-					spawnComp.animations = blueSlimeAnim.animations;
+					spawnComp.animations = blueSlimeAnim.animations; //you need a reference to the animation component, there is no animations variable in spawn component
 				}
 			}
 		}
 
-		// Add components to player only once
-		if (playerSpriteSet)
-		{
-			scene.GetEntityManager().template AddComponent<ECSEngine::SpriteComponent>(player, {firstCatSpriteId, ECSEngine::Rect(0.f, 0.f, 32.f, 32.f), true});
-
-			// Set default animation to idleA if it exists
-			if (playerAnim.animations.count("idleA") > 0)
-			{
-				playerAnim.currentAnimation = "idleA";
-				playerAnim.playing = true;
-			}
-			scene.GetEntityManager().template AddComponent<ECSEngine::AnimationComponent>(player, playerAnim);
-		}
-
-		// need to set parallax factor TODO
-
-		// // Register player sprite
-		// SpriteID playerSpriteId = scene.GetSpriteManager().RegisterTexture(
-		// 	gResourcePath + "sprite-sheet-character.png", ECSEngine::Rect(0.f, 32.f, 32.f, 32.f));
-
-		// Add Components
+		// Add Player Components
 		scene.GetEntityManager().template AddComponent<ECSEngine::LocationComponent>(player, ECSEngine::LocationComponent(ECSEngine::Point2D(spawnX, spawnY)));
 		scene.GetEntityManager().template AddComponent<ECSEngine::GravityComponent>(player, ECSEngine::GravityComponent(ECSEngine::Point2D(0.0f, 600.0f)));
 		scene.GetEntityManager().template AddComponent<ECSEngine::MovementComponent>(player, {});
 		scene.GetEntityManager().template AddComponent<ECSEngine::InputComponent>(player, {});
 		scene.GetEntityManager().template AddComponent<ECSEngine::CameraFollower>(player, {player});
 		scene.GetEntityManager().template AddComponent<ECSEngine::ScoreComponent>(player, {});
+		scene.GetEntityManager().template AddComponent<ECSEngine::CollisionComponent>(player, {ECSEngine::Rect(0.f, 0.f, 32.f, 32.f), false}); // Collision box: 32x32, full sprite size (adjust if sprite has padding/transparency)
 
-		// Collision box: 32x32, full sprite size (adjust if sprite has padding/transparency)
-		scene.GetEntityManager().template AddComponent<ECSEngine::CollisionComponent>(player, {ECSEngine::Rect(0.f, 0.f, 32.f, 32.f), false});
-
-		// // Sprite display bounds: show the full 32x32 sprite
-		// scene.GetEntityManager().template AddComponent<ECSEngine::SpriteComponent>(player, {playerSpriteId, ECSEngine::Rect(0.f, 0.f, 32.f, 32.f), true});
-
-		// SPELLS
+		// ADD SPELLS
 		// Register fireball sprite (actual size is 28x22)
 		SpriteID fireSpellSpriteId = scene.GetSpriteManager().RegisterTexture(
 			gResourcePath + "sprites/fireball_flying_1.png", ECSEngine::Rect(0.f, 0.f, 28.f, 22.f));
@@ -410,7 +434,7 @@ void LoadMap(const std::string &path, SceneType &scene, const std::string &resou
 		fireProps.size = 28.0f;
 		fireProps.spriteId = fireSpellSpriteId;
 		
-		// Add explosion animation frames
+		// Add explosion animation frames, what does this do?
 		if (fireballExplosionAnim.animations.count("explosion") > 0)
 		{
 			fireProps.explosionFrames = fireballExplosionAnim.animations["explosion"];
@@ -635,8 +659,8 @@ int main(int argc, char *argv[])
 	spriteSystem.SetParallaxFactor(3, 1.2f);
 
 	// Load maps into the scene
-	LoadMap("maps/cat_sky_swamp.map", *scene, gResourcePath);
-	LoadMap("maps/cat_world.map", *scene, gResourcePath);
+	LoadMap("maps/cat_sky_swamp.map", *scene);
+	LoadMap("maps/cat_world.map", *scene);
 
 	// Upload atlas image to GPU texture
 	scene->GetSpriteManager().FinalizeAtlas();
