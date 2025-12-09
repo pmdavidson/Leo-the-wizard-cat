@@ -24,6 +24,8 @@ namespace ECSEngine
         // shader name (resolved in ShaderManager)
         std::string shaderName = "";
 
+        bool flipX = false; // Flip sprite horizontally
+
         SpriteComponent() = default;
 
         SpriteComponent(SpriteID id, const Rect &drawBounds, bool world = true, int layerNum = 1, std::string shadeName = "")
@@ -31,6 +33,7 @@ namespace ECSEngine
               bounds(drawBounds),
               inWorldSpace(world),
               layer(layerNum),
-              shaderName(shadeName) {}
+              shaderName(shadeName),
+              flipX(false) {}
     };
 }

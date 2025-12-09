@@ -91,6 +91,38 @@ namespace ECSEngine
 							enemy.canMove = false;
 							enemy.damageSoundName = "slime_damage";
 							enemy.deathSoundName = "slime_die";
+
+							// Default resistances = 1.0 (no resistance)
+							for (auto &r : enemy.resistances)
+								r = 1.0f;
+
+							// Set elemental resistances based on slime type
+							if (spawnComp.spawnDescription == "redSlime")
+							{
+								// Red: resist fire
+								enemy.resistances[static_cast<size_t>(SpellType::Fire)] = 0.5f;
+							}
+							else if (spawnComp.spawnDescription == "blueSlime")
+							{
+								// Blue (water): resist water and fire
+								enemy.resistances[static_cast<size_t>(SpellType::Water)] = 0.5f;
+								enemy.resistances[static_cast<size_t>(SpellType::Fire)] = 0.5f;
+							}
+							else if (spawnComp.spawnDescription == "greenSlime")
+							{
+								// Green: resist water
+								enemy.resistances[static_cast<size_t>(SpellType::Water)] = 0.5f;
+							}
+							else if (spawnComp.spawnDescription == "brownSlime")
+							{
+								// Brown/rock: resistant to all elements (set all to 0.5x), base HP stays at 30
+								for (auto &r : enemy.resistances)
+									r = 0.5f;
+								enemy.hp = 50.0f;
+								enemy.maxHp = 50.0f;
+								enemy.previousHp = 50.0f;
+							}
+
 							entityManager.template AddComponent<EnemyComponent>(slimeId, enemy);
 
 							// Add AnimationComponent for slime if animations are available

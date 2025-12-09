@@ -115,6 +115,15 @@ namespace ECSEngine
 								   (entityManager.template HasComponent<GravityComponent>(idB) ||
 									!entityManager.template HasComponent<MovementComponent>(idB));
 
+					// Skip collision resolution entirely if a projectile overlaps its owner (avoid pushback/stick)
+					if ((isProjectileA && isPlayerB &&
+						 entityManager.template GetComponent<ProjectileComponent>(idA).ownerEntityId == idB) ||
+						(isProjectileB && isPlayerA &&
+						 entityManager.template GetComponent<ProjectileComponent>(idB).ownerEntityId == idA))
+					{
+						continue;
+					}
+
 					Point2D preCollisionVelocityA(0.0f, 0.0f);
 					Point2D preCollisionVelocityB(0.0f, 0.0f);
 
@@ -292,8 +301,16 @@ namespace ECSEngine
 						// Only damage if projectile is active, enemy is alive, and it's not an enemy's projectile
 						if (projectile.active && enemy.isAlive && !isEnemyProjectile)
 						{
-							// Deal damage to enemy
-							enemy.hp -= projectile.damage;
+							// Apply elemental resistance if present
+							float dmgMultiplier = 1.0f;
+							size_t spellIdx = static_cast<size_t>(projectile.spellType);
+							if (spellIdx < enemy.resistances.size() && enemy.resistances[spellIdx] > 0.0f)
+							{
+								dmgMultiplier = enemy.resistances[spellIdx];
+							}
+
+							float appliedDamage = projectile.damage * dmgMultiplier;
+							enemy.hp -= appliedDamage;
 
 							// Play enemy damage sound 
 							static std::mt19937 rng(std::random_device{}());
@@ -318,7 +335,15 @@ namespace ECSEngine
 					}
 
 					// Handle projectile-player collisions (enemy projectiles hitting player)
-					if ((isProjectileA && isPlayerB) || (isProjectileB && isPlayerA))
+					// Skip collision response if the projectile belongs to this player (no self-collide)
+					bool isPlayerProjectileHitsOwner =
+						(isProjectileA && isPlayerB &&
+						 entityManager.template GetComponent<ProjectileComponent>(idA).ownerEntityId == idB) ||
+						(isProjectileB && isPlayerA &&
+						 entityManager.template GetComponent<ProjectileComponent>(idB).ownerEntityId == idA);
+
+					if (!isPlayerProjectileHitsOwner &&
+						((isProjectileA && isPlayerB) || (isProjectileB && isPlayerA)))
 					{
 						EntityID projectileId = isProjectileA ? idA : idB;
 						EntityID playerId = isPlayerA ? idA : idB;

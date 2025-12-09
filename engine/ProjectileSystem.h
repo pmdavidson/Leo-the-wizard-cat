@@ -6,6 +6,7 @@
 #include "SpellComponent.h"
 #include "LocationComponent.h"
 #include "CollisionComponent.h"
+
 #include "SpriteComponent.h"
 #include "AnimationComponent.h"
 #include "SoundManager.h"
@@ -31,7 +32,8 @@ namespace ECSEngine
 
             // Collect entities to remove and explosions to spawn
             std::vector<EntityID> entitiesToRemove;
-            struct ExplosionSpawn {
+            struct ExplosionSpawn
+            {
                 Point2D position;
                 std::vector<SpriteID> frames;
                 float size;
@@ -85,13 +87,13 @@ namespace ECSEngine
                 {
                     PlayImpactSound(projectile.spellType, soundManager);
                     projectile.active = false;
-                    
+
                     // Queue explosion spawn
                     if (!projectile.explosionFrames.empty())
                     {
                         explosionsToSpawn.push_back({explosionPos, projectile.explosionFrames, projectile.explosionSize, projectile.spellType});
                     }
-                    
+
                     entitiesToRemove.push_back(entityId);
                     continue;
                 }
@@ -104,7 +106,7 @@ namespace ECSEngine
                     {
                         explosionsToSpawn.push_back({explosionPos, projectile.explosionFrames, projectile.explosionSize, projectile.spellType});
                     }
-                    
+
                     entitiesToRemove.push_back(entityId);
                     continue;
                 }
@@ -120,13 +122,13 @@ namespace ECSEngine
                     {
                         projectile.active = false;
                         PlayImpactSound(projectile.spellType, soundManager);
-                        
+
                         // Queue explosion spawn
                         if (!projectile.explosionFrames.empty())
                         {
                             explosionsToSpawn.push_back({explosionPos, projectile.explosionFrames, projectile.explosionSize, projectile.spellType});
                         }
-                        
+
                         entitiesToRemove.push_back(entityId);
                     }
                 }
@@ -136,17 +138,21 @@ namespace ECSEngine
             for (const auto &exp : explosionsToSpawn)
             {
                 EntityID explosionId = entityManager.CreateEntity("explosion");
-                
-                // Position explosion at projectile location
-                entityManager.template AddComponent<LocationComponent>(explosionId, LocationComponent(exp.position));
-                
+
+                // Center explosion on projectile position
+                Point2D centeredPos(
+                    exp.position.x - exp.size / 2.0f,
+                    exp.position.y - exp.size / 2.0f
+                );
+                entityManager.template AddComponent<LocationComponent>(explosionId, LocationComponent(centeredPos));
+
                 // Add sprite component
                 SpriteComponent explosionSprite;
                 explosionSprite.spriteId = exp.frames[0];
                 explosionSprite.bounds = Rect(0.0f, 0.0f, exp.size, exp.size);
                 explosionSprite.inWorldSpace = true;
                 entityManager.template AddComponent<SpriteComponent>(explosionId, explosionSprite);
-                
+
                 // Add animation component
                 AnimationComponent explosionAnim;
                 explosionAnim.animations["explosion"] = exp.frames;
@@ -155,7 +161,7 @@ namespace ECSEngine
                 explosionAnim.playing = true;
                 explosionAnim.looping = false;
                 entityManager.template AddComponent<AnimationComponent>(explosionId, explosionAnim);
-                
+
                 // Track explosion lifetime
                 float lifetime = explosionAnim.frameDuration * exp.frames.size();
                 explosionTimers[explosionId] = lifetime;
@@ -186,13 +192,13 @@ namespace ECSEngine
                 }
                 break;
             case SpellType::Water:
-                soundManager.PlaySound("water_impact");
+                soundManager.PlaySound("water_impact", 150.0f);
                 break;
             case SpellType::Wind:
                 soundManager.PlaySound("wind_impact");
                 break;
             case SpellType::Earth:
-                soundManager.PlaySound("earth_impact");
+                soundManager.PlaySound("earth_impact", 150.0f);
                 break;
             default:
                 break;

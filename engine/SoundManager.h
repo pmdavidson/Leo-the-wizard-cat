@@ -44,6 +44,14 @@ namespace ECSEngine
 		 */
 		void PlaySound(const std::string &soundName);
 
+		/**
+		 * @brief Plays a registered sound by name with specified volume.
+		 *
+		 * @param soundName The name identifier of the sound to play.
+		 * @param volume Volume level (0.0 = silent, 100.0 = full volume, can go higher for boost)
+		 */
+		void PlaySound(const std::string &soundName, float volume);
+
 	private:
 		std::unordered_map<std::string, sf::SoundBuffer> mSoundBuffers;
 		std::unordered_map<std::string, sf::Sound> mSounds;

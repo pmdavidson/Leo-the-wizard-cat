@@ -3,6 +3,8 @@
 #include "SystemManager.h"
 #include "Scene.h"
 #include "LocationComponent.h"
+#include "SpriteComponent.h"
+#include "InputComponent.h"
 
 namespace ECSEngine
 {
@@ -32,6 +34,19 @@ namespace ECSEngine
 					// Update position based on velocity
 					locationComp.position.x += movementComp.velocity.x * deltaTime;
 					locationComp.position.y += movementComp.velocity.y * deltaTime;
+					
+					// Update sprite flip based on velocity for entities without InputComponent
+					// (InputComponent entities are handled in InputSystem)
+					if (!entityManager.template HasComponent<InputComponent>(entityId) &&
+						entityManager.template HasComponent<SpriteComponent>(entityId))
+					{
+						auto &spriteComp = entityManager.template GetComponent<SpriteComponent>(entityId);
+						// Flip based on horizontal velocity direction
+						if (std::abs(movementComp.velocity.x) > 5.0f)
+						{
+							spriteComp.flipX = (movementComp.velocity.x < 0);
+						}
+					}
 				}
 			}
 

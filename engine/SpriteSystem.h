@@ -48,6 +48,7 @@ public:
 
             Rect dest;      // screen-space rect
             sf::IntRect texRect; // atlas rect
+            bool flipX = false; // Flip horizontally
         };
 
         std::vector<DrawItem> drawItems;
@@ -95,6 +96,7 @@ public:
             item.shaderName = spriteComp.shaderName;
             item.dest = screenRect;
             item.texRect = texRect;
+            item.flipX = spriteComp.flipX;
 
             drawItems.push_back(item);
         }
@@ -138,6 +140,12 @@ public:
                 float v0 = item.texRect.position.y;
                 float u1 = u0 + item.texRect.size.x;
                 float v1 = v0 + item.texRect.size.y;
+
+                // Flip UV coordinates horizontally if flipX is true
+                if (item.flipX)
+                {
+                    std::swap(u0, u1);
+                }
 
                 vertices.append(sf::Vertex({x,     y},     sf::Color::White, {u0, v0}));
                 vertices.append(sf::Vertex({x + w, y},     sf::Color::White, {u1, v0}));

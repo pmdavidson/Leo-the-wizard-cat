@@ -32,4 +32,18 @@ namespace ECSEngine
         }
     }
 
+    void SoundManager::PlaySound(const std::string &soundName, float volume)
+    {
+        auto it = mSounds.find(soundName);
+        if (it != mSounds.end())
+        {
+            it->second.setVolume(volume);
+            it->second.play();
+        }
+        else
+        {
+            std::cerr << "Sound not found: " << soundName << "\n";
+        }
+    }
+
 }

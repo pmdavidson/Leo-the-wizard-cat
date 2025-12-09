@@ -7,6 +7,7 @@
 #include "WindowManager.h"
 #include <cmath>
 #include <random>
+#include <unordered_map>
 
 namespace ECSEngine
 {
@@ -14,6 +15,10 @@ namespace ECSEngine
 	template <typename... Components>
 	class CameraSystem : public System<Components...>
 	{
+	private:
+		// Per-camera look-ahead state
+		std::unordered_map<EntityID, float> mLookAheadState;
+
 	public:
 		bool Run(Scene<Components...> &scene) override
 		{
@@ -54,36 +59,69 @@ namespace ECSEngine
 								float playerWindowX = (trackedLocation.position.x - cameraComp.position.x) / cameraComp.scale + windowWidth * 0.5f;
 								float playerXPercent = playerWindowX / windowWidth;
 
+								// Get movement direction and speed
 								bool isMoving = false;
+								float moveDirection = 0.0f; // -1 for left, 1 for right, 0 for stopped
 								if (entityManager.template HasComponent<MovementComponent>(trackedEntityId))
 								{
 									auto &movementComp = entityManager.template GetComponent<MovementComponent>(trackedEntityId);
 									isMoving = std::abs(movementComp.velocity.x) > 0.1f;
+									if (isMoving)
+									{
+										moveDirection = (movementComp.velocity.x > 0.0f) ? 1.0f : -1.0f;
+									}
 								}
+
+								// Look-ahead parameters
+								const float lookAheadDistance = 120.0f; // World units to look ahead (reduced for smoother feel)
+								const float lookAheadSmoothing = 5.0f;	// Smoothing speed for look-ahead (slower for smoother transitions)
+
+								// Calculate look-ahead offset based on movement direction (per-camera)
+								// Only apply look-ahead when moving
+								float &currentLookAhead = mLookAheadState[camEntityId];
+								float targetLookAhead = isMoving ? (moveDirection * lookAheadDistance) : 0.0f;
+								float lookAheadDelta = targetLookAhead - currentLookAhead;
+								float lerpFactor = 1.0f - std::exp(-lookAheadSmoothing * deltaTime);
+								currentLookAhead += lookAheadDelta * lerpFactor;
 
 								float targetCameraX = cameraComp.position.x;
 								float trackingSpeed = 0.0f;
 
-								if (playerXPercent < 0.1f)
+								// Hard zones: outer 5% (smaller than before)
+								if (playerXPercent < 0.05f)
 								{
-									targetCameraX = trackedLocation.position.x - (windowWidth * 0.1f - windowWidth * 0.5f) * cameraComp.scale;
+									targetCameraX = trackedLocation.position.x - (windowWidth * 0.05f - windowWidth * 0.5f) * cameraComp.scale;
 									trackingSpeed = 0.0f;
 								}
-								else if (playerXPercent > 0.9f)
+								else if (playerXPercent > 0.95f)
 								{
-									targetCameraX = trackedLocation.position.x - (windowWidth * 0.9f - windowWidth * 0.5f) * cameraComp.scale;
+									targetCameraX = trackedLocation.position.x - (windowWidth * 0.95f - windowWidth * 0.5f) * cameraComp.scale;
 									trackingSpeed = 0.0f;
 								}
-								else if (playerXPercent < 0.3f)
+								// Soft zones: 5-35% (left) and 65-95% (right)
+								// Apply reduced look-ahead in soft zones for smoother transitions
+								else if (playerXPercent < 0.35f)
 								{
-									targetCameraX = trackedLocation.position.x - (windowWidth * 0.3f - windowWidth * 0.5f) * cameraComp.scale;
+									targetCameraX = trackedLocation.position.x - (windowWidth * 0.35f - windowWidth * 0.5f) * cameraComp.scale;
+									// Apply reduced look-ahead (50%) in soft zones for smooth transition
+									if (isMoving)
+									{
+										targetCameraX += currentLookAhead * 0.5f;
+									}
 									trackingSpeed = 5.0f;
 								}
-								else if (playerXPercent > 0.7f)
+								else if (playerXPercent > 0.65f)
 								{
-									targetCameraX = trackedLocation.position.x - (windowWidth * 0.7f - windowWidth * 0.5f) * cameraComp.scale;
+									targetCameraX = trackedLocation.position.x - (windowWidth * 0.65f - windowWidth * 0.5f) * cameraComp.scale;
+									// Apply reduced look-ahead (50%) in soft zones for smooth transition
+									if (isMoving)
+									{
+										targetCameraX += currentLookAhead * 0.5f;
+									}
 									trackingSpeed = 5.0f;
 								}
+								// Dead zone: center 30% (35-65%, smaller than before)
+								// Apply look-ahead only in dead zone when moving
 								else
 								{
 									if (!isMoving)
@@ -91,7 +129,7 @@ namespace ECSEngine
 										float centerWindowX = windowWidth * 0.5f;
 										float distanceFromCenter = playerWindowX - centerWindowX;
 
-										if (std::abs(distanceFromCenter) > windowWidth * 0.2f)
+										if (std::abs(distanceFromCenter) > windowWidth * 0.15f) // Dead zone threshold smaller (was 0.2f)
 										{
 											targetCameraX = trackedLocation.position.x;
 											trackingSpeed = 3.0f;
@@ -103,7 +141,9 @@ namespace ECSEngine
 									}
 									else
 									{
-										targetCameraX = cameraComp.position.x;
+										// In dead zone and moving - apply look-ahead smoothly
+										targetCameraX = trackedLocation.position.x + currentLookAhead;
+										trackingSpeed = 4.0f; // Smooth follow with look-ahead
 									}
 								}
 

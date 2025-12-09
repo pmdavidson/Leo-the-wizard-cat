@@ -12,6 +12,7 @@
 #include <unordered_map>
 #include <array>
 #include <random>
+#include <iostream>
 
 namespace ECSEngine
 {
@@ -137,6 +138,7 @@ namespace ECSEngine
 
             std::array<sf::Keyboard::Scancode, 4> selectKeys = {scancode1, scancode2, scancode3, scancode4};
             std::array<SpellType, 4> spellTypes = {SpellType::Fire, SpellType::Water, SpellType::Wind, SpellType::Earth};
+            std::array<std::string, 4> spellNames = {"Fire", "Water", "Wind", "Rock"}; // Debug
 
             for (size_t i = 0; i < 4; ++i)
             {
@@ -153,6 +155,7 @@ namespace ECSEngine
                         spellComp.selectedSpell = spellTypes[i];
                         StartSwitchCooldown(spellComp);
                         PlaySwitchSound(spellTypes[i], soundManager);
+                        std::cout << "Element switched to: " << spellNames[i] << " (key " << (i + 1) << ")" << std::endl;
                     }
                 }
 
@@ -226,7 +229,10 @@ namespace ECSEngine
             entityManager.template AddComponent<ProjectileComponent>(projectileId, projectile);
 
             // Add CollisionComponent 
-            Rect collisionBounds(0.0f, 0.0f, props.size, props.size);
+            // Adjust collision box position based on facing direction
+            // When facing right (not flipped), offset left to align with sprite
+            float collisionOffsetX = (spellComp.facingDirection > 0) ? -props.size : 0.0f;
+            Rect collisionBounds(collisionOffsetX, 0.0f, props.size, props.size);
             CollisionComponent collision(collisionBounds, false);
             entityManager.template AddComponent<CollisionComponent>(projectileId, collision);
 
@@ -235,6 +241,7 @@ namespace ECSEngine
             sprite.spriteId = props.spriteId;
             sprite.bounds = Rect(0.0f, 0.0f, props.size, props.size);
             sprite.inWorldSpace = true;
+            sprite.flipX = (spellComp.facingDirection < 0);
             entityManager.template AddComponent<SpriteComponent>(projectileId, sprite);
 
             // Start cast cooldown

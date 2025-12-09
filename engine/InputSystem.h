@@ -13,6 +13,7 @@
 #include <unordered_map>
 #include <cmath>
 #include <random>
+#include <algorithm>
 
 namespace ECSEngine
 {
@@ -34,6 +35,8 @@ namespace ECSEngine
 			static std::unordered_map<EntityID, float> walkSoundTimer;
 			static std::unordered_map<EntityID, bool> wasCastPressed;
 			static std::unordered_map<EntityID, float> castAnimTimer;
+			// Track last input direction (A = -1, D = 1, default = 1 for right)
+			static std::unordered_map<EntityID, int> lastInputDirection;
 
 			for (auto it = entityManager.begin(); it != entityManager.end(); ++it)
 			{
@@ -63,12 +66,39 @@ namespace ECSEngine
 					if (scancodeA != sf::Keyboard::Scan::Unknown && static_cast<size_t>(scancodeA) < sf::Keyboard::ScancodeCount)
 					{
 						movingLeft = inputComp.keydown[static_cast<size_t>(scancodeA)];
+						// Update last input direction when A is pressed
+						if (movingLeft)
+							lastInputDirection[entityId] = -1;
 					}
 
 					bool movingRight = false;
 					if (scancodeD != sf::Keyboard::Scan::Unknown && static_cast<size_t>(scancodeD) < sf::Keyboard::ScancodeCount)
 					{
 						movingRight = inputComp.keydown[static_cast<size_t>(scancodeD)];
+						// Update last input direction when D is pressed
+						if (movingRight)
+							lastInputDirection[entityId] = 1;
+					}
+					
+					// Initialize last input direction if not set (default to right)
+					if (lastInputDirection.find(entityId) == lastInputDirection.end())
+					{
+						lastInputDirection[entityId] = 1;
+					}
+					
+					// Update sprite flip immediately when A or D is pressed (for all entities)
+					if (entityManager.template HasComponent<SpriteComponent>(entityId))
+					{
+						auto &spriteComp = entityManager.template GetComponent<SpriteComponent>(entityId);
+						// Flip based on last input direction (A = flip, D = no flip)
+						spriteComp.flipX = (lastInputDirection[entityId] < 0);
+					}
+					
+					// Update facing direction for entities with SpellComponent
+					if (entityManager.template HasComponent<SpellComponent>(entityId))
+					{
+						auto &spellComp = entityManager.template GetComponent<SpellComponent>(entityId);
+						spellComp.facingDirection = lastInputDirection[entityId];
 					}
 
 					// Check collision sides for wall jumping
@@ -298,51 +328,41 @@ namespace ECSEngine
 						}
 
 						// Spawn fireball
-						if (entityManager.template HasComponent<LocationComponent>(entityId))
+						if (entityManager.template HasComponent<LocationComponent>(entityId) &&
+							entityManager.template HasComponent<SpellComponent>(entityId))
 						{
 							auto &playerLoc = entityManager.template GetComponent<LocationComponent>(entityId);
+							auto &spellComp = entityManager.template GetComponent<SpellComponent>(entityId);
 							
-							// Determine facing direction based on movement or last direction
-							int facingDir = 1; // Default right
-							if (movingLeft && !movingRight)
-								facingDir = -1;
-							else if (movingRight && !movingLeft)
-								facingDir = 1;
-							
-							// Store facing direction for entities with SpellComponent
-							if (entityManager.template HasComponent<SpellComponent>(entityId))
-							{
-								auto &spellComp = entityManager.template GetComponent<SpellComponent>(entityId);
-								if (movingLeft && !movingRight)
-									spellComp.facingDirection = -1;
-								else if (movingRight && !movingLeft)
-									spellComp.facingDirection = 1;
-								facingDir = spellComp.facingDirection;
+							// Use last input direction for facing (sprite flip already updated above)
+							int facingDir = lastInputDirection[entityId]; // Use last input direction
 								
-								// Check cooldown
-								if (spellComp.castCooldown <= 0.0f)
+							// Check cooldown
+							if (spellComp.castCooldown <= 0.0f)
 								{
-									const auto &props = spellComp.spellProperties[static_cast<size_t>(SpellType::Fire)];
+									// Use the currently selected spell type
+									SpellType currentSpell = spellComp.selectedSpell;
+									const auto &props = spellComp.spellProperties[static_cast<size_t>(currentSpell)];
 									
 									// Calculate spawn position - spawn far enough to avoid colliding with player
-									// Player is 32x32, fireball collision is 28x28, need at least 32 offset
 									float spawnOffsetX = facingDir * 40.0f;
 									Point2D spawnPos = {
 										playerLoc.position.x + spawnOffsetX,
 										playerLoc.position.y
 									};
 
-									// Create fireball entity
-									EntityID fireballId = entityManager.CreateEntity("fireball");
+									// Create projectile entity
+									std::string spellName = this->GetSpellEntityName(currentSpell);
+									EntityID projectileId = entityManager.CreateEntity(spellName);
 
-									entityManager.template AddComponent<LocationComponent>(fireballId, LocationComponent(spawnPos));
+									entityManager.template AddComponent<LocationComponent>(projectileId, LocationComponent(spawnPos));
 
-									MovementComponent fireballMovement;
-									fireballMovement.velocity = Point2D(facingDir * props.speed, 0.0f);
-									entityManager.template AddComponent<MovementComponent>(fireballId, fireballMovement);
+									MovementComponent projectileMovement;
+									projectileMovement.velocity = Point2D(facingDir * props.speed, 0.0f);
+									entityManager.template AddComponent<MovementComponent>(projectileId, projectileMovement);
 
 									ProjectileComponent projectile;
-									projectile.spellType = SpellType::Fire;
+									projectile.spellType = currentSpell;
 									projectile.damage = props.damage;
 									projectile.lifetime = props.lifetime;
 									projectile.maxLifetime = props.lifetime;
@@ -350,31 +370,44 @@ namespace ECSEngine
 									projectile.active = true;
 									projectile.explosionFrames = props.explosionFrames;
 									projectile.explosionSize = props.explosionSize;
-									entityManager.template AddComponent<ProjectileComponent>(fireballId, projectile);
+									entityManager.template AddComponent<ProjectileComponent>(projectileId, projectile);
 
-									Rect collisionBounds(0.0f, 0.0f, props.size, props.size);
+									// Adjust collision box position based on facing direction
+									// When facing right (not flipped), offset left to align with sprite
+									float collisionOffsetX = (facingDir > 0) ? -props.size : 0.0f;
+									Rect collisionBounds(collisionOffsetX, 0.0f, props.size, props.size);
 									CollisionComponent collision(collisionBounds, false);
-									entityManager.template AddComponent<CollisionComponent>(fireballId, collision);
+									entityManager.template AddComponent<CollisionComponent>(projectileId, collision);
 
-									// Create fireball sprite
-									SpriteComponent fireballSprite;
-									fireballSprite.spriteId = props.spriteId;
-									fireballSprite.bounds = Rect(0.0f, 0.0f, 28.0f, 22.0f); // Actual fireball size
-									fireballSprite.inWorldSpace = true;
-									entityManager.template AddComponent<SpriteComponent>(fireballId, fireballSprite);
+									// Create projectile sprite
+									SpriteComponent projectileSprite;
+									projectileSprite.spriteId = props.spriteId;
+									projectileSprite.bounds = Rect(0.0f, 0.0f, props.size, props.size);
+									projectileSprite.inWorldSpace = true;
+									// Flip projectile sprite based on facing direction
+									projectileSprite.flipX = (facingDir < 0);
+									entityManager.template AddComponent<SpriteComponent>(projectileId, projectileSprite);
+
+									// Add flying animation if frames exist
+									if (!props.flyingFrames.empty())
+									{
+										AnimationComponent projectileAnim;
+										projectileAnim.animations["flying"] = props.flyingFrames;
+										projectileAnim.currentAnimation = "flying";
+										projectileAnim.frameDuration = 0.05f;
+										projectileAnim.playing = true;
+										projectileAnim.looping = true;
+										entityManager.template AddComponent<AnimationComponent>(projectileId, projectileAnim);
+									}
 
 									// Start cooldown
 									spellComp.castCooldown = props.cooldown;
 
-									// Play fire cast sound
-									static std::mt19937 rng(std::random_device{}());
-									std::uniform_int_distribution<int> dist(1, 2);
-									std::string soundName = "fire_cast_" + std::to_string(dist(rng));
-									soundManager.PlaySound(soundName);
+									// Play cast sound based on selected element
+									PlayCastSound(currentSpell, soundManager);
 								}
 							}
 						}
-					}
 
 					// Handle animation transitions back to idle/run
 					// Skip if we just triggered an action this frame
@@ -422,6 +455,52 @@ namespace ECSEngine
 			}
 
 			return true;
+		}
+
+	private:
+		// Get entity name for spell type
+		std::string GetSpellEntityName(SpellType type)
+		{
+			switch (type)
+			{
+			case SpellType::Fire:
+				return "fireball";
+			case SpellType::Water:
+				return "waterball";
+			case SpellType::Wind:
+				return "windball";
+			case SpellType::Earth:
+				return "rockarrow";
+			default:
+				return "spell";
+			}
+		}
+
+		// Play cast sound based on spell type
+		void PlayCastSound(SpellType type, SoundManager &soundManager)
+		{
+			switch (type)
+			{
+			case SpellType::Fire:
+				{
+					static std::mt19937 rng(std::random_device{}());
+					std::uniform_int_distribution<int> dist(1, 2);
+					std::string soundName = "fire_cast_" + std::to_string(dist(rng));
+					soundManager.PlaySound(soundName);
+				}
+				break;
+			case SpellType::Water:
+				soundManager.PlaySound("water_cast");
+				break;
+			case SpellType::Wind:
+				soundManager.PlaySound("wind_cast");
+				break;
+			case SpellType::Earth:
+				soundManager.PlaySound("earth_cast");
+				break;
+			default:
+				break;
+			}
 		}
 	};
 

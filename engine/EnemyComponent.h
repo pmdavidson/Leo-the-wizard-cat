@@ -3,6 +3,7 @@
 #include "MathUtil.h"
 #include "SpriteManager.h"
 #include "SpellComponent.h"
+#include <array>
 
 namespace ECSEngine
 {
@@ -38,6 +39,9 @@ namespace ECSEngine
 
         // For wizards - which element they use
         SpellType element = SpellType::Fire;
+
+        // Damage multipliers per spell type (1.0 = normal, <1 = resistant)
+        std::array<float, static_cast<size_t>(SpellType::Count)> resistances{};
 
         // Movement (for future use, enemies can move)
         bool canMove = false;

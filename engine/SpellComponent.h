@@ -28,9 +28,12 @@ namespace ECSEngine
         float size = 32.0f;
         SpriteID spriteId = 0;
         
+        // Flying animation frames
+        std::vector<SpriteID> flyingFrames;
+        
         // Explosion animation frames
         std::vector<SpriteID> explosionFrames;
-        float explosionSize = 32.0f;
+        float explosionSize = 64.0f;
     };
 
     // Used on player to track spell state
