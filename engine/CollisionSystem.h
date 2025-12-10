@@ -405,7 +405,7 @@ namespace ECSEngine
 								}
 							}
 						}
-					}
+					}					
 
 					// Handle projectile-enemy collisions (player projectiles hitting enemies)
 					if ((isProjectileA && isEnemyB) || (isProjectileB && isEnemyA))

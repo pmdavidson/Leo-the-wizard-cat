@@ -59,7 +59,6 @@ public:
 		window->display();  // required
 	}
 
-
 	bool IsComplete() const { return mStartGame; }
 
 private:

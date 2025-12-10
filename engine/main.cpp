@@ -916,7 +916,7 @@ int main(int argc, char *argv[])
 	spriteSystem.SetParallaxFactor(-1, 0.95f);
 	spriteSystem.SetParallaxFactor(0, 1.0f);
 	spriteSystem.SetParallaxFactor(1, 1.0f);
-	spriteSystem.SetParallaxFactor(2, 1.1f);
+	spriteSystem.SetParallaxFactor(2, 1.0f);
 	spriteSystem.SetParallaxFactor(3, 1.2f);
 
 	// Load maps into the scene
@@ -936,9 +936,9 @@ int main(int argc, char *argv[])
 	engine.PushScene(scene);
 
 	// Push menu scene (it will run first)
-	using GameMainMenu = UnpackMainMenuScene<GameComponents>::type;
-	auto mainMenu = std::make_shared<GameMainMenu>(scene->GetWindow());
-	engine.PushScene(mainMenu);
+	// using GameMainMenu = UnpackMainMenuScene<GameComponents>::type;
+	// auto mainMenu = std::make_shared<GameMainMenu>(scene->GetWindow());
+	// engine.PushScene(mainMenu);
 
 	// Run the game loop
 	engine.Run();

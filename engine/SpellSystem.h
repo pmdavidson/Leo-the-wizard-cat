@@ -79,6 +79,21 @@ namespace ECSEngine
                     {
                         hpComp.hasRockShield = false;
                     }
+
+                    // // Check if we just switched TO water
+                    // bool justSwitchedToWater = (spellComp.selectedSpell == SpellType::Water) && 
+                    //                           (prevSpell != SpellType::Water);
+                    
+                    // // Activate walk on water only when switching to water
+                    // if (justSwitchedToWater)
+                    // {
+                    //     hpComp.canWalkonWater = true;
+                    // }
+                    // // Deactivate shield when switching away from rock
+                    // else if (spellComp.selectedSpell != SpellType::Water && hpComp.canWalkonWater)
+                    // {
+                    //     hpComp.canWalkonWater = false;
+                    // }
                     
                     // Track current spell for next frame
                     mPrevSelectedSpell[entityId] = spellComp.selectedSpell;
