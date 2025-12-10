@@ -9,6 +9,7 @@
 #include "SpellComponent.h"
 #include "ProjectileComponent.h"
 #include "SpriteComponent.h"
+#include "HpComponent.h"
 #include "SoundManager.h"
 #include <unordered_map>
 #include <cmath>
@@ -47,6 +48,16 @@ namespace ECSEngine
 				if (entityManager.template HasComponent<InputComponent>(entityId) &&
 					entityManager.template HasComponent<MovementComponent>(entityId))
 				{
+					// Skip input processing if player is dead or dying
+					if (entityManager.template HasComponent<HpComponent>(entityId))
+					{
+						auto &hpComp = entityManager.template GetComponent<HpComponent>(entityId);
+						if (!hpComp.isAlive || hpComp.isDying)
+						{
+							continue; // Skip all input processing during death
+						}
+					}
+
 					auto &inputComp = entityManager.template GetComponent<InputComponent>(entityId);
 					auto &movementComp = entityManager.template GetComponent<MovementComponent>(entityId);
 
@@ -122,26 +133,14 @@ namespace ECSEngine
 							recentlyJumped[entityId] = false;
 						}
 
-						// Play wall push sound when hitting a wall
+						// Track wall push state (no sound)
 						if ((onWallLeft || onWallRight) && 
 							((onWallLeft && (movingLeft || movementComp.velocity.x < -10.0f)) ||
 							 (onWallRight && (movingRight || movementComp.velocity.x > 10.0f)) ||
 							 (wasFalling && !onGround)))
 						{
-							if (!wasPushingWall[entityId])
-								soundManager.PlaySound("wall_push");
 							wasPushingWall[entityId] = true;
 						}
-						// wall push sound but this also registers stars so not good
-						// else if ((onWallLeft || onWallRight) && !wasFalling && onGround)
-						// {
-						// 	bool wasPushingWallLastFrame = wasPushingWall[entityId];
-						// 	if (!wasPushingWallLastFrame)
-						// 	{
-						// 		soundManager.PlaySound("wall_push");
-						// 	}
-						// 	wasPushingWall[entityId] = true;
-						// }
 						else
 						{
 							wasPushingWall[entityId] = false;
@@ -257,7 +256,6 @@ namespace ECSEngine
 								movementComp.velocity.x = -wallJumpVelocityX;
 							}
 							movementComp.velocity.y = wallJumpVelocityY;
-							soundManager.PlaySound("wall_push");
 							recentlyJumped[entityId] = true;
 							justJumped = true;
 							
@@ -412,65 +410,81 @@ namespace ECSEngine
 
 					// Handle animation transitions back to idle/run
 					// Skip if we just triggered an action this frame
-					if (!justJumped && !justCast && entityManager.template HasComponent<AnimationComponent>(entityId))
+					// Also skip if player is dead or dying
+					bool isDeadOrDying = false;
+					if (entityManager.template HasComponent<HpComponent>(entityId))
+					{
+						auto &hpComp = entityManager.template GetComponent<HpComponent>(entityId);
+						isDeadOrDying = !hpComp.isAlive || hpComp.isDying;
+					}
+					
+					if (!justJumped && !justCast && !isDeadOrDying && entityManager.template HasComponent<AnimationComponent>(entityId))
 					{
 						auto &anim = entityManager.template GetComponent<AnimationComponent>(entityId);
 						
-						// If casting animation is done
-						bool castingDone = castAnimTimer[entityId] <= 0.0f;
-						bool isCasting = anim.currentAnimation == "magic" && !castingDone;
-						// Consider jumping if in air OR if we recently jumped (to catch first frame)
-						bool isJumping = anim.currentAnimation == "jump" && (!onGround || recentlyJumped[entityId]);
-						// If hurt animation finished (not playing and not looping), return to idle/run
-						bool hurtFinished = anim.currentAnimation == "hurt" && !anim.playing;
-						
-						// Return to idle/run after hurt animation finishes
-						if (hurtFinished)
+						// Don't interrupt death animation
+						if (anim.currentAnimation == "death")
 						{
-							if (onGround && (movingLeft || movingRight))
-							{
-								// Running on ground
-								if (anim.animations.count("run") > 0)
-								{
-									anim.Play("run", true);
-								}
-							}
-							else if (onGround)
-							{
-								// Idle on ground
-								if (anim.animations.count("idle") > 0)
-								{
-									anim.Play("idle", true);
-								}
-							}
+							// Skip all animation transitions during death
 						}
-						
-						// Don't interrupt casting, jumping, or hurt animations
-						if (!isCasting && !isJumping && !hurtFinished)
+						else
 						{
-							// Transition to appropriate animation based on state
-							if (!onGround)
+							// If casting animation is done
+							bool castingDone = castAnimTimer[entityId] <= 0.0f;
+							bool isCasting = anim.currentAnimation == "magic" && !castingDone;
+							// Consider jumping if in air OR if we recently jumped (to catch first frame)
+							bool isJumping = anim.currentAnimation == "jump" && (!onGround || recentlyJumped[entityId]);
+							// If hurt animation finished (not playing and not looping), return to idle/run
+							bool hurtFinished = anim.currentAnimation == "hurt" && !anim.playing;
+							
+							// Return to idle/run after hurt animation finishes
+							if (hurtFinished)
 							{
-								// In air - show jump animation
-								if (anim.currentAnimation != "jump" && anim.animations.count("jump") > 0)
+								if (onGround && (movingLeft || movingRight))
 								{
-									anim.Play("jump", false);
+									// Running on ground
+									if (anim.animations.count("run") > 0)
+									{
+										anim.Play("run", true);
+									}
+								}
+								else if (onGround)
+								{
+									// Idle on ground
+									if (anim.animations.count("idle") > 0)
+									{
+										anim.Play("idle", true);
+									}
 								}
 							}
-							else if (movingLeft || movingRight)
+							
+							// Don't interrupt casting, jumping, or hurt animations
+							if (!isCasting && !isJumping && !hurtFinished)
 							{
-								// Running on ground
-								if (anim.currentAnimation != "run" && anim.animations.count("run") > 0)
+								// Transition to appropriate animation based on state
+								if (!onGround)
 								{
-									anim.Play("run", true);
+									// In air - show jump animation
+									if (anim.currentAnimation != "jump" && anim.animations.count("jump") > 0)
+									{
+										anim.Play("jump", false);
+									}
 								}
-							}
-							else
-							{
-								// Idle on ground
-								if (anim.currentAnimation != "idleA" && anim.animations.count("idleA") > 0)
+								else if (movingLeft || movingRight)
 								{
-									anim.Play("idleA", true);
+									// Running on ground
+									if (anim.currentAnimation != "run" && anim.animations.count("run") > 0)
+									{
+										anim.Play("run", true);
+									}
+								}
+								else
+								{
+									// Idle on ground
+									if (anim.currentAnimation != "idleA" && anim.animations.count("idleA") > 0)
+									{
+										anim.Play("idleA", true);
+									}
 								}
 							}
 						}

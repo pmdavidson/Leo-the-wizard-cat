@@ -6,8 +6,12 @@
 #include "LocationComponent.h"
 #include "AnimationComponent.h"
 #include "SpriteComponent.h"
+#include "CollisionComponent.h"
 #include "SoundManager.h"
 #include <vector>
+#include <random>
+#include <unordered_map>
+#include <cmath>
 
 namespace ECSEngine
 {
@@ -35,6 +39,14 @@ namespace ECSEngine
                     continue;
 
                 auto &enemy = entityManager.template GetComponent<EnemyComponent>(entityId);
+
+                // Tick damage flash timer
+                if (enemy.damageFlashTimer > 0.0f)
+                {
+                    enemy.damageFlashTimer -= deltaTime;
+                    if (enemy.damageFlashTimer < 0.0f)
+                        enemy.damageFlashTimer = 0.0f;
+                }
 
                 // Check if enemy took damage (for hurt animation)
                 if (enemy.hp < enemy.previousHp && enemy.isAlive && !enemy.isDying)
@@ -113,6 +125,90 @@ namespace ECSEngine
                         if (anim.animations.count("idle") > 0)
                         {
                             anim.Play("idle", true);
+                        }
+                    }
+                }
+
+                // Handle slime random movement
+                if (enemy.isAlive && !enemy.isDying && enemy.type == EnemyType::Slime && enemy.canMove)
+                {
+                    // Check for wall collisions and reverse direction if needed
+                    // Only reverse if colliding with static objects (walls)
+                    static std::unordered_map<EntityID, Point2D> lastPositions;
+                    if (entityManager.template HasComponent<LocationComponent>(entityId) &&
+                        entityManager.template HasComponent<CollisionComponent>(entityId))
+                    {
+                        auto &location = entityManager.template GetComponent<LocationComponent>(entityId);
+                        auto &collision = entityManager.template GetComponent<CollisionComponent>(entityId);
+                        Point2D currentPos = location.position;
+                        
+                        if (lastPositions.find(entityId) != lastPositions.end())
+                        {
+                            Point2D lastPos = lastPositions[entityId];
+                            float expectedMovement = enemy.moveDirection * enemy.moveSpeed * deltaTime;
+                            float actualMovement = currentPos.x - lastPos.x;
+                            
+                            // If we're trying to move but haven't moved, we hit a wall
+                            if (std::abs(actualMovement) < std::abs(expectedMovement) * 0.5f && std::abs(expectedMovement) > 0.1f)
+                            {
+                                // Check collision sides to determine which wall we hit
+                                if (collision.collidedSides.left && enemy.moveDirection < 0.0f)
+                                {
+                                    enemy.moveDirection = 1.0f; // Move right
+                                    enemy.directionChangeTimer = enemy.directionChangeInterval; // Reset timer
+                                }
+                                else if (collision.collidedSides.right && enemy.moveDirection > 0.0f)
+                                {
+                                    enemy.moveDirection = -1.0f; // Move left
+                                    enemy.directionChangeTimer = enemy.directionChangeInterval; // Reset timer
+                                }
+                            }
+                        }
+                        lastPositions[entityId] = currentPos;
+                    }
+                    
+                    // Update direction change timer
+                    enemy.directionChangeTimer -= deltaTime;
+                    
+                    // Change direction randomly when timer expires
+                    if (enemy.directionChangeTimer <= 0.0f)
+                    {
+                        static std::mt19937 rng(std::random_device{}());
+                        std::uniform_real_distribution<float> dist(0.0f, 1.0f);
+                        
+                        // Randomly choose left or right
+                        enemy.moveDirection = (dist(rng) < 0.5f) ? -1.0f : 1.0f;
+                        
+                        // Set next direction change time (1-3 seconds)
+                        std::uniform_real_distribution<float> timeDist(1.0f, 3.0f);
+                        enemy.directionChangeTimer = timeDist(rng);
+                    }
+                    
+                    // Apply movement directly to position
+                    if (entityManager.template HasComponent<LocationComponent>(entityId))
+                    {
+                        auto &location = entityManager.template GetComponent<LocationComponent>(entityId);
+                        location.position.x += enemy.moveDirection * enemy.moveSpeed * deltaTime;
+                    }
+                    
+                    // Flip sprite based on movement direction
+                    if (entityManager.template HasComponent<SpriteComponent>(entityId))
+                    {
+                        auto &sprite = entityManager.template GetComponent<SpriteComponent>(entityId);
+                        sprite.flipX = (enemy.moveDirection < 0.0f);
+                    }
+                    
+                    // Play idle animation while moving
+                    if (entityManager.template HasComponent<AnimationComponent>(entityId))
+                    {
+                        auto &anim = entityManager.template GetComponent<AnimationComponent>(entityId);
+                        // Only play idle if not playing hurt or death animation
+                        if (anim.currentAnimation != "hurt" && anim.currentAnimation != "death" && anim.animations.count("idle") > 0)
+                        {
+                            if (anim.currentAnimation != "idle")
+                            {
+                                anim.Play("idle", true);
+                            }
                         }
                     }
                 }

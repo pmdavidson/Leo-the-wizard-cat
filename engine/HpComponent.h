@@ -29,10 +29,24 @@ namespace ECSEngine
         // Flag to check if player is alive
         bool isAlive = true;
 
+        // Death animation state
+        bool isDying = false; // Playing death animation
+        float deathAnimTimer = 0.0f; // Time until restart after death animation
+
+        // Initial spawn position for game restart
+        Point2D initialSpawnPosition = Point2D(0.0f, 0.0f);
+
+        // Damage flash effect
+        float damageFlashTimer = 0.0f; // Timer for red screen flash when taking damage
+        float damageFlashDuration = 0.2f; // Duration of the flash effect
+
+        // Rock shield (brown shader that absorbs 1 hit)
+        bool hasRockShield = false; // True when rock element is selected and shield is active
+
         HpComponent() = default;
 
         HpComponent(int hp, SpriteID fullHeart, SpriteID emptyHeart)
-            : currentHp(hp), maxHp(hp), heartFullSpriteId(fullHeart), heartEmptySpriteId(emptyHeart) {}
+            : currentHp(hp), maxHp(hp), previousHp(hp), heartFullSpriteId(fullHeart), heartEmptySpriteId(emptyHeart) {}
     };
 
 } // namespace ECSEngine
