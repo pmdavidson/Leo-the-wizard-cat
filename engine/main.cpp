@@ -304,23 +304,6 @@ void LoadMap(const std::string &path, SceneType &scene)
 
 		// Extract layer number from filename (e.g., "_swamp_sky_-3.png" -> -3)
 		// The layer is the last number before .png
-		std::string filename = entry.texturePath;
-		size_t lastUnderscore = filename.find_last_of('_');
-		size_t dotPos = filename.find_last_of('.');
-		if (lastUnderscore != std::string::npos && dotPos != std::string::npos && lastUnderscore < dotPos)
-		{
-			std::string layerStr = filename.substr(lastUnderscore + 1, dotPos - lastUnderscore - 1);
-			try
-			{
-				entry.layer = std::stoi(layerStr);
-			}
-			catch (...)
-			{
-				// If parsing fails, use default layer 1
-				entry.layer = 1;
-			}
-		}
-
 		entry.texturePath = gResourcePath + "sprites/" + entry.texturePath;
 		entry.sourceRect = sf::IntRect(
 			sf::Vector2i(sx, sy),
@@ -338,10 +321,38 @@ void LoadMap(const std::string &path, SceneType &scene)
 			if (bx == 0 && by == 0 && bw == 0 && bh == 0)
 			{
 				entry.hasCollision = false;
+				// Decorative elements (no collision) should be on layer 0 (behind world tiles)
+				entry.layer = 0;
 			}
 			else
 			{
 				entry.hasCollision = true;
+				// Ground tiles (with collision) should be on layer 1 (world tiles)
+				entry.layer = 1;
+			}
+		}
+		else
+		{
+			// Dictionary type 1: extract layer from filename
+			std::string filename = entry.texturePath;
+			size_t lastUnderscore = filename.find_last_of('_');
+			size_t dotPos = filename.find_last_of('.');
+			if (lastUnderscore != std::string::npos && dotPos != std::string::npos && lastUnderscore < dotPos)
+			{
+				std::string layerStr = filename.substr(lastUnderscore + 1, dotPos - lastUnderscore - 1);
+				try
+				{
+					entry.layer = std::stoi(layerStr);
+				}
+				catch (...)
+				{
+					// If parsing fails, use default layer 1
+					entry.layer = 1;
+				}
+			}
+			else
+			{
+				entry.layer = 1;
 			}
 		}
 
@@ -413,9 +424,10 @@ void LoadMap(const std::string &path, SceneType &scene)
 	// Make Player after everything else has been made
 	if (dictionaryType == 2)
 	{
-		// Spawn position
-		float spawnX = tileW * 8;
-		float spawnY = tileH * 3;
+		// Spawn position - account for map origin and align collision box bottom with tile top
+		// Player collision box is 28 pixels tall, so subtract that to align bottom with tile top
+		float spawnX = originX + tileW * 8;
+		float spawnY = originY + tileH * 3 - 28.0f; // Subtract collision height to align bottom with tile top
 
 		// Update all SpawnComponents with slime animations
 		for (auto it = scene.GetEntityManager().begin(); it != scene.GetEntityManager().end(); ++it)
@@ -492,7 +504,7 @@ void LoadMap(const std::string &path, SceneType &scene)
 		waterProps.speed = 350.0f;
 		waterProps.cooldown = 0.6f;
 		waterProps.lifetime = 200.0f;
-		waterProps.size = 32.0f;
+		waterProps.size = 28.0f;
 
 		// Register waterball flying animation frames (1-3)
 		for (int i = 1; i <= 3; ++i)
@@ -520,7 +532,7 @@ void LoadMap(const std::string &path, SceneType &scene)
 		earthProps.speed = 300.0f;
 		earthProps.cooldown = 0.8f;
 		earthProps.lifetime = 180.0f;
-		earthProps.size = 32.0f;
+		earthProps.size = 28.0f;
 
 		// Register rockarrow flying animation frames (1-8)
 		for (int i = 1; i <= 8; ++i)
@@ -613,37 +625,56 @@ void LoadMap(const std::string &path, SceneType &scene)
 		// }
 
 		// Set up HP display system (hearts)
-		// Register heart sprites
-		// SpriteID heartFullSpriteId = scene.GetSpriteManager().RegisterTexture(
-		// 	gResourcePath + "sprites/heart_idle_0.png", ECSEngine::Rect(0.f, 0.f, 32.f, 32.f));
-		// SpriteID heartEmptySpriteId = scene.GetSpriteManager().RegisterTexture(
-		// 	gResourcePath + "sprites/heart_empty_0.png", ECSEngine::Rect(0.f, 0.f, 32.f, 32.f));
+		// Register heart sprites - load images first to get actual dimensions
+		sf::Image heartFullImg;
+		if (!heartFullImg.loadFromFile(gResourcePath + "sprites/heart_idle_0.png"))
+		{
+			std::cerr << "Failed to load heart_idle_0.png\n";
+		}
+		float heartWidth = static_cast<float>(heartFullImg.getSize().x);
+		float heartHeight = static_cast<float>(heartFullImg.getSize().y);
+		SpriteID heartFullSpriteId = scene.GetSpriteManager().RegisterTexture(
+			gResourcePath + "sprites/heart_idle_0.png", ECSEngine::Rect(0.f, 0.f, heartWidth, heartHeight));
+		
+		sf::Image heartEmptyImg;
+		if (!heartEmptyImg.loadFromFile(gResourcePath + "sprites/heart_empty_0.png"))
+		{
+			std::cerr << "Failed to load heart_empty_0.png\n";
+		}
+		float heartEmptyWidth = static_cast<float>(heartEmptyImg.getSize().x);
+		float heartEmptyHeight = static_cast<float>(heartEmptyImg.getSize().y);
+		SpriteID heartEmptySpriteId = scene.GetSpriteManager().RegisterTexture(
+			gResourcePath + "sprites/heart_empty_0.png", ECSEngine::Rect(0.f, 0.f, heartEmptyWidth, heartEmptyHeight));
 
-		// // Create HpComponent for player
-		// ECSEngine::HpComponent hpComp(3, heartFullSpriteId, heartEmptySpriteId);
+		// Create HpComponent for player (3 hearts total)
+		ECSEngine::HpComponent hpComp(3, heartFullSpriteId, heartEmptySpriteId);
 
-		// // Create 3 heart display entities at top left (below score)
-		// const float heartSize = 32.f;
-		// const float heartStartX = 20.f;
-		// const float heartStartY = 60.f; // Below the score display
+		// Create 5 heart display entities at top left
+		// Scale hearts to be larger (1.5x size)
+		const float heartScale = 1.5f;
+		const float heartDisplayWidth = heartWidth * heartScale;
+		const float heartDisplayHeight = heartHeight * heartScale;
+		const float heartStartX = 20.f;
+		const float heartStartY = 20.f; // Top left corner
 
-		// for (int i = 0; i < 3; ++i)
-		// {
-		// 	EntityId heartEntity = scene.GetEntityManager().CreateEntity("heart_" + std::to_string(i));
+		for (int i = 0; i < 5; ++i)
+		{
+			EntityId heartEntity = scene.GetEntityManager().CreateEntity("heart_" + std::to_string(i));
 
-		// 	scene.GetEntityManager().template AddComponent<ECSEngine::LocationComponent>(
-		// 		heartEntity,
-		// 		ECSEngine::LocationComponent(ECSEngine::Point2D(heartStartX + i * heartSize, heartStartY)));
+			scene.GetEntityManager().template AddComponent<ECSEngine::LocationComponent>(
+				heartEntity,
+				ECSEngine::LocationComponent(ECSEngine::Point2D(heartStartX + i * heartDisplayWidth, heartStartY)));
 
-		// 	// Initialize with full heart sprite (inWorldSpace = false for UI)
-		// 	scene.GetEntityManager().template AddComponent<ECSEngine::SpriteComponent>(
-		// 		heartEntity,
-		// 		{heartFullSpriteId, ECSEngine::Rect(0.f, 0.f, heartSize, heartSize), false});
+			// Initialize with full heart sprite (inWorldSpace = false for UI)
+			// Use scaled size for display
+			scene.GetEntityManager().template AddComponent<ECSEngine::SpriteComponent>(
+				heartEntity,
+				{heartFullSpriteId, ECSEngine::Rect(0.f, 0.f, heartDisplayWidth, heartDisplayHeight), false});
 
-		// 	hpComp.heartDisplayEntityIds.push_back(heartEntity);
-		// }
+			hpComp.heartDisplayEntityIds.push_back(heartEntity);
+		}
 
-		// scene.GetEntityManager().template AddComponent<ECSEngine::HpComponent>(player, hpComp);
+		scene.GetEntityManager().template AddComponent<ECSEngine::HpComponent>(player, hpComp);
 
 		// // Set up checkpoint system
 		// ECSEngine::CheckpointComponent checkpointComp(ECSEngine::Point2D(spawnX, spawnY));
@@ -768,9 +799,9 @@ int main(int argc, char *argv[])
 	spriteSystem.SetParallaxFactor(-3, 0.85f);
 	spriteSystem.SetParallaxFactor(-2, 0.90f);
 	spriteSystem.SetParallaxFactor(-1, 0.95f);
-	spriteSystem.SetParallaxFactor(0, 0.98f);
-	spriteSystem.SetParallaxFactor(1, 1.0f);
-	spriteSystem.SetParallaxFactor(2, 1.1f);
+	spriteSystem.SetParallaxFactor(0, 1.0f);  // World tiles (decorative) - no parallax
+	spriteSystem.SetParallaxFactor(1, 1.0f);  // World tiles (ground) - no parallax
+	spriteSystem.SetParallaxFactor(2, 1.0f); // Props/enemies/spells - align with collisions
 	spriteSystem.SetParallaxFactor(3, 1.2f);
 
 	// Load maps into the scene

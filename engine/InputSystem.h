@@ -384,6 +384,7 @@ namespace ECSEngine
 									projectileSprite.spriteId = props.spriteId;
 									projectileSprite.bounds = Rect(0.0f, 0.0f, props.size, props.size);
 									projectileSprite.inWorldSpace = true;
+									projectileSprite.layer = 2; // Spells should be on layer 2 (just above world)
 									// Flip projectile sprite based on facing direction
 									projectileSprite.flipX = (facingDir < 0);
 									entityManager.template AddComponent<SpriteComponent>(projectileId, projectileSprite);
@@ -420,9 +421,32 @@ namespace ECSEngine
 						bool isCasting = anim.currentAnimation == "magic" && !castingDone;
 						// Consider jumping if in air OR if we recently jumped (to catch first frame)
 						bool isJumping = anim.currentAnimation == "jump" && (!onGround || recentlyJumped[entityId]);
+						// If hurt animation finished (not playing and not looping), return to idle/run
+						bool hurtFinished = anim.currentAnimation == "hurt" && !anim.playing;
 						
-						// Don't interrupt casting or jumping animations
-						if (!isCasting && !isJumping)
+						// Return to idle/run after hurt animation finishes
+						if (hurtFinished)
+						{
+							if (onGround && (movingLeft || movingRight))
+							{
+								// Running on ground
+								if (anim.animations.count("run") > 0)
+								{
+									anim.Play("run", true);
+								}
+							}
+							else if (onGround)
+							{
+								// Idle on ground
+								if (anim.animations.count("idle") > 0)
+								{
+									anim.Play("idle", true);
+								}
+							}
+						}
+						
+						// Don't interrupt casting, jumping, or hurt animations
+						if (!isCasting && !isJumping && !hurtFinished)
 						{
 							// Transition to appropriate animation based on state
 							if (!onGround)

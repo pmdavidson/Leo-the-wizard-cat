@@ -53,8 +53,13 @@ namespace ECSEngine
 											  static_cast<float>(textureRect.size.x),
 											  static_cast<float>(textureRect.size.y));
 
-							// Slimes are 96x32, collision box is narrower and centered
-							Rect collisionBounds = {19.0f, 0.0f, 58.0f, 32.0f};
+							// Slimes are 96x32, collision box is narrower and shorter
+							// Collision box: tighter fit around the slime
+							float collisionWidth = 40.0f;
+							float collisionHeight = 20.0f;
+							float collisionOffsetX = (96.0f - collisionWidth) * 0.5f; // Center the collision box horizontally
+							float collisionOffsetY = (32.0f - collisionHeight) * 0.5f; // Center the collision box vertically
+							Rect collisionBounds = {collisionOffsetX, collisionOffsetY, collisionWidth, collisionHeight};
 
 							EntityID slimeId = entityManager.CreateEntity("slime");
 
@@ -73,10 +78,12 @@ namespace ECSEngine
 							slimeCollision.previousBounds = collisionBounds;
 							entityManager.template AddComponent<CollisionComponent>(slimeId, slimeCollision);
 
+							float spriteOffsetY = collisionOffsetY + collisionHeight - 32.0f;
 							SpriteComponent slimeSprite;
 							slimeSprite.spriteId = spawnComp.spriteId;
-							slimeSprite.bounds = spriteBounds;
+							slimeSprite.bounds = Rect(0.0f, spriteOffsetY, spriteBounds.width, spriteBounds.height);
 							slimeSprite.inWorldSpace = true;
+							slimeSprite.layer = 2; // Enemies should be on layer 2 (just above world)
 							entityManager.template AddComponent<SpriteComponent>(slimeId, slimeSprite);
 
 							// Add EnemyComponent for slime

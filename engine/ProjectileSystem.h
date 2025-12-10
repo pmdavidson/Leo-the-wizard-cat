@@ -146,12 +146,13 @@ namespace ECSEngine
                 );
                 entityManager.template AddComponent<LocationComponent>(explosionId, LocationComponent(centeredPos));
 
-                // Add sprite component
-                SpriteComponent explosionSprite;
-                explosionSprite.spriteId = exp.frames[0];
-                explosionSprite.bounds = Rect(0.0f, 0.0f, exp.size, exp.size);
-                explosionSprite.inWorldSpace = true;
-                entityManager.template AddComponent<SpriteComponent>(explosionId, explosionSprite);
+				// Add sprite component
+				SpriteComponent explosionSprite;
+				explosionSprite.spriteId = exp.frames[0];
+				explosionSprite.bounds = Rect(0.0f, 0.0f, exp.size, exp.size);
+				explosionSprite.inWorldSpace = true;
+				explosionSprite.layer = 2; // Explosions should be on layer 2 (just above world)
+				entityManager.template AddComponent<SpriteComponent>(explosionId, explosionSprite);
 
                 // Add animation component
                 AnimationComponent explosionAnim;
