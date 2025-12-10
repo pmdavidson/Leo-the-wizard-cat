@@ -130,140 +130,6 @@ ECSEngine::Rect FromSFML(const sf::IntRect &r)
 template <typename SceneType>
 void LoadMap(const std::string &path, SceneType &scene)
 {
-
-	// REGISTER NON-MAP THINGS
-	std::vector<std::filesystem::path> paths;
-	for (const auto &f : std::filesystem::directory_iterator(std::filesystem::path{gResourcePath + "sprites/"}))
-	{
-		if (std::filesystem::is_regular_file(f) && f.path().extension().string() == ".png")
-		{
-			paths.push_back(f.path());
-		}
-	}
-
-	// campfire is in map too so no need to handle here, projectiles are made dynamically not pre-made
-	EntityId player = scene.GetEntityManager().CreateEntity("player");
-	EntityId blueSlime = scene.GetEntityManager().CreateEntity("blueSlime");
-	EntityId redSlime = scene.GetEntityManager().CreateEntity("redSlime");
-	EntityId greenSlime = scene.GetEntityManager().CreateEntity("greenSlime");
-	EntityId brownSlime = scene.GetEntityManager().CreateEntity("brownSlime");
-
-	SpriteID blueSlimeSpriteId = 0;
-	bool first = true;
-
-	// Animation components to accumulate frames BEFORE adding to entities
-	ECSEngine::AnimationComponent catAnim;
-	ECSEngine::AnimationComponent blueSlimeAnimComp;
-	ECSEngine::AnimationComponent redSlimeAnimComp;
-	ECSEngine::AnimationComponent greenSlimeAnimComp;
-	ECSEngine::AnimationComponent brownSlimeAnimComp;
-
-	// Track first sprite and bounds for each entity
-	SpriteID catFirstSprite = 0;
-	ECSEngine::Rect catBounds;
-	bool catHasSprite = false;
-
-	for (const auto &path : paths)
-	{
-		std::string filename = path.stem().string(); // no .png extension
-		std::vector<std::string> parts;
-		std::stringstream ss(filename);
-		std::string part;
-
-		std::filesystem::path spritesDir = gResourcePath + "sprites";
-		std::filesystem::path fullpath = spritesDir / path.filename();
-
-		sf::Image original;
-		if (!original.loadFromFile(fullpath))
-		{
-			std::cerr << "Failed to load image: " << fullpath << "\n";
-			continue;
-		}
-
-		while (std::getline(ss, part, '_'))
-		{
-			parts.push_back(part);
-		}
-
-		// blueSlime_idle_0
-		// background things have _ at the front _swamp_bg_1.png
-
-		if (parts.size() >= 3)
-		{
-			std::string name = parts[0];	  // "cat" or "blueSlime"
-			std::string animation = parts[1]; // "idleA", "run", "idle", "hurt", "death", etc.
-
-			// Use image size
-			float imgWidth = static_cast<float>(original.getSize().x);
-			float imgHeight = static_cast<float>(original.getSize().y);
-			ECSEngine::Rect imgRect(ECSEngine::Point2D(0, 0), imgWidth, imgHeight);
-
-			if (name == "cat")
-			{
-				SpriteID spriteId = scene.GetSpriteManager().RegisterTexture(fullpath, imgRect);
-
-				// Add frame to animation map (accumulate, don't overwrite)
-				catAnim.animations[animation].push_back(spriteId);
-
-				// Track first sprite for initial display
-				if (!catHasSprite)
-				{
-					catFirstSprite = spriteId;
-					catBounds = imgRect;
-					catHasSprite = true;
-				}
-			}
-			else if (name == "blueSlime")
-			{
-				SpriteID spriteId = scene.GetSpriteManager().RegisterTexture(fullpath, imgRect);
-
-				// Add frame to animation map
-				blueSlimeAnimComp.animations[animation].push_back(spriteId);
-
-				if (first)
-				{
-					blueSlimeSpriteId = spriteId;
-					first = false;
-				}
-			}
-			else if (name == "redSlime")
-			{
-				SpriteID spriteId = scene.GetSpriteManager().RegisterTexture(fullpath, imgRect);
-				redSlimeAnimComp.animations[animation].push_back(spriteId);
-			}
-			else if (name == "greenSlime")
-			{
-				SpriteID spriteId = scene.GetSpriteManager().RegisterTexture(fullpath, imgRect);
-				greenSlimeAnimComp.animations[animation].push_back(spriteId);
-			}
-			else if (name == "brownSlime")
-			{
-				SpriteID spriteId = scene.GetSpriteManager().RegisterTexture(fullpath, imgRect);
-				brownSlimeAnimComp.animations[animation].push_back(spriteId);
-			}
-			else
-			{
-				continue;
-			}
-		}
-	}
-
-	// Now add the accumulated animation components to entities ONCE
-	if (catHasSprite)
-	{
-		// Set initial animation to idleA if available
-		if (catAnim.animations.count("idleA") > 0)
-		{
-			catAnim.currentAnimation = "idleA";
-			catAnim.playing = true;
-			catAnim.looping = true;
-			catAnim.frameDuration = 0.15f; // Slower animations for player (was default 0.1f)
-			catFirstSprite = catAnim.animations["idleA"][0];
-		}
-		scene.GetEntityManager().template AddComponent<ECSEngine::SpriteComponent>(player, ECSEngine::SpriteComponent(catFirstSprite, catBounds, true, 1));
-		scene.GetEntityManager().template AddComponent<ECSEngine::AnimationComponent>(player, catAnim);
-	}
-
 	// REGISTER MAP THINGS HERE
 	std::ifstream file(gResourcePath + path);
 	if (!file)
@@ -275,6 +141,8 @@ void LoadMap(const std::string &path, SceneType &scene)
 	std::unordered_map<char, SpriteEntry> dictionary;
 	std::string line;
 	int dictionaryType = 1;
+
+	std::unordered_map<std::string, SpriteID> Textures;
 
 	// Parse dictionary
 	while (std::getline(file, line))
@@ -387,8 +255,15 @@ void LoadMap(const std::string &path, SceneType &scene)
 			scene.GetEntityManager().template AddComponent<ECSEngine::LocationComponent>(id, ECSEngine::LocationComponent(position));
 
 			// Drawing Sprites
-			auto spriteId = scene.GetSpriteManager().RegisterTexture(
-				entry.texturePath, FromSFML(entry.sourceRect));
+			auto it = Textures.find(entry.texturePath);
+			SpriteID spriteId;
+			if (it != Textures.end()) {
+				spriteId = it->second;
+			} else {
+				spriteId = scene.GetSpriteManager().RegisterTexture(
+					entry.texturePath, FromSFML(entry.sourceRect));
+				Textures[entry.texturePath] = spriteId;
+			}
 
 			ECSEngine::Rect drawBounds(0.f, 0.f,
 									   static_cast<float>(entry.sourceRect.size.x),
@@ -413,6 +288,147 @@ void LoadMap(const std::string &path, SceneType &scene)
 	// Make Player after everything else has been made
 	if (dictionaryType == 2)
 	{
+		// REGISTER NON-MAP THINGS
+		std::vector<std::filesystem::path> paths;
+		for (const auto &f : std::filesystem::directory_iterator(std::filesystem::path{gResourcePath + "sprites/"}))
+		{
+			if (std::filesystem::is_regular_file(f) && f.path().extension().string() == ".png")
+			{
+				paths.push_back(f.path());
+			}
+		}
+
+		// campfire is in map too so no need to handle here, projectiles are made dynamically not pre-made
+		EntityId player = scene.GetEntityManager().CreateEntity("player");
+		EntityId blueSlime = scene.GetEntityManager().CreateEntity("blueSlime");
+		EntityId redSlime = scene.GetEntityManager().CreateEntity("redSlime");
+		EntityId greenSlime = scene.GetEntityManager().CreateEntity("greenSlime");
+		EntityId brownSlime = scene.GetEntityManager().CreateEntity("brownSlime");
+
+		SpriteID blueSlimeSpriteId = 0;
+		bool first = true;
+
+		// Animation components to accumulate frames BEFORE adding to entities
+		ECSEngine::AnimationComponent catAnim;
+		ECSEngine::AnimationComponent blueSlimeAnimComp;
+		ECSEngine::AnimationComponent redSlimeAnimComp;
+		ECSEngine::AnimationComponent greenSlimeAnimComp;
+		ECSEngine::AnimationComponent brownSlimeAnimComp;
+
+		// Track first sprite and bounds for each entity
+		SpriteID catFirstSprite = 0;
+		ECSEngine::Rect catBounds;
+		bool catHasSprite = false;
+
+		for (const auto &path : paths)
+		{
+			std::string filename = path.stem().string(); // no .png extension
+			std::vector<std::string> parts;
+			std::stringstream ss(filename);
+			std::string part;
+
+			std::filesystem::path spritesDir = gResourcePath + "sprites";
+			std::filesystem::path fullpath = spritesDir / path.filename();
+
+			sf::Image original;
+			if (!original.loadFromFile(fullpath))
+			{
+				std::cerr << "Failed to load image: " << fullpath << "\n";
+				continue;
+			}
+
+			while (std::getline(ss, part, '_'))
+			{
+				parts.push_back(part);
+			}
+
+			// blueSlime_idle_0
+			// background things have _ at the front _swamp_bg_1.png
+
+			if (parts.size() >= 3)
+			{
+				std::string name = parts[0];	  // "cat" or "blueSlime"
+				std::string animation = parts[1]; // "idleA", "run", "idle", "hurt", "death", etc.
+
+				// Use image size
+				float imgWidth = static_cast<float>(original.getSize().x);
+				float imgHeight = static_cast<float>(original.getSize().y);
+				ECSEngine::Rect imgRect(ECSEngine::Point2D(0, 0), imgWidth, imgHeight);
+
+				if (name == "cat")
+				{
+					SpriteID spriteId = scene.GetSpriteManager().RegisterTexture(fullpath, imgRect);
+					Textures[path] = spriteId;
+
+					// Add frame to animation map (accumulate, don't overwrite)
+					catAnim.animations[animation].push_back(spriteId);
+
+					// Track first sprite for initial display
+					if (!catHasSprite)
+					{
+						catFirstSprite = spriteId;
+						catBounds = imgRect;
+						catHasSprite = true;
+					}
+				}
+				else if (name == "blueSlime")
+				{
+					SpriteID spriteId = scene.GetSpriteManager().RegisterTexture(fullpath, imgRect);
+					Textures[path] = spriteId;
+
+					// Add frame to animation map
+					blueSlimeAnimComp.animations[animation].push_back(spriteId);
+
+					if (first)
+					{
+						blueSlimeSpriteId = spriteId;
+						first = false;
+					}
+				}
+				else if (name == "redSlime")
+				{
+					SpriteID spriteId = scene.GetSpriteManager().RegisterTexture(fullpath, imgRect);
+					Textures[path] = spriteId;
+
+					redSlimeAnimComp.animations[animation].push_back(spriteId);
+				}
+				else if (name == "greenSlime")
+				{
+					SpriteID spriteId = scene.GetSpriteManager().RegisterTexture(fullpath, imgRect);
+					Textures[path] = spriteId;
+
+					greenSlimeAnimComp.animations[animation].push_back(spriteId);
+				}
+				else if (name == "brownSlime")
+				{
+					SpriteID spriteId = scene.GetSpriteManager().RegisterTexture(fullpath, imgRect);
+					Textures[path] = spriteId;
+
+					brownSlimeAnimComp.animations[animation].push_back(spriteId);
+				}
+				else
+				{
+					continue;
+				}
+			}
+		}
+
+		// Now add the accumulated animation components to entities ONCE
+		if (catHasSprite)
+		{
+			// Set initial animation to idleA if available
+			if (catAnim.animations.count("idleA") > 0)
+			{
+				catAnim.currentAnimation = "idleA";
+				catAnim.playing = true;
+				catAnim.looping = true;
+				catAnim.frameDuration = 0.15f; // Slower animations for player (was default 0.1f)
+				catFirstSprite = catAnim.animations["idleA"][0];
+			}
+			scene.GetEntityManager().template AddComponent<ECSEngine::SpriteComponent>(player, ECSEngine::SpriteComponent(catFirstSprite, catBounds, true, 1));
+			scene.GetEntityManager().template AddComponent<ECSEngine::AnimationComponent>(player, catAnim);
+		}
+
 		// Spawn position
 		float spawnX = tileW * 8;
 		float spawnY = tileH * 3;
@@ -472,6 +488,7 @@ void LoadMap(const std::string &path, SceneType &scene)
 			SpriteID id = scene.GetSpriteManager().RegisterTexture(
 				gResourcePath + "sprites/fireball_flying_" + std::to_string(i) + ".png",
 				ECSEngine::Rect(0.f, 0.f, 28.f, 22.f));
+			Textures[path] = spriteId;
 			fireProps.flyingFrames.push_back(id);
 		}
 		fireProps.spriteId = fireProps.flyingFrames[0];
@@ -482,6 +499,7 @@ void LoadMap(const std::string &path, SceneType &scene)
 			SpriteID id = scene.GetSpriteManager().RegisterTexture(
 				gResourcePath + "sprites/fireball_explosion_" + std::to_string(i) + ".png",
 				ECSEngine::Rect(0.f, 0.f, 32.f, 32.f));
+			Textures[path] = spriteId;
 			fireProps.explosionFrames.push_back(id);
 		}
 		fireProps.explosionSize = 32.0f;
@@ -500,6 +518,7 @@ void LoadMap(const std::string &path, SceneType &scene)
 			SpriteID id = scene.GetSpriteManager().RegisterTexture(
 				gResourcePath + "sprites/waterball_flying_" + std::to_string(i) + ".png",
 				ECSEngine::Rect(0.f, 0.f, 32.f, 32.f));
+			Textures[path] = spriteId;
 			waterProps.flyingFrames.push_back(id);
 		}
 		waterProps.spriteId = waterProps.flyingFrames[0];
@@ -510,6 +529,7 @@ void LoadMap(const std::string &path, SceneType &scene)
 			SpriteID id = scene.GetSpriteManager().RegisterTexture(
 				gResourcePath + "sprites/waterball_explode_" + std::to_string(i) + ".png",
 				ECSEngine::Rect(0.f, 0.f, 64.f, 64.f));
+			Textures[path] = spriteId;
 			waterProps.explosionFrames.push_back(id);
 		}
 		waterProps.explosionSize = 64.0f;
@@ -528,6 +548,7 @@ void LoadMap(const std::string &path, SceneType &scene)
 			SpriteID id = scene.GetSpriteManager().RegisterTexture(
 				gResourcePath + "sprites/rockarrow_flying_" + std::to_string(i) + ".png",
 				ECSEngine::Rect(0.f, 0.f, 32.f, 32.f));
+			Textures[path] = spriteId;
 			earthProps.flyingFrames.push_back(id);
 		}
 		earthProps.spriteId = earthProps.flyingFrames[0];
@@ -537,6 +558,7 @@ void LoadMap(const std::string &path, SceneType &scene)
 			SpriteID id = scene.GetSpriteManager().RegisterTexture(
 				gResourcePath + "sprites/rockarrow_explode_" + std::to_string(i) + ".png",
 				ECSEngine::Rect(0.f, 0.f, 64.f, 63.f));
+			Textures[path] = spriteId;
 			earthProps.explosionFrames.push_back(id);
 		}
 		earthProps.explosionSize = 64.0f;
