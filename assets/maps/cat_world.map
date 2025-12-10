@@ -1,16 +1,21 @@
 dictionary 2
 G swampTile_idle_1.png 0 0 32 32 0 0 32 32
 H swampTile_idle_2.png 0 0 32 32 0 0 32 32
+h swampTile_idle_0.png 0 0 32 32 0 0 32 32
 b swampBush1_idle_0.png 0 0 31 15 0 0 0 0
 g swampGrass1_idle_0.png 0 0 17 18 0 0 0 0
 m swampPointer1_idle_0.png 0 0 16 21 0 0 0 0
 w swampWillow1_idle_0.png 0 0 104 135 0 0 0 0
 r swampRidge1_idle_0.png 0 0 89 26 0 0 0 0
 S swampStone3_idle_0.png 0 0 52 63 0 0 0 0
+d swampTile_idle_11.png 0 0 32 32 0 0 32 32
+l swampTile_idle_10.png 0 0 32 32 0 0 32 32
+r swampTile_idle_12.png 0 0 32 32 0 0 32 32
 
-map origin 0 0 tile 31 31 size 32 5
-........w.......................
-GG..........GG..................
-GG..........GG........S.........
-GG..........GG..................
-GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGH
+map origin 0 0 tile 32 32 size 64 6
+........w...............................w.......................
+............GG.....G.......G....................................
+............GG.....G..S....G..........................S.........
+............GG.....G.......G.......G............................
+hGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGH
+lddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddr

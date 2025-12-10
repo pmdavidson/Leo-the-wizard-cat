@@ -13,6 +13,7 @@ namespace ECSEngine
         // Health values
         int currentHp = 3;
         int maxHp = 3;
+        int previousHp = 3; // Track HP changes for hurt animation
 
         // Invincibility frames after being hit
         float invincibilityTimer = 0.0f;

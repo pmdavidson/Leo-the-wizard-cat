@@ -4,6 +4,9 @@
 #include "Scene.h"
 #include "SpriteComponent.h"
 #include "LocationComponent.h"
+#include "CollisionComponent.h"
+#include <cmath>
+#include <SFML/Graphics/RectangleShape.hpp>
 
 namespace ECSEngine
 {
@@ -44,7 +47,7 @@ public:
         {
             int layer = 0;
             float parallax = 1.0f;
-            std::string shaderName;
+            std::string shaderName; // The key to the shaderName, current shader is shader name and vertex
 
             Rect dest;      // screen-space rect
             sf::IntRect texRect; // atlas rect
@@ -131,8 +134,21 @@ public:
             {
                 const DrawItem &item = drawItems[i];
 
-                float x = item.dest.topLeft.x * item.parallax;
-                float y = item.dest.topLeft.y;
+                // World tiles (layers 0 and 1) should not have parallax applied
+                // Parallax is only for background/foreground layers
+                float x, y;
+                if (item.layer == 0 || item.layer == 1)
+                {
+                    // World tiles: no parallax, just use screen position directly
+                    x = std::round(item.dest.topLeft.x);
+                    y = std::round(item.dest.topLeft.y);
+                }
+                else
+                {
+                    // Background/foreground layers: apply parallax
+                    x = item.dest.topLeft.x * item.parallax;
+                    y = item.dest.topLeft.y;
+                }
                 float w = item.dest.width;
                 float h = item.dest.height;
 
@@ -161,6 +177,36 @@ public:
             states.shader = shader;
 
             window->draw(vertices, states);
+        }
+
+        // Debug: draw collision bounding boxes (purple overlay)
+        const bool debugDrawColliders = true;
+        if (debugDrawColliders)
+        {
+            for (auto it = entityManager.begin(); it != entityManager.end(); ++it)
+            {
+                if (!it->isActive())
+                    continue;
+                EntityID id = it->getID();
+                if (!entityManager.template HasComponent<CollisionComponent>(id))
+                    continue;
+
+                auto &col = entityManager.template GetComponent<CollisionComponent>(id);
+                Rect worldRect = col.currentBounds;
+                Rect screenRect = windowManager.WorldToWindow(worldRect);
+
+                sf::RectangleShape box;
+                box.setPosition(sf::Vector2f(
+                    static_cast<float>(screenRect.topLeft.x),
+                    static_cast<float>(screenRect.topLeft.y)));
+                box.setSize(sf::Vector2f(
+                    static_cast<float>(screenRect.width),
+                    static_cast<float>(screenRect.height)));
+                box.setFillColor(sf::Color(255, 0, 255, 80));      // purple 
+                box.setOutlineThickness(2.0f);
+                box.setOutlineColor(sf::Color(255, 0, 255, 220)); // bright purple outline
+                window->draw(box);
+            }
         }
 
         return true;

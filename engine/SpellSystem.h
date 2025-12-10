@@ -8,6 +8,7 @@
 #include "LocationComponent.h"
 #include "CollisionComponent.h"
 #include "SpriteComponent.h"
+#include "AnimationComponent.h"
 #include "SoundManager.h"
 #include <unordered_map>
 #include <array>
@@ -163,12 +164,12 @@ namespace ECSEngine
             }
         }
 
-        // Process spell casting (J key)
+        // Process spell casting (E key)
         void ProcessSpellCast(Scene<Components...> &scene, EntityID entityId,
                               SpellComponent &spellComp, const InputComponent &inputComp,
                               SoundManager &soundManager)
         {
-            sf::Keyboard::Scancode scancodeE = sf::Keyboard::delocalize(sf::Keyboard::Key::J);
+            sf::Keyboard::Scancode scancodeE = sf::Keyboard::delocalize(sf::Keyboard::Key::E);
 
             bool castKeyPressed = (scancodeE != sf::Keyboard::Scan::Unknown &&
                                    static_cast<size_t>(scancodeE) < sf::Keyboard::ScancodeCount)
@@ -191,19 +192,30 @@ namespace ECSEngine
                        SpellComponent &spellComp, SoundManager &soundManager)
         {
             auto &entityManager = scene.GetEntityManager();
+            auto &spriteManager = scene.GetSpriteManager();
 
-            // Get caster position
-            if (!entityManager.template HasComponent<LocationComponent>(casterId))
+            // Get caster position and collision box
+            if (!entityManager.template HasComponent<LocationComponent>(casterId) ||
+                !entityManager.template HasComponent<CollisionComponent>(casterId))
                 return;
 
             auto &casterLoc = entityManager.template GetComponent<LocationComponent>(casterId);
+            auto &casterCollision = entityManager.template GetComponent<CollisionComponent>(casterId);
             const SpellProperties &props = GetSelectedProperties(spellComp);
 
-            // Calculate spawn position (offset from caster based on facing direction)
-            float spawnOffsetX = spellComp.facingDirection * 20.0f;
+            // Calculate spawn position
+            // Spawn in front of player based on facing direction
+            float spawnOffsetX = spellComp.facingDirection * 30.0f; // Spawn 30 pixels in front
+            
+            // Align bottom of spell AABB with bottom of player AABB
+            // Player collision bottom = casterLoc.position.y + casterCollision.localBounds.height
+            // Spell collision bottom = spellPos.y + 22.0f (all spells are 28x22)
+            // We want: spellPos.y + 22.0f = casterLoc.position.y + casterCollision.localBounds.height
+            // So: spellPos.y = casterLoc.position.y + casterCollision.localBounds.height - 22.0f
+            float playerBottom = casterLoc.position.y + casterCollision.localBounds.height;
             Point2D spawnPos = {
                 casterLoc.position.x + spawnOffsetX,
-                casterLoc.position.y + 8.0f
+                playerBottom - 22.0f  // 28x22 collision box (height is 22)
             };
 
             // Create projectile entity
@@ -226,23 +238,37 @@ namespace ECSEngine
             projectile.maxLifetime = props.lifetime;
             projectile.ownerEntityId = casterId;
             projectile.active = true;
+            projectile.gracePeriod = 0.1f; // Brief period to avoid colliding with caster
+            projectile.explosionFrames = props.explosionFrames;
+            projectile.explosionSize = props.explosionSize;
             entityManager.template AddComponent<ProjectileComponent>(projectileId, projectile);
 
-            // Add CollisionComponent 
-            // Adjust collision box position based on facing direction
-            // When facing right (not flipped), offset left to align with sprite
-            float collisionOffsetX = (spellComp.facingDirection > 0) ? -props.size : 0.0f;
-            Rect collisionBounds(collisionOffsetX, 0.0f, props.size, props.size);
+            // Add CollisionComponent - all spells are 28x22
+            Rect collisionBounds(0.0f, 0.0f, 28.0f, 22.0f);
             CollisionComponent collision(collisionBounds, false);
             entityManager.template AddComponent<CollisionComponent>(projectileId, collision);
 
             // Add SpriteComponent
+            // All spells use 28x22 bounds to match collision box
             SpriteComponent sprite;
             sprite.spriteId = props.spriteId;
-            sprite.bounds = Rect(0.0f, 0.0f, props.size, props.size);
+            sprite.bounds = Rect(0.0f, 0.0f, 28.0f, 22.0f);
             sprite.inWorldSpace = true;
+            sprite.layer = 2; // Spells should be on layer 2 (just above world)
             sprite.flipX = (spellComp.facingDirection < 0);
             entityManager.template AddComponent<SpriteComponent>(projectileId, sprite);
+
+            // Add AnimationComponent for flying animation
+            if (!props.flyingFrames.empty())
+            {
+                AnimationComponent flyingAnim;
+                flyingAnim.animations["flying"] = props.flyingFrames;
+                flyingAnim.currentAnimation = "flying";
+                flyingAnim.frameDuration = 0.05f;
+                flyingAnim.playing = true;
+                flyingAnim.looping = true;
+                entityManager.template AddComponent<AnimationComponent>(projectileId, flyingAnim);
+            }
 
             // Start cast cooldown
             StartCastCooldown(spellComp);

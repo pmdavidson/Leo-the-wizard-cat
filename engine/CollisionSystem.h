@@ -14,6 +14,8 @@
 #include "HpComponent.h"
 #include "ProjectileComponent.h"
 #include "CheckpointComponent.h"
+#include "AnimationComponent.h"
+#include "SpriteComponent.h"
 #include <cmath>
 #include <random>
 
@@ -46,6 +48,15 @@ namespace ECSEngine
 				collisionComp.currentBounds.topLeft = locationComp.position + collisionComp.localBounds.topLeft;
 				collisionComp.currentBounds.width = collisionComp.localBounds.width;
 				collisionComp.currentBounds.height = collisionComp.localBounds.height;
+
+				// If previousBounds is still in local space (newly created), initialize it
+				// to the current world bounds so first-frame collision resolution has correct deltas.
+				if (collisionComp.previousBounds.topLeft == collisionComp.localBounds.topLeft &&
+					collisionComp.previousBounds.width == collisionComp.localBounds.width &&
+					collisionComp.previousBounds.height == collisionComp.localBounds.height)
+				{
+					collisionComp.previousBounds = collisionComp.currentBounds;
+				}
 
 				collisionComp.collidedSides = {};
 			}
@@ -127,9 +138,10 @@ namespace ECSEngine
 					Point2D preCollisionVelocityA(0.0f, 0.0f);
 					Point2D preCollisionVelocityB(0.0f, 0.0f);
 
-					if (isPlayerA && entityManager.template HasComponent<MovementComponent>(idA))
+					// Use movement velocity for any movable entity so side resolution works for projectiles, enemies, etc.
+					if (entityManager.template HasComponent<MovementComponent>(idA))
 						preCollisionVelocityA = entityManager.template GetComponent<MovementComponent>(idA).velocity;
-					if (isPlayerB && entityManager.template HasComponent<MovementComponent>(idB))
+					if (entityManager.template HasComponent<MovementComponent>(idB))
 						preCollisionVelocityB = entityManager.template GetComponent<MovementComponent>(idB).velocity;
 
 					// Skip collision resolution for player-campfire (player walks through)
@@ -261,8 +273,25 @@ namespace ECSEngine
 							if (entityManager.template HasComponent<HpComponent>(playerId))
 							{
 								auto &playerHp = entityManager.template GetComponent<HpComponent>(playerId);
+								playerHp.previousHp = playerHp.currentHp; // Track previous HP for animation
 								playerHp.currentHp -= static_cast<int>(enemy.contactDamage);
 								playerHp.invincibilityTimer = playerHp.invincibilityDuration;
+							}
+
+							// Play catHurt animation
+							if (entityManager.template HasComponent<AnimationComponent>(playerId))
+							{
+								auto &anim = entityManager.template GetComponent<AnimationComponent>(playerId);
+								if (anim.animations.count("hurt") > 0)
+								{
+									anim.Play("hurt", false); // Don't loop hurt animation
+									// Set first frame immediately
+									if (entityManager.template HasComponent<SpriteComponent>(playerId))
+									{
+										auto &sprite = entityManager.template GetComponent<SpriteComponent>(playerId);
+										sprite.spriteId = anim.animations["hurt"][0];
+									}
+								}
 							}
 
 							// Apply knockback to player

@@ -35,6 +35,7 @@
 #include "AnimationSystem.h"
 #include "SpellSystem.h"
 #include "ProjectileSystem.h"
+#include "MainMenuScene.h"
 
 #include <fstream>
 
@@ -172,23 +173,6 @@ void LoadMap(const std::string &path, SceneType &scene)
 
 		// Extract layer number from filename (e.g., "_swamp_sky_-3.png" -> -3)
 		// The layer is the last number before .png
-		std::string filename = entry.texturePath;
-		size_t lastUnderscore = filename.find_last_of('_');
-		size_t dotPos = filename.find_last_of('.');
-		if (lastUnderscore != std::string::npos && dotPos != std::string::npos && lastUnderscore < dotPos)
-		{
-			std::string layerStr = filename.substr(lastUnderscore + 1, dotPos - lastUnderscore - 1);
-			try
-			{
-				entry.layer = std::stoi(layerStr);
-			}
-			catch (...)
-			{
-				// If parsing fails, use default layer 1
-				entry.layer = 1;
-			}
-		}
-
 		entry.texturePath = gResourcePath + "sprites/" + entry.texturePath;
 		entry.sourceRect = sf::IntRect(
 			sf::Vector2i(sx, sy),
@@ -206,10 +190,38 @@ void LoadMap(const std::string &path, SceneType &scene)
 			if (bx == 0 && by == 0 && bw == 0 && bh == 0)
 			{
 				entry.hasCollision = false;
+				// Decorative elements (no collision) should be on layer 0 (behind world tiles)
+				entry.layer = 0;
 			}
 			else
 			{
 				entry.hasCollision = true;
+				// Ground tiles (with collision) should be on layer 1 (world tiles)
+				entry.layer = 1;
+			}
+		}
+		else
+		{
+			// Dictionary type 1: extract layer from filename
+			std::string filename = entry.texturePath;
+			size_t lastUnderscore = filename.find_last_of('_');
+			size_t dotPos = filename.find_last_of('.');
+			if (lastUnderscore != std::string::npos && dotPos != std::string::npos && lastUnderscore < dotPos)
+			{
+				std::string layerStr = filename.substr(lastUnderscore + 1, dotPos - lastUnderscore - 1);
+				try
+				{
+					entry.layer = std::stoi(layerStr);
+				}
+				catch (...)
+				{
+					// If parsing fails, use default layer 1
+					entry.layer = 1;
+				}
+			}
+			else
+			{
+				entry.layer = 1;
 			}
 		}
 
@@ -227,8 +239,23 @@ void LoadMap(const std::string &path, SceneType &scene)
 	}
 
 	// Register blueSlime sprite for spawning
-	// SpriteID blueSlimeSpriteId = scene.GetSpriteManager().RegisterTexture(
-	// 	resourceRoot + "sprites/blueSlime_idle_0.png", ECSEngine::Rect(0, 0, 96, 32));
+	ECSEngine::AnimationComponent blueSlimeAnimComp;
+
+	sf::Image original;
+	if (!original.loadFromFile(gResourcePath + "sprites/blueSlime_idle_0.png"))
+	{
+		std::cerr << "Failed to load image: " << gResourcePath + "sprites/blueSlime_idle_0.png" << "\n";
+	}
+
+	float imgWidth = static_cast<float>(original.getSize().x);
+	float imgHeight = static_cast<float>(original.getSize().y);
+	ECSEngine::Rect imgRect(ECSEngine::Point2D(0, 0), imgWidth, imgHeight);
+
+	SpriteID blueSlimeSpriteId = scene.GetSpriteManager().RegisterTexture(gResourcePath + "sprites/blueSlime_idle_0.png", imgRect);
+	Textures[gResourcePath + "sprites/blueSlime_idle_0.png"] = blueSlimeSpriteId;
+
+	// Add frame to animation map
+	blueSlimeAnimComp.animations["idle"].push_back(blueSlimeSpriteId);
 
 	// Parse map rows
 	for (int y = 0; y < mapH; ++y)
@@ -305,12 +332,10 @@ void LoadMap(const std::string &path, SceneType &scene)
 		EntityId greenSlime = scene.GetEntityManager().CreateEntity("greenSlime");
 		EntityId brownSlime = scene.GetEntityManager().CreateEntity("brownSlime");
 
-		SpriteID blueSlimeSpriteId = 0;
 		bool first = true;
 
 		// Animation components to accumulate frames BEFORE adding to entities
 		ECSEngine::AnimationComponent catAnim;
-		ECSEngine::AnimationComponent blueSlimeAnimComp;
 		ECSEngine::AnimationComponent redSlimeAnimComp;
 		ECSEngine::AnimationComponent greenSlimeAnimComp;
 		ECSEngine::AnimationComponent brownSlimeAnimComp;
@@ -348,7 +373,7 @@ void LoadMap(const std::string &path, SceneType &scene)
 			if (parts.size() >= 3)
 			{
 				std::string name = parts[0];	  // "cat" or "blueSlime"
-				std::string animation = parts[1]; // "idleA", "run", "idle", "hurt", "death", etc.
+				std::string animation = parts[1]; // "idle", "run", "idle", "hurt", "death", etc.
 
 				// Use image size
 				float imgWidth = static_cast<float>(original.getSize().x);
@@ -358,7 +383,7 @@ void LoadMap(const std::string &path, SceneType &scene)
 				if (name == "cat")
 				{
 					SpriteID spriteId = scene.GetSpriteManager().RegisterTexture(fullpath, imgRect);
-					Textures[path] = spriteId;
+					Textures[fullpath] = spriteId;
 
 					// Add frame to animation map (accumulate, don't overwrite)
 					catAnim.animations[animation].push_back(spriteId);
@@ -373,8 +398,15 @@ void LoadMap(const std::string &path, SceneType &scene)
 				}
 				else if (name == "blueSlime")
 				{
-					SpriteID spriteId = scene.GetSpriteManager().RegisterTexture(fullpath, imgRect);
-					Textures[path] = spriteId;
+					auto it = Textures.find(path);
+					SpriteID spriteId;
+					if (it != Textures.end()) {
+						spriteId = it->second;
+					} else {
+						spriteId = scene.GetSpriteManager().RegisterTexture(
+							fullpath, imgRect);
+						Textures[fullpath] = spriteId;
+					}
 
 					// Add frame to animation map
 					blueSlimeAnimComp.animations[animation].push_back(spriteId);
@@ -388,21 +420,21 @@ void LoadMap(const std::string &path, SceneType &scene)
 				else if (name == "redSlime")
 				{
 					SpriteID spriteId = scene.GetSpriteManager().RegisterTexture(fullpath, imgRect);
-					Textures[path] = spriteId;
+					Textures[fullpath] = spriteId;
 
 					redSlimeAnimComp.animations[animation].push_back(spriteId);
 				}
 				else if (name == "greenSlime")
 				{
 					SpriteID spriteId = scene.GetSpriteManager().RegisterTexture(fullpath, imgRect);
-					Textures[path] = spriteId;
+					Textures[fullpath] = spriteId;
 
 					greenSlimeAnimComp.animations[animation].push_back(spriteId);
 				}
 				else if (name == "brownSlime")
 				{
 					SpriteID spriteId = scene.GetSpriteManager().RegisterTexture(fullpath, imgRect);
-					Textures[path] = spriteId;
+					Textures[fullpath] = spriteId;
 
 					brownSlimeAnimComp.animations[animation].push_back(spriteId);
 				}
@@ -417,21 +449,22 @@ void LoadMap(const std::string &path, SceneType &scene)
 		if (catHasSprite)
 		{
 			// Set initial animation to idleA if available
-			if (catAnim.animations.count("idleA") > 0)
+			if (catAnim.animations.count("idle") > 0)
 			{
-				catAnim.currentAnimation = "idleA";
+				catAnim.currentAnimation = "idle";
 				catAnim.playing = true;
 				catAnim.looping = true;
 				catAnim.frameDuration = 0.15f; // Slower animations for player (was default 0.1f)
-				catFirstSprite = catAnim.animations["idleA"][0];
+				catFirstSprite = catAnim.animations["idle"][0];
 			}
 			scene.GetEntityManager().template AddComponent<ECSEngine::SpriteComponent>(player, ECSEngine::SpriteComponent(catFirstSprite, catBounds, true, 1));
 			scene.GetEntityManager().template AddComponent<ECSEngine::AnimationComponent>(player, catAnim);
 		}
 
-		// Spawn position
-		float spawnX = tileW * 8;
-		float spawnY = tileH * 3;
+		// Spawn position - account for map origin and align collision box bottom with tile top
+		// Player collision box is 28 pixels tall, so subtract that to align bottom with tile top
+		float spawnX = originX + tileW * 8;
+		float spawnY = originY + tileH * 3 - 28.0f; // Subtract collision height to align bottom with tile top
 
 		// Update all SpawnComponents with slime animations
 		for (auto it = scene.GetEntityManager().begin(); it != scene.GetEntityManager().end(); ++it)
@@ -488,7 +521,7 @@ void LoadMap(const std::string &path, SceneType &scene)
 			SpriteID id = scene.GetSpriteManager().RegisterTexture(
 				gResourcePath + "sprites/fireball_flying_" + std::to_string(i) + ".png",
 				ECSEngine::Rect(0.f, 0.f, 28.f, 22.f));
-			Textures[path] = spriteId;
+			Textures[gResourcePath + "sprites/fireball_flying_" + std::to_string(i) + ".png"] = id;
 			fireProps.flyingFrames.push_back(id);
 		}
 		fireProps.spriteId = fireProps.flyingFrames[0];
@@ -499,7 +532,7 @@ void LoadMap(const std::string &path, SceneType &scene)
 			SpriteID id = scene.GetSpriteManager().RegisterTexture(
 				gResourcePath + "sprites/fireball_explosion_" + std::to_string(i) + ".png",
 				ECSEngine::Rect(0.f, 0.f, 32.f, 32.f));
-			Textures[path] = spriteId;
+			Textures[gResourcePath + "sprites/fireball_explosion_" + std::to_string(i) + ".png"] = id;
 			fireProps.explosionFrames.push_back(id);
 		}
 		fireProps.explosionSize = 32.0f;
@@ -510,7 +543,7 @@ void LoadMap(const std::string &path, SceneType &scene)
 		waterProps.speed = 350.0f;
 		waterProps.cooldown = 0.6f;
 		waterProps.lifetime = 200.0f;
-		waterProps.size = 32.0f;
+		waterProps.size = 28.0f;
 
 		// Register waterball flying animation frames (1-3)
 		for (int i = 1; i <= 3; ++i)
@@ -518,7 +551,7 @@ void LoadMap(const std::string &path, SceneType &scene)
 			SpriteID id = scene.GetSpriteManager().RegisterTexture(
 				gResourcePath + "sprites/waterball_flying_" + std::to_string(i) + ".png",
 				ECSEngine::Rect(0.f, 0.f, 32.f, 32.f));
-			Textures[path] = spriteId;
+			Textures[gResourcePath + "sprites/waterball_flying_" + std::to_string(i) + ".png"] = id;
 			waterProps.flyingFrames.push_back(id);
 		}
 		waterProps.spriteId = waterProps.flyingFrames[0];
@@ -529,7 +562,7 @@ void LoadMap(const std::string &path, SceneType &scene)
 			SpriteID id = scene.GetSpriteManager().RegisterTexture(
 				gResourcePath + "sprites/waterball_explode_" + std::to_string(i) + ".png",
 				ECSEngine::Rect(0.f, 0.f, 64.f, 64.f));
-			Textures[path] = spriteId;
+			Textures[gResourcePath + "sprites/waterball_explode_" + std::to_string(i) + ".png"] = id;
 			waterProps.explosionFrames.push_back(id);
 		}
 		waterProps.explosionSize = 64.0f;
@@ -540,7 +573,7 @@ void LoadMap(const std::string &path, SceneType &scene)
 		earthProps.speed = 300.0f;
 		earthProps.cooldown = 0.8f;
 		earthProps.lifetime = 180.0f;
-		earthProps.size = 32.0f;
+		earthProps.size = 28.0f;
 
 		// Register rockarrow flying animation frames (1-8)
 		for (int i = 1; i <= 8; ++i)
@@ -548,7 +581,7 @@ void LoadMap(const std::string &path, SceneType &scene)
 			SpriteID id = scene.GetSpriteManager().RegisterTexture(
 				gResourcePath + "sprites/rockarrow_flying_" + std::to_string(i) + ".png",
 				ECSEngine::Rect(0.f, 0.f, 32.f, 32.f));
-			Textures[path] = spriteId;
+			Textures[gResourcePath + "sprites/rockarrow_flying_" + std::to_string(i) + ".png"] = id;
 			earthProps.flyingFrames.push_back(id);
 		}
 		earthProps.spriteId = earthProps.flyingFrames[0];
@@ -558,7 +591,7 @@ void LoadMap(const std::string &path, SceneType &scene)
 			SpriteID id = scene.GetSpriteManager().RegisterTexture(
 				gResourcePath + "sprites/rockarrow_explode_" + std::to_string(i) + ".png",
 				ECSEngine::Rect(0.f, 0.f, 64.f, 63.f));
-			Textures[path] = spriteId;
+			Textures[gResourcePath + "sprites/rockarrow_explode_" + std::to_string(i) + ".png"] = id;
 			earthProps.explosionFrames.push_back(id);
 		}
 		earthProps.explosionSize = 64.0f;
@@ -635,37 +668,56 @@ void LoadMap(const std::string &path, SceneType &scene)
 		// }
 
 		// Set up HP display system (hearts)
-		// Register heart sprites
-		// SpriteID heartFullSpriteId = scene.GetSpriteManager().RegisterTexture(
-		// 	gResourcePath + "sprites/heart_idle_0.png", ECSEngine::Rect(0.f, 0.f, 32.f, 32.f));
-		// SpriteID heartEmptySpriteId = scene.GetSpriteManager().RegisterTexture(
-		// 	gResourcePath + "sprites/heart_empty_0.png", ECSEngine::Rect(0.f, 0.f, 32.f, 32.f));
+		// Register heart sprites - load images first to get actual dimensions
+		sf::Image heartFullImg;
+		if (!heartFullImg.loadFromFile(gResourcePath + "sprites/heart_idle_0.png"))
+		{
+			std::cerr << "Failed to load heart_idle_0.png\n";
+		}
+		float heartWidth = static_cast<float>(heartFullImg.getSize().x);
+		float heartHeight = static_cast<float>(heartFullImg.getSize().y);
+		SpriteID heartFullSpriteId = scene.GetSpriteManager().RegisterTexture(
+			gResourcePath + "sprites/heart_idle_0.png", ECSEngine::Rect(0.f, 0.f, heartWidth, heartHeight));
+		
+		sf::Image heartEmptyImg;
+		if (!heartEmptyImg.loadFromFile(gResourcePath + "sprites/heart_empty_0.png"))
+		{
+			std::cerr << "Failed to load heart_empty_0.png\n";
+		}
+		float heartEmptyWidth = static_cast<float>(heartEmptyImg.getSize().x);
+		float heartEmptyHeight = static_cast<float>(heartEmptyImg.getSize().y);
+		SpriteID heartEmptySpriteId = scene.GetSpriteManager().RegisterTexture(
+			gResourcePath + "sprites/heart_empty_0.png", ECSEngine::Rect(0.f, 0.f, heartEmptyWidth, heartEmptyHeight));
 
-		// // Create HpComponent for player
-		// ECSEngine::HpComponent hpComp(3, heartFullSpriteId, heartEmptySpriteId);
+		// Create HpComponent for player (3 hearts total)
+		ECSEngine::HpComponent hpComp(3, heartFullSpriteId, heartEmptySpriteId);
 
-		// // Create 3 heart display entities at top left (below score)
-		// const float heartSize = 32.f;
-		// const float heartStartX = 20.f;
-		// const float heartStartY = 60.f; // Below the score display
+		// Create 5 heart display entities at top left
+		// Scale hearts to be larger (1.5x size)
+		const float heartScale = 1.5f;
+		const float heartDisplayWidth = heartWidth * heartScale;
+		const float heartDisplayHeight = heartHeight * heartScale;
+		const float heartStartX = 20.f;
+		const float heartStartY = 20.f; // Top left corner
 
-		// for (int i = 0; i < 3; ++i)
-		// {
-		// 	EntityId heartEntity = scene.GetEntityManager().CreateEntity("heart_" + std::to_string(i));
+		for (int i = 0; i < 5; ++i)
+		{
+			EntityId heartEntity = scene.GetEntityManager().CreateEntity("heart_" + std::to_string(i));
 
-		// 	scene.GetEntityManager().template AddComponent<ECSEngine::LocationComponent>(
-		// 		heartEntity,
-		// 		ECSEngine::LocationComponent(ECSEngine::Point2D(heartStartX + i * heartSize, heartStartY)));
+			scene.GetEntityManager().template AddComponent<ECSEngine::LocationComponent>(
+				heartEntity,
+				ECSEngine::LocationComponent(ECSEngine::Point2D(heartStartX + i * heartDisplayWidth, heartStartY)));
 
-		// 	// Initialize with full heart sprite (inWorldSpace = false for UI)
-		// 	scene.GetEntityManager().template AddComponent<ECSEngine::SpriteComponent>(
-		// 		heartEntity,
-		// 		{heartFullSpriteId, ECSEngine::Rect(0.f, 0.f, heartSize, heartSize), false});
+			// Initialize with full heart sprite (inWorldSpace = false for UI)
+			// Use scaled size for display
+			scene.GetEntityManager().template AddComponent<ECSEngine::SpriteComponent>(
+				heartEntity,
+				{heartFullSpriteId, ECSEngine::Rect(0.f, 0.f, heartDisplayWidth, heartDisplayHeight), false});
 
-		// 	hpComp.heartDisplayEntityIds.push_back(heartEntity);
-		// }
+			hpComp.heartDisplayEntityIds.push_back(heartEntity);
+		}
 
-		// scene.GetEntityManager().template AddComponent<ECSEngine::HpComponent>(player, hpComp);
+		scene.GetEntityManager().template AddComponent<ECSEngine::HpComponent>(player, hpComp);
 
 		// // Set up checkpoint system
 		// ECSEngine::CheckpointComponent checkpointComp(ECSEngine::Point2D(spawnX, spawnY));
@@ -734,6 +786,15 @@ void LoadMap(const std::string &path, SceneType &scene)
 	}
 }
 
+// Expand tuple to MainMenuScene<...>
+template <typename Tuple>
+struct UnpackMainMenuScene;
+
+template <typename... Components>
+struct UnpackMainMenuScene<std::tuple<Components...>> {
+	using type = MainMenuScene<Components...>;
+};
+
 int main(int argc, char *argv[])
 {
 	bool debugMode = false;
@@ -763,10 +824,10 @@ int main(int argc, char *argv[])
 	// Initialize engine using GameComponents tuple
 	GameEngine engine(1024, 768, "Leo the Wizard Cat");
 
-	// Create a scene
+	// Create the main gameplay scene
 	auto scene = engine.MakeScene();
 
-	// Add systems to the scene in execution order
+	// Add systems to the gameplay scene in execution order
 	auto &sm = scene->GetSystemManager();
 	AddSystem<ECSEngine::ProcessEventsSystem>(sm);
 	AddSystem<ECSEngine::CollisionUpdateSystem>(sm);
@@ -781,16 +842,16 @@ int main(int argc, char *argv[])
 	AddSystem<ECSEngine::CheckpointSystem>(sm);
 	AddSystem<ECSEngine::ScoreSystem>(sm);
 	AddSystem<ECSEngine::CameraSystem>(sm);
-	AddSystem<ECSEngine::AnimationSystem>(sm); // double check TODO
+	AddSystem<ECSEngine::AnimationSystem>(sm);
 	AddSystem<ECSEngine::SpriteSystem>(sm);
 	AddSystem<ECSEngine::SpawnSystem>(sm);
 
-	// Set up parallax factors for different layers
+	// Set up parallax
 	auto &spriteSystem = sm.template GetSystem<GameSpriteSystem>();
 	spriteSystem.SetParallaxFactor(-3, 0.85f);
 	spriteSystem.SetParallaxFactor(-2, 0.90f);
 	spriteSystem.SetParallaxFactor(-1, 0.95f);
-	spriteSystem.SetParallaxFactor(0, 0.98f);
+	spriteSystem.SetParallaxFactor(0, 1.0f);
 	spriteSystem.SetParallaxFactor(1, 1.0f);
 	spriteSystem.SetParallaxFactor(2, 1.1f);
 	spriteSystem.SetParallaxFactor(3, 1.2f);
@@ -799,22 +860,23 @@ int main(int argc, char *argv[])
 	LoadMap("maps/cat_sky_swamp.map", *scene);
 	LoadMap("maps/cat_world.map", *scene);
 
-	// Upload atlas image to GPU texture
+	// Upload atlas
 	scene->GetSpriteManager().FinalizeAtlas();
-
 	sf::Image atlasImg = scene->GetSpriteManager().GetTexture().copyToImage();
-
-	if (!atlasImg.saveToFile("atlas.png"))
-	{
+	if (!atlasImg.saveToFile("atlas.png")) {
 		std::cerr << "Failed to save atlas to file\n";
-	}
-	else
-	{
-		std::cout << "Successfully saved atlas.png file (inside build folder)!\n";
+	} else {
+		std::cout << "Successfully saved atlas.png file!\n";
 	}
 
-	// Push scene to engine and run
+	// Push gameplay scene first
 	engine.PushScene(scene);
+
+	// Push menu scene (it will run first)
+	using GameMainMenu = UnpackMainMenuScene<GameComponents>::type;
+	auto mainMenu = std::make_shared<GameMainMenu>(scene->GetWindow());
+	engine.PushScene(mainMenu);
+
+	// Run the game loop
 	engine.Run();
-	return 0;
 }
