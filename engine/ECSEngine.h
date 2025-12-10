@@ -86,6 +86,14 @@ namespace ECSEngine
 		}
 
 		/**
+		 * @brief Lets us get the shared render window pointer for custom scenes.
+		 */
+		std::shared_ptr<sf::RenderWindow> GetWindowPtr() const
+		{
+			return mWindow;
+		}
+
+		/**
 		 * @brief Pushes a scene onto the scene stack.
 		 *
 		 * @param scene Shared pointer to the scene to push.

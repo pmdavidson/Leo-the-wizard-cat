@@ -36,6 +36,8 @@
 #include "SpellSystem.h"
 #include "ProjectileSystem.h"
 #include "MainMenuScene.h"
+#include "PauseScene.h"
+#include "GameplayScene.h"
 
 #include <fstream>
 
@@ -381,10 +383,10 @@ void LoadMap(const std::string &path, SceneType &scene)
 
 		// campfire is in map too so no need to handle here, projectiles are made dynamically not pre-made
 		EntityId player = scene.GetEntityManager().CreateEntity("player");
-		EntityId blueSlime = scene.GetEntityManager().CreateEntity("blueSlime");
-		EntityId redSlime = scene.GetEntityManager().CreateEntity("redSlime");
-		EntityId greenSlime = scene.GetEntityManager().CreateEntity("greenSlime");
-		EntityId brownSlime = scene.GetEntityManager().CreateEntity("brownSlime");
+		[[maybe_unused]] EntityId blueSlime = scene.GetEntityManager().CreateEntity("blueSlime");
+		[[maybe_unused]] EntityId redSlime = scene.GetEntityManager().CreateEntity("redSlime");
+		[[maybe_unused]] EntityId greenSlime = scene.GetEntityManager().CreateEntity("greenSlime");
+		[[maybe_unused]] EntityId brownSlime = scene.GetEntityManager().CreateEntity("brownSlime");
 
 		bool first = true;
 
@@ -697,12 +699,12 @@ void LoadMap(const std::string &path, SceneType &scene)
 		// SCORE
 		//  Set up score display system
 		//  Get the ScoreComponent attached to the player entity
-		auto &scoreComp = scene.GetEntityManager().template GetComponent<ECSEngine::ScoreComponent>(player);
+		[[maybe_unused]] auto &scoreComp = scene.GetEntityManager().template GetComponent<ECSEngine::ScoreComponent>(player);
 
 		// Register digit sprites (0-9) from the spritesheet
 		const float tileSize = 32.f;
-		const float digitX = 13.f * tileSize;	  // X position of digit column in spritesheet
-		const float digitStartY = 4.f * tileSize; // Y position where digit 0 starts
+		[[maybe_unused]] const float digitX = 13.f * tileSize;	  // X position of digit column in spritesheet
+		[[maybe_unused]] const float digitStartY = 4.f * tileSize; // Y position where digit 0 starts
 
 		// for (int digit = 0; digit < 10; ++digit)
 		// {
@@ -715,9 +717,9 @@ void LoadMap(const std::string &path, SceneType &scene)
 		// }
 
 		// Create 3 display entities for the score
-		const float digitSize = 32.f;
-		const float startX = 20.f;
-		const float startY = 20.f;
+		[[maybe_unused]] const float digitSize = 32.f;
+		[[maybe_unused]] const float startX = 20.f;
+		[[maybe_unused]] const float startY = 20.f;
 
 		// for (int i = 0; i < 3; ++i)
 		// {
@@ -858,6 +860,15 @@ struct UnpackMainMenuScene<std::tuple<Components...>> {
 	using type = MainMenuScene<Components...>;
 };
 
+// Expand tuple to GameplayScene<...>
+template <typename Tuple>
+struct UnpackGameplayScene;
+
+template <typename... Components>
+struct UnpackGameplayScene<std::tuple<Components...>> {
+	using type = GameplayScene<Components...>;
+};
+
 int main(int argc, char *argv[])
 {
 	bool debugMode = false;
@@ -887,8 +898,9 @@ int main(int argc, char *argv[])
 	// Initialize engine using GameComponents tuple
 	GameEngine engine(1024, 768, "Leo the Wizard Cat");
 
-	// Create the main gameplay scene
-	auto scene = engine.MakeScene();
+	// Create the main gameplay scene (cat/slime content)
+	using GamePlaySceneType = UnpackGameplayScene<GameComponents>::type;
+	auto scene = std::make_shared<GamePlaySceneType>(engine.GetWindowPtr());
 
 	// Add systems to the gameplay scene in execution order
 	auto &sm = scene->GetSystemManager();
@@ -917,6 +929,7 @@ int main(int argc, char *argv[])
 	spriteSystem.SetParallaxFactor(0, 1.0f);
 	spriteSystem.SetParallaxFactor(1, 1.0f);
 	spriteSystem.SetParallaxFactor(2, 1.0f);
+	spriteSystem.SetParallaxFactor(2, 1.0f);
 	spriteSystem.SetParallaxFactor(3, 1.2f);
 
 	// Load maps into the scene
@@ -936,9 +949,9 @@ int main(int argc, char *argv[])
 	engine.PushScene(scene);
 
 	// Push menu scene (it will run first)
-	// using GameMainMenu = UnpackMainMenuScene<GameComponents>::type;
-	// auto mainMenu = std::make_shared<GameMainMenu>(scene->GetWindow());
-	// engine.PushScene(mainMenu);
+	using GameMainMenu = UnpackMainMenuScene<GameComponents>::type;
+	auto mainMenu = std::make_shared<GameMainMenu>(scene->GetWindowPtr());
+	engine.PushScene(mainMenu);
 
 	// Run the game loop
 	engine.Run();
