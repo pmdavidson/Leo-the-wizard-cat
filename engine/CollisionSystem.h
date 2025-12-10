@@ -273,44 +273,137 @@ namespace ECSEngine
 							if (entityManager.template HasComponent<HpComponent>(playerId))
 							{
 								auto &playerHp = entityManager.template GetComponent<HpComponent>(playerId);
-								playerHp.previousHp = playerHp.currentHp; // Track previous HP for animation
-								playerHp.currentHp -= static_cast<int>(enemy.contactDamage);
-								playerHp.invincibilityTimer = playerHp.invincibilityDuration;
-							}
-
-							// Play catHurt animation
-							if (entityManager.template HasComponent<AnimationComponent>(playerId))
-							{
-								auto &anim = entityManager.template GetComponent<AnimationComponent>(playerId);
-								if (anim.animations.count("hurt") > 0)
+								
+								// Check if rock shield absorbs the hit
+								if (playerHp.hasRockShield)
 								{
-									anim.Play("hurt", false); // Don't loop hurt animation
-									// Set first frame immediately
-									if (entityManager.template HasComponent<SpriteComponent>(playerId))
+									// Shield absorbs 1 hit - remove shield
+									playerHp.hasRockShield = false;
+									
+									// Play shield break sound
+									soundManager.PlaySound("rock_shield_break");
+									
+									// Still apply knockback (but no damage, no flash, no hurt animation, no meow)
+									if (entityManager.template HasComponent<MovementComponent>(playerId) &&
+										entityManager.template HasComponent<CollisionComponent>(playerId))
 									{
-										auto &sprite = entityManager.template GetComponent<SpriteComponent>(playerId);
-										sprite.spriteId = anim.animations["hurt"][0];
+										auto &playerMovement = entityManager.template GetComponent<MovementComponent>(playerId);
+										auto &playerLoc = entityManager.template GetComponent<LocationComponent>(playerId);
+										auto &playerCollision = entityManager.template GetComponent<CollisionComponent>(playerId);
+
+										// Calculate centers of current and previous bounding boxes
+										Point2D currentCenter = Point2D(
+											playerCollision.currentBounds.topLeft.x + playerCollision.currentBounds.width * 0.5f,
+											playerCollision.currentBounds.topLeft.y + playerCollision.currentBounds.height * 0.5f
+										);
+										Point2D previousCenter = Point2D(
+											playerCollision.previousBounds.topLeft.x + playerCollision.previousBounds.width * 0.5f,
+											playerCollision.previousBounds.topLeft.y + playerCollision.previousBounds.height * 0.5f
+										);
+
+										// Calculate direction from current position back to previous position
+										Point2D knockbackDir = previousCenter - currentCenter;
+										
+										// Normalize the direction vector
+										float distance = std::sqrt(knockbackDir.x * knockbackDir.x + knockbackDir.y * knockbackDir.y);
+										if (distance > 0.0f)
+										{
+											knockbackDir.x /= distance;
+											knockbackDir.y /= distance;
+										}
+										else
+										{
+											// Fallback: push away from enemy if no previous position difference
+											auto &enemyLoc = entityManager.template GetComponent<LocationComponent>(enemyId);
+											knockbackDir.x = (playerLoc.position.x > enemyLoc.position.x) ? 1.0f : -1.0f;
+											knockbackDir.y = -0.5f; // Slight upward
+										}
+
+										// Apply knockback velocity towards previous position
+										playerMovement.velocity.x = knockbackDir.x * enemy.knockbackForce;
+										playerMovement.velocity.y = knockbackDir.y * enemy.knockbackForce;
+									}
+									
+									// Don't take damage, don't play hurt animation, don't trigger flash, don't play meow
+								}
+								else
+								{
+									// No shield
+									playerHp.previousHp = playerHp.currentHp; // Track previous HP for animation
+									playerHp.currentHp -= static_cast<int>(enemy.contactDamage);
+									// Clamp HP to not go below 0
+									if (playerHp.currentHp < 0)
+										playerHp.currentHp = 0;
+									playerHp.invincibilityTimer = playerHp.invincibilityDuration;
+									// Trigger damage flash effect
+									playerHp.damageFlashTimer = playerHp.damageFlashDuration;
+									
+									// Play catHurt animation
+									if (entityManager.template HasComponent<AnimationComponent>(playerId))
+									{
+										auto &anim = entityManager.template GetComponent<AnimationComponent>(playerId);
+										if (anim.animations.count("hurt") > 0)
+										{
+											anim.Play("hurt", false); // Don't loop hurt animation
+											// Set first frame immediately
+											if (entityManager.template HasComponent<SpriteComponent>(playerId))
+											{
+												auto &sprite = entityManager.template GetComponent<SpriteComponent>(playerId);
+												sprite.spriteId = anim.animations["hurt"][0];
+											}
+										}
+									}
+
+									// Apply knockback to player using previous bounding box
+									if (entityManager.template HasComponent<MovementComponent>(playerId) &&
+										entityManager.template HasComponent<CollisionComponent>(playerId))
+									{
+										auto &playerMovement = entityManager.template GetComponent<MovementComponent>(playerId);
+										auto &playerLoc = entityManager.template GetComponent<LocationComponent>(playerId);
+										auto &playerCollision = entityManager.template GetComponent<CollisionComponent>(playerId);
+
+										// Calculate centers of current and previous bounding boxes
+										Point2D currentCenter = Point2D(
+											playerCollision.currentBounds.topLeft.x + playerCollision.currentBounds.width * 0.5f,
+											playerCollision.currentBounds.topLeft.y + playerCollision.currentBounds.height * 0.5f
+										);
+										Point2D previousCenter = Point2D(
+											playerCollision.previousBounds.topLeft.x + playerCollision.previousBounds.width * 0.5f,
+											playerCollision.previousBounds.topLeft.y + playerCollision.previousBounds.height * 0.5f
+										);
+
+										// Calculate direction from current position back to previous position
+										Point2D knockbackDir = previousCenter - currentCenter;
+										
+										// Normalize the direction vector
+										float distance = std::sqrt(knockbackDir.x * knockbackDir.x + knockbackDir.y * knockbackDir.y);
+										if (distance > 0.0f)
+										{
+											knockbackDir.x /= distance;
+											knockbackDir.y /= distance;
+										}
+										else
+										{
+											// Fallback: push away from enemy if no previous position difference
+											auto &enemyLoc = entityManager.template GetComponent<LocationComponent>(enemyId);
+											knockbackDir.x = (playerLoc.position.x > enemyLoc.position.x) ? 1.0f : -1.0f;
+											knockbackDir.y = -0.5f; // Slight upward
+										}
+
+										// Apply knockback velocity towards previous position
+										playerMovement.velocity.x = knockbackDir.x * enemy.knockbackForce;
+										playerMovement.velocity.y = knockbackDir.y * enemy.knockbackForce;
+									}
+
+									// Play random meow sound when player takes damage
+									{
+										static std::mt19937 rng(std::random_device{}());
+										std::uniform_int_distribution<int> dist(1, 3);
+										std::string meowSound = "meow_0" + std::to_string(dist(rng));
+										soundManager.PlaySound(meowSound, 200.0f); // 2x volume
 									}
 								}
 							}
-
-							// Apply knockback to player
-							if (entityManager.template HasComponent<MovementComponent>(playerId))
-							{
-								auto &playerMovement = entityManager.template GetComponent<MovementComponent>(playerId);
-								auto &playerLoc = entityManager.template GetComponent<LocationComponent>(playerId);
-								auto &enemyLoc = entityManager.template GetComponent<LocationComponent>(enemyId);
-
-								// Knockback direction: away from enemy
-								float knockbackDirX = (playerLoc.position.x > enemyLoc.position.x) ? 1.0f : -1.0f;
-
-								// Apply knockback velocity
-								playerMovement.velocity.x = knockbackDirX * enemy.knockbackForce;
-								playerMovement.velocity.y = -enemy.knockbackForce * 0.5f; // Slight upward knockback
-							}
-
-							// Play player hurt sound
-							soundManager.PlaySound("take_damage");
 						}
 					}
 
@@ -340,12 +433,36 @@ namespace ECSEngine
 
 							float appliedDamage = projectile.damage * dmgMultiplier;
 							enemy.hp -= appliedDamage;
+							enemy.damageFlashTimer = enemy.damageFlashDuration;
 
 							// Play enemy damage sound 
 							static std::mt19937 rng(std::random_device{}());
 							std::uniform_int_distribution<int> dist(1, 2);
 							std::string damageSoundName = enemy.damageSoundName + "_" + std::to_string(dist(rng));
 							soundManager.PlaySound(damageSoundName);
+
+							// Play projectile impact sound on enemy hit
+							switch (projectile.spellType)
+							{
+							case SpellType::Fire:
+							{
+								std::uniform_int_distribution<int> fireDist(1, 2);
+								std::string soundName = "fire_impact_" + std::to_string(fireDist(rng));
+								soundManager.PlaySound(soundName);
+								break;
+							}
+							case SpellType::Water:
+								soundManager.PlaySound("water_impact", 150.0f);
+								break;
+							case SpellType::Wind:
+								soundManager.PlaySound("wind_impact");
+								break;
+							case SpellType::Earth:
+								soundManager.PlaySound("earth_impact", 150.0f);
+								break;
+							default:
+								break;
+							}
 
 							// Remove the projectile
 							projectile.active = false;
@@ -397,12 +514,40 @@ namespace ECSEngine
 							if (entityManager.template HasComponent<HpComponent>(playerId))
 							{
 								auto &playerHp = entityManager.template GetComponent<HpComponent>(playerId);
-								playerHp.currentHp -= static_cast<int>(projectile.damage);
-								playerHp.invincibilityTimer = playerHp.invincibilityDuration;
+								
+								// Check if rock shield absorbs the hit
+								if (playerHp.hasRockShield)
+								{
+									// Shield absorbs 1 hit - remove shield
+									playerHp.hasRockShield = false;
+									
+									// Play shield break sound
+									soundManager.PlaySound("rock_shield_break");
+									
+									// Don't take damage, but still apply knockback (no flash, no hurt animation, no meow)
+									// Note: Projectile knockback would need to be implemented if desired
+									// For now, projectiles just get absorbed without knockback
+								}
+								else
+								{
+									// No shield - take normal damage
+									playerHp.currentHp -= static_cast<int>(projectile.damage);
+									// Clamp HP to not go below 0
+									if (playerHp.currentHp < 0)
+										playerHp.currentHp = 0;
+									playerHp.invincibilityTimer = playerHp.invincibilityDuration;
+									// Trigger damage flash effect
+									playerHp.damageFlashTimer = playerHp.damageFlashDuration;
+									
+									// Play random meow sound when player takes damage
+									{
+										static std::mt19937 rng(std::random_device{}());
+										std::uniform_int_distribution<int> dist(1, 3);
+										std::string meowSound = "meow_0" + std::to_string(dist(rng));
+										soundManager.PlaySound(meowSound, 200.0f); // 2x volume
+									}
+								}
 							}
-
-							// Play player hurt sound
-							soundManager.PlaySound("take_damage");
 
 							// Deactivate the projectile
 							projectile.active = false;
@@ -427,9 +572,24 @@ namespace ECSEngine
 							// Light the campfire
 							campfire.isLit = true;
 
-							// Update campfire sprite to lit version
-							if (entityManager.template HasComponent<SpriteComponent>(campfireId))
+							// Start burning animation
+							if (entityManager.template HasComponent<AnimationComponent>(campfireId))
 							{
+								auto &anim = entityManager.template GetComponent<AnimationComponent>(campfireId);
+								if (anim.animations.count("burning") > 0)
+								{
+									anim.Play("burning", true); // Loop the burning animation
+									// Set first frame immediately
+									if (entityManager.template HasComponent<SpriteComponent>(campfireId))
+									{
+										auto &sprite = entityManager.template GetComponent<SpriteComponent>(campfireId);
+										sprite.spriteId = anim.animations["burning"][0];
+									}
+								}
+							}
+							else if (entityManager.template HasComponent<SpriteComponent>(campfireId))
+							{
+								// Fallback: just update sprite if no animation component
 								auto &sprite = entityManager.template GetComponent<SpriteComponent>(campfireId);
 								sprite.spriteId = campfire.litSpriteId;
 							}
@@ -450,6 +610,14 @@ namespace ECSEngine
 
 								auto &checkpoint = entityManager.template GetComponent<CheckpointComponent>(playerId);
 								checkpoint.ActivateCheckpoint(campfire.checkpointIndex, checkpointPos);
+
+								// Also update initial spawn so future restarts use this campfire
+								if (entityManager.template HasComponent<HpComponent>(playerId))
+								{
+									auto &hp = entityManager.template GetComponent<HpComponent>(playerId);
+									hp.initialSpawnPosition = checkpointPos;
+								}
+								checkpoint.initialSpawnPosition = checkpointPos;
 							}
 
 							// Deactivate the projectile

@@ -5,6 +5,7 @@
 #include "SpriteComponent.h"
 #include "LocationComponent.h"
 #include "CollisionComponent.h"
+#include "HpComponent.h"
 #include <cmath>
 #include <SFML/Graphics/RectangleShape.hpp>
 
@@ -52,6 +53,9 @@ public:
             Rect dest;      // screen-space rect
             sf::IntRect texRect; // atlas rect
             bool flipX = false; // Flip horizontally
+            
+            EntityID entityId = 0; // Store entity ID for per-entity shader uniforms
+            float flashIntensity = 0.0f; // Flash intensity for red flash shader
         };
 
         std::vector<DrawItem> drawItems;
@@ -87,7 +91,19 @@ public:
             }
             else
             {
-                screenRect = spriteComp.bounds;
+                // For UI elements (inWorldSpace = false), use LocationComponent position + bounds
+                if (entityManager.template HasComponent<LocationComponent>(id))
+                {
+                    auto &loc = entityManager.template GetComponent<LocationComponent>(id);
+                    screenRect = Rect(
+                        loc.position + spriteComp.bounds.topLeft,
+                        spriteComp.bounds.width,
+                        spriteComp.bounds.height);
+                }
+                else
+                {
+                    screenRect = spriteComp.bounds;
+                }
             }
 
             sf::Sprite sfSprite = spriteManager.GetSprite(spriteComp.spriteId);
@@ -96,10 +112,57 @@ public:
             DrawItem item;
             item.layer = spriteComp.layer;
             item.parallax = GetParallaxFactor(spriteComp.layer);
-            item.shaderName = spriteComp.shaderName;
+            item.entityId = id;
             item.dest = screenRect;
             item.texRect = texRect;
             item.flipX = spriteComp.flipX;
+            
+            // Check if player is taking damage and apply red flash shader
+            // Or check if rock shield is active and apply brown shader
+            float flashIntensity = 0.0f;
+            float shieldIntensity = 0.0f;
+            if (entityManager.template HasComponent<HpComponent>(id))
+            {
+                auto &hpComp = entityManager.template GetComponent<HpComponent>(id);
+                if (hpComp.damageFlashTimer > 0.0f)
+                {
+                    // Damage flash takes priority - apply red flash shader
+                    float flashProgress = hpComp.damageFlashTimer / hpComp.damageFlashDuration;
+                    flashIntensity = 1.0f - (1.0f - flashProgress) * (1.0f - flashProgress);
+                    item.shaderName = "hurt";
+                    item.flashIntensity = flashIntensity;
+                }
+                else if (hpComp.hasRockShield)
+                {
+                    // Rock shield is active - apply brown shader
+                    item.shaderName = "rock_shield";
+                    shieldIntensity = 1.0f; // Full shield intensity
+                    item.flashIntensity = shieldIntensity; // Reuse flashIntensity field for shield
+                }
+                else
+                {
+                    item.shaderName = spriteComp.shaderName;
+                }
+            }
+            else if (entityManager.template HasComponent<EnemyComponent>(id))
+            {
+                auto &enemyComp = entityManager.template GetComponent<EnemyComponent>(id);
+                if (enemyComp.damageFlashTimer > 0.0f)
+                {
+                    float flashProgress = enemyComp.damageFlashTimer / enemyComp.damageFlashDuration;
+                    flashIntensity = 1.0f - (1.0f - flashProgress) * (1.0f - flashProgress);
+                    item.shaderName = "hurt";
+                    item.flashIntensity = flashIntensity;
+                }
+                else
+                {
+                    item.shaderName = spriteComp.shaderName;
+                }
+            }
+            else
+            {
+                item.shaderName = spriteComp.shaderName;
+            }
 
             drawItems.push_back(item);
         }
@@ -121,6 +184,7 @@ public:
         while (i < drawItems.size())
         {
             const std::string &currentShader = drawItems[i].shaderName;
+            float batchFlashIntensity = drawItems[i].flashIntensity; // Store flash intensity for this batch
 
             sf::Shader *shader = nullptr;
             if (!currentShader.empty())
@@ -175,6 +239,17 @@ public:
             sf::RenderStates states;
             states.texture = &atlasTexture; //atlas texture is the entire texture
             states.shader = shader;
+            
+            // Set flash intensity uniform if using hurt shader
+            if (shader && currentShader == "hurt")
+            {
+                shader->setUniform("flashIntensity", batchFlashIntensity);
+            }
+            // Set shield intensity uniform if using rock_shield shader
+            else if (shader && currentShader == "rock_shield")
+            {
+                shader->setUniform("shieldIntensity", batchFlashIntensity);
+            }
 
             window->draw(vertices, states);
         }

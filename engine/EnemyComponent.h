@@ -28,6 +28,10 @@ namespace ECSEngine
         float maxHp = 50.0f;
         float previousHp = 50.0f; // Track HP changes for hurt animation
 
+        // Damage flash effect
+        float damageFlashTimer = 0.0f;
+        float damageFlashDuration = 0.2f;
+
         // Damage dealt to player when touched
         float contactDamage = 1.0f;
 
@@ -46,6 +50,11 @@ namespace ECSEngine
         // Movement (for future use, enemies can move)
         bool canMove = false;
         float moveSpeed = 50.0f;
+        
+        // Random movement state for slimes
+        float moveDirection = 1.0f; // 1.0 = right, -1.0 = left
+        float directionChangeTimer = 0.0f; // Timer until next direction change
+        float directionChangeInterval = 2.0f; // Change direction every 2 seconds
 
         // Sound names for this enemy
         std::string damageSoundName = "slime_damage";

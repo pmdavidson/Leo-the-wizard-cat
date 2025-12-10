@@ -373,25 +373,79 @@ void LoadMap(const std::string &path, SceneType &scene)
 	// SpriteID blueSlimeSpriteId = scene.GetSpriteManager().RegisterTexture(
 	// 	resourceRoot + "sprites/blueSlime_idle_0.png", ECSEngine::Rect(0, 0, 96, 32));
 
+	// Register campfire sprites for checkpoints (needed in map parsing)
+	SpriteID campfireUnlitSpriteId = scene.GetSpriteManager().RegisterTexture(
+		gResourcePath + "sprites/campfire_unlit_1.png", ECSEngine::Rect(0.f, 0.f, 32.f, 32.f));
+	
+	// Register burning campfire animation frames (1-23)
+	std::vector<SpriteID> campfireBurningFrames;
+	for (int i = 1; i <= 23; ++i)
+	{
+		SpriteID id = scene.GetSpriteManager().RegisterTexture(
+			gResourcePath + "sprites/campfire_burning_" + std::to_string(i) + ".png",
+			ECSEngine::Rect(0.f, 0.f, 32.f, 32.f));
+		campfireBurningFrames.push_back(id);
+	}
+	// Use first burning frame as the lit sprite ID for CampfireComponent
+	SpriteID campfireLitSpriteId = campfireBurningFrames[0];
+
 	// Parse map rows
 	for (int y = 0; y < mapH; ++y)
 	{
 		std::getline(file, line);
 		for (int x = 0; x < mapW; ++x)
 		{
-			char tile = line[x];
+			// Guard against short map lines
+			char tile = (x < static_cast<int>(line.size())) ? line[x] : '.';
 			if (tile == '.')
 				continue;
+
+			ECSEngine::Point2D position = {
+				static_cast<float>(originX + x * tileW),
+				static_cast<float>(originY + y * tileH)};
+
+			// Campfire checkpoints - use '0', '1', '2', '3' for checkpoint indices 0-3
+			if (tile == '0' || tile == '1' || tile == '2' || tile == '3')
+			{
+				// Get checkpoint index from tile character
+				size_t checkpointIndex = static_cast<size_t>(tile - '0');
+				
+				// Create campfire entity
+				EntityId campfireId = scene.GetEntityManager().CreateEntity("campfire_" + std::to_string(checkpointIndex));
+				
+				// Position - align bottom of campfire with tile bottom
+				ECSEngine::Point2D campfirePos(position.x, position.y + tileH - 32.0f);
+				
+				scene.GetEntityManager().template AddComponent<ECSEngine::LocationComponent>(
+					campfireId, ECSEngine::LocationComponent(campfirePos));
+				
+				// Start with unlit sprite
+				scene.GetEntityManager().template AddComponent<ECSEngine::SpriteComponent>(
+					campfireId, {campfireUnlitSpriteId, ECSEngine::Rect(0.f, 0.f, 32.f, 32.f), true, 1});
+				
+				// Collision component - static, only collides with projectiles (handled in CollisionSystem)
+				scene.GetEntityManager().template AddComponent<ECSEngine::CollisionComponent>(
+					campfireId, ECSEngine::CollisionComponent(ECSEngine::Rect(0.f, 0.f, 32.f, 32.f), true));
+				
+				// Campfire component
+				scene.GetEntityManager().template AddComponent<ECSEngine::CampfireComponent>(
+					campfireId, ECSEngine::CampfireComponent(checkpointIndex, campfireUnlitSpriteId, campfireLitSpriteId));
+				
+				// Animation component for burning animation
+				ECSEngine::AnimationComponent campfireAnim;
+				campfireAnim.animations["burning"] = campfireBurningFrames;
+				scene.GetEntityManager().template AddComponent<ECSEngine::AnimationComponent>(campfireId, campfireAnim);
+				
+				continue; // Skip regular tile creation for campfires
+			}
+
+			// Regular tile handling
 			if (!dictionary.contains(tile))
 			{
 				continue;
 			}
 
 			const SpriteEntry &entry = dictionary[tile];
-
-			ECSEngine::Point2D position = {
-				static_cast<float>(originX + x * tileW),
-				static_cast<float>(originY + y * tileH)};
 
 			EntityId id = scene.GetEntityManager().CreateEntity("tile_" + std::string(1, tile)); // what is this
 
@@ -553,16 +607,32 @@ void LoadMap(const std::string &path, SceneType &scene)
 		}
 		earthProps.explosionSize = 64.0f;
 
-		// Wind spell: low damage, very fast (placeholder - no sprites yet)
+		// Wind spell: low damage, very fast
 		auto &windProps = spellComp.spellProperties[static_cast<size_t>(ECSEngine::SpellType::Wind)];
 		windProps.damage = 8.0f;
 		windProps.speed = 500.0f;
 		windProps.cooldown = 0.3f;
 		windProps.lifetime = 150.0f;
-		windProps.size = 24.0f;
-		windProps.flyingFrames = fireProps.flyingFrames; // Use fire as placeholder
-		windProps.spriteId = fireProps.spriteId;
-		windProps.explosionFrames = fireProps.explosionFrames;
+		windProps.size = 28.0f; // Match other spells (28x22 bounding box)
+
+		// Register tornado flying animation frames (1-3)
+		for (int i = 1; i <= 3; ++i)
+		{
+			SpriteID id = scene.GetSpriteManager().RegisterTexture(
+				gResourcePath + "sprites/tornado_flying_" + std::to_string(i) + ".png",
+				ECSEngine::Rect(0.f, 0.f, 28.f, 22.f));
+			windProps.flyingFrames.push_back(id);
+		}
+		windProps.spriteId = windProps.flyingFrames[0];
+
+		// Register tornado explosion frames (1-4)
+		for (int i = 1; i <= 4; ++i)
+		{
+			SpriteID id = scene.GetSpriteManager().RegisterTexture(
+				gResourcePath + "sprites/tornado_explode_" + std::to_string(i) + ".png",
+				ECSEngine::Rect(0.f, 0.f, 28.f, 22.f));
+			windProps.explosionFrames.push_back(id);
+		}
 		windProps.explosionSize = 32.0f;
 
 		// Configure element switch cooldown (time between switching elements)
@@ -646,8 +716,10 @@ void LoadMap(const std::string &path, SceneType &scene)
 		SpriteID heartEmptySpriteId = scene.GetSpriteManager().RegisterTexture(
 			gResourcePath + "sprites/heart_empty_0.png", ECSEngine::Rect(0.f, 0.f, heartEmptyWidth, heartEmptyHeight));
 
-		// Create HpComponent for player (3 hearts total)
-		ECSEngine::HpComponent hpComp(3, heartFullSpriteId, heartEmptySpriteId);
+		// Create HpComponent for player (5 hearts total)
+		ECSEngine::HpComponent hpComp(5, heartFullSpriteId, heartEmptySpriteId);
+		// Set initial spawn position for game restart
+		hpComp.initialSpawnPosition = ECSEngine::Point2D(spawnX, spawnY);
 
 		// Create 5 heart display entities at top left
 		// Scale hearts to be larger (1.5x size)
@@ -676,29 +748,12 @@ void LoadMap(const std::string &path, SceneType &scene)
 
 		scene.GetEntityManager().template AddComponent<ECSEngine::HpComponent>(player, hpComp);
 
-		// // Set up checkpoint system
-		// ECSEngine::CheckpointComponent checkpointComp(ECSEngine::Point2D(spawnX, spawnY));
-		// scene.GetEntityManager().template AddComponent<ECSEngine::CheckpointComponent>(player, checkpointComp);
+		// Set up checkpoint system
+		ECSEngine::CheckpointComponent checkpointComp(ECSEngine::Point2D(spawnX, spawnY));
+		scene.GetEntityManager().template AddComponent<ECSEngine::CheckpointComponent>(player, checkpointComp);
 
-		// Register campfire sprites for checkpoints
-		// SpriteID campfireUnlitSpriteId = scene.GetSpriteManager().RegisterTexture(
-		// 	gResourcePath + "sprites/campfire-sprite-unlit-1.png", ECSEngine::Rect(0.f, 0.f, 64.f, 64.f));
-		// SpriteID campfireLitSpriteId = scene.GetSpriteManager().RegisterTexture(
-		// 	gResourcePath + "sprites/campfire-sprite-1.png", ECSEngine::Rect(0.f, 0.f, 64.f, 64.f));
-
-		// Create a sample campfire checkpoint (checkpoint 0) at a specific location
-		// You can add more campfires at different positions for different checkpoints
-		// EntityId campfire0 = scene.GetEntityManager().CreateEntity("campfire_0");
-		// ECSEngine::Point2D campfire0Pos(tileW * 10, tileH * 7); // Adjust position as needed
-
-		// scene.GetEntityManager().template AddComponent<ECSEngine::LocationComponent>(
-		// 	campfire0, ECSEngine::LocationComponent(campfire0Pos));
-		// scene.GetEntityManager().template AddComponent<ECSEngine::SpriteComponent>(
-		// 	campfire0, {campfireUnlitSpriteId, ECSEngine::Rect(0.f, 0.f, 64.f, 64.f), true});
-		// scene.GetEntityManager().template AddComponent<ECSEngine::CollisionComponent>(
-		// 	campfire0, ECSEngine::CollisionComponent(ECSEngine::Rect(0.f, 0.f, 64.f, 64.f), false));
-		// scene.GetEntityManager().template AddComponent<ECSEngine::CampfireComponent>(
-		// 	campfire0, ECSEngine::CampfireComponent(0, campfireUnlitSpriteId, campfireLitSpriteId));
+		// Campfire checkpoints are now created from map file (tiles '0', '1', '2', '3')
+		// No need to create them manually here
 
 		// TODO LAYERING WITH WORLD
 		// SOUNDS
@@ -708,6 +763,10 @@ void LoadMap(const std::string &path, SceneType &scene)
 		scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/sfx_gem.ogg", "star_collect");
 		scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/Walking and Running on Grass Sound Effect [Minecraft] [TubeRipper.cc].ogg", "walk");
 		scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/cat_take_damage1.ogg", "take_damage");
+		// Register meow sounds for when player takes damage
+		scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/cat_meow-01.ogg", "meow_01");
+		scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/cat_meow-02.ogg", "meow_02");
+		scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/cat_meow-03.ogg", "meow_03");
 
 		// scene.GetSpriteManager().SaveAtlas(gResourcePath + "atlas_debug_output.png");
 
@@ -717,8 +776,7 @@ void LoadMap(const std::string &path, SceneType &scene)
 		scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/fireball_whoosh-2.ogg", "fire_cast_2");
 		scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/waterball_whoosh_1.ogg", "water_cast");
 		scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/rock_whooshing_1.ogg", "earth_cast");
-		// Wind has no sound assets yet, using fire as placeholder
-		scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/fireball_whoosh-2.ogg", "wind_cast");
+		scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/wind_whoosh_1.ogg", "wind_cast");
 
 		// Register spell impact sounds
 		// Fire spell has two impact variants for variety
@@ -726,20 +784,25 @@ void LoadMap(const std::string &path, SceneType &scene)
 		scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/fireball_impact2.ogg", "fire_impact_2");
 		scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/waterball_explode_1.ogg", "water_impact");
 		scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/rock_explode_1.ogg", "earth_impact");
-		// Wind has no sound assets yet, using fire as placeholder
-		scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/fireball_impact1.ogg", "wind_impact");
+		scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/wind_explosion_1.ogg", "wind_impact");
 
 		// Register element selection sounds (using cast sounds as placeholders)
 		scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/fireball_whoosh-1.ogg", "fire_select");
 		scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/waterball_whoosh_1.ogg", "water_select");
 		scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/rock_whooshing_1.ogg", "earth_select");
-		// Wind has no sound assets yet, using fire as placeholder
-		scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/fireball_whoosh-2.ogg", "wind_select");
+		scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/wind_whoosh_1.ogg", "wind_select");
 
 		// Register enemy sounds
 		scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/slime_die1.ogg", "slime_die");
 		scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/slime_take_dmg1.ogg", "slime_damage_1");
 		scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/slime_take_dmg2.ogg", "slime_damage_2");
+		
+		// Register rock shield break sound
+		scene.GetSoundManager().RegisterSound(gResourcePath + "sounds/rock_shield_break.ogg", "rock_shield_break");
+
+		// Register shaders
+		scene.GetShaderManager().RegisterShader(gResourcePath + "hurt.frag", "hurt");
+		scene.GetShaderManager().RegisterShader(gResourcePath + "rock_shield.frag", "rock_shield");
 	}
 }
 

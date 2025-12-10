@@ -9,6 +9,8 @@
 #include "CollisionComponent.h"
 #include "SpriteComponent.h"
 #include "AnimationComponent.h"
+#include "HpComponent.h"
+#include "SpriteComponent.h"
 #include "SoundManager.h"
 #include <unordered_map>
 #include <array>
@@ -39,6 +41,49 @@ namespace ECSEngine
                     !entityManager.template HasComponent<InputComponent>(entityId))
                     continue;
 
+                // Skip spell processing if player is dead or dying
+                if (entityManager.template HasComponent<HpComponent>(entityId))
+                {
+                    auto &hpComp = entityManager.template GetComponent<HpComponent>(entityId);
+                    if (!hpComp.isAlive || hpComp.isDying)
+                    {
+                        continue; // Skip all spell processing during death
+                    }
+                }
+                
+                // Update rock shield based on selected spell
+                if (entityManager.template HasComponent<HpComponent>(entityId) &&
+                    entityManager.template HasComponent<SpellComponent>(entityId))
+                {
+                    auto &hpComp = entityManager.template GetComponent<HpComponent>(entityId);
+                    auto &spellComp = entityManager.template GetComponent<SpellComponent>(entityId);
+                    
+                    // Get previous spell
+                    SpellType prevSpell = spellComp.selectedSpell;
+                    if (mPrevSelectedSpell.find(entityId) != mPrevSelectedSpell.end())
+                    {
+                        prevSpell = mPrevSelectedSpell[entityId];
+                    }
+                    
+                    // Check if we just switched TO rock
+                    bool justSwitchedToRock = (spellComp.selectedSpell == SpellType::Earth) && 
+                                              (prevSpell != SpellType::Earth);
+                    
+                    // Activate rock shield only when switching to rock
+                    if (justSwitchedToRock)
+                    {
+                        hpComp.hasRockShield = true;
+                    }
+                    // Deactivate shield when switching away from rock
+                    else if (spellComp.selectedSpell != SpellType::Earth && hpComp.hasRockShield)
+                    {
+                        hpComp.hasRockShield = false;
+                    }
+                    
+                    // Track current spell for next frame
+                    mPrevSelectedSpell[entityId] = spellComp.selectedSpell;
+                }
+
                 auto &spellComp = entityManager.template GetComponent<SpellComponent>(entityId);
                 auto &inputComp = entityManager.template GetComponent<InputComponent>(entityId);
 
@@ -62,6 +107,8 @@ namespace ECSEngine
         // Track previous key states for edge detection
         std::unordered_map<EntityID, std::array<bool, 4>> mPrevSelectKeyStates;
         std::unordered_map<EntityID, bool> mPrevCastKeyState;
+        // Track previous spell selection to detect when switching TO rock
+        std::unordered_map<EntityID, SpellType> mPrevSelectedSpell;
 
         // Update all cooldowns
         void UpdateCooldowns(SpellComponent &spellComp, float deltaTime)

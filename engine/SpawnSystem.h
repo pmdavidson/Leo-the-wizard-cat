@@ -89,13 +89,20 @@ namespace ECSEngine
 							// Add EnemyComponent for slime
 							EnemyComponent enemy;
 							enemy.type = EnemyType::Slime;
+							enemy.canMove = true; // Enable movement for slimes
+							enemy.moveSpeed = 30.0f; // Slime movement speed
+							// Initialize random direction and timer
+							static std::mt19937 rng(std::random_device{}());
+							std::uniform_real_distribution<float> dirDist(0.0f, 1.0f);
+							enemy.moveDirection = (dirDist(rng) < 0.5f) ? -1.0f : 1.0f;
+							std::uniform_real_distribution<float> timeDist(1.0f, 3.0f);
+							enemy.directionChangeTimer = timeDist(rng);
 							enemy.hp = 30.0f;
 							enemy.maxHp = 30.0f;
 							enemy.previousHp = 30.0f;
-							enemy.contactDamage = 10.0f;
+							enemy.contactDamage = 1.0f; // Slimes deal 1 damage per hit
 							enemy.knockbackForce = 300.0f;
 							enemy.isAlive = true;
-							enemy.canMove = false;
 							enemy.damageSoundName = "slime_damage";
 							enemy.deathSoundName = "slime_die";
 
