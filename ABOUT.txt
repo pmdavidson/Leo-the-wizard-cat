@@ -1,3 +1,4 @@
+Project 3
 Managers
 --------
 The SpriteManager stores textures in an unordered_map and sprites in a vector,
@@ -87,3 +88,86 @@ Group B: CameraComponent, CameraFollowerComponent, CameraShakeComponent, InputCo
 Managers:
 Group A: EntityManager, SoundManager, ECSEngine.h
 Group B: WindowManager, SpriteManager, MathUtil.h, ECSEngine.h
+
+Project 4
+Managers
+--------
+The SpriteManager stores textures in an unordered_map and sprites in a vector,
+both valid for the SpriteManager's lifetime. The atlas is finalized after map
+load to avoid reallocations; SpriteIDs remain valid for the lifetime.
+
+The SoundManager stores sound buffers and sound instances in separate
+unordered_maps, both valid for the SoundManager's lifetime. PlaySound() uses the
+stored instances with non-blocking playback, allowing multiple sounds to play
+simultaneously.
+
+The WindowManager's GetWindow() returns a pointer valid for the WindowManager's
+lifetime. The window is created by ECSEngine; camera settings persist until
+explicitly changed.
+
+The EntityManager maintains EntityIDs that are valid until RemoveEntity() is
+called, after which they may be reused. GetComponent() returns a reference valid
+until the component or entity is removed. Component references are invalidated
+by RemoveComponent() or RemoveEntity().
+
+The ShaderManager caches shaders (hurt flash, rock shield). The SystemManager
+holds and runs systems per scene. ECSEngine owns one window and a scene stack;
+only the top scene runs each frame and the engine does a single display().
+
+Scenes
+------
+MainMenuScene: draws “Leo the Wizard Cat” and “Press Enter to Start”; completes
+on Enter to reveal gameplay.
+
+GameplayScene: full cat/slime platformer; Escape edge-press pushes PauseScene.
+
+PauseScene: dark overlay with “Paused” and resume prompt; Enter/Esc pops it.
+
+Systems
+-------
+
+InputSystem applies buffered input to movement/jump/dash/wall-slide intents.
+
+SpellSystem handles element select (1–4) and casting (E), spawns projectiles based on where we are looking ie the last directional input. This is
+also the system that manages the sounds when we swap to a different element and when we fire said element. It tracks which element we were on.
+
+ProjectileSystem manages the actual spell flying and colliding. So when we send a spell out they become a projectile and when they collide it depends ont this
+system to dictate the explosion, ie the sounds and animations for the specific spell
+
+EnemySystem manages slimes (movement, damage flash, death, resistances). This means that this is what has the component and manages what happens 
+to slimes when hit, what resistances they have, and it does use the hpSystem in tandem to track the slime hp. The movement here is just random left or right
+movement where we will randomly swap directions while moving.
+
+HpSystem tracks health, invulnerability timers, dying state, and rock shield. 
+
+CheckpointSystem/Campfire manages checkpoints and saves.
+
+CameraSystem was changed to a lookahead system instead so depending on where the player is going thats where more of the screen realestate will be.
+
+AnimationSystem plays and stores animations for player, enemies, spells, explosions.
+
+SpriteSystem renders atlas sprites (world/UI), supports flip and shaders for
+damage/shield, and parallax per layer. we have layers -3 to 3, where 1 and 2 are the neutral 1.0 layers with no parallax
+
+SpawnSystem handles map-driven enemy/entity spawns.
+
+Components
+-----------------------
+LocationComponent, MovementComponent, CollisionComponent (local/current AABB),
+SpriteComponent (bounds, layer, flip), GravityComponent, InputComponent,
+CameraComponent/Follower/Shake, ScoreComponent, SpellComponent,
+ProjectileComponent (lifetime, gracePeriod, owner), EnemyComponent, HpComponent,
+CheckpointComponent, CampfireComponent, AnimationComponent.
+
+DESIGN DECISIONS
+---------------
+Freed entity slots are reused to minimize allocation; components use vector
+storage with entity-to-index mapping. Fixed timestep assumption ~1/60s; Scene
+clamps dt to 1/30s max to prevent physics spikes. Scene stack isolates
+menu/pause/gameplay with one display() in ECSEngine. Parallax keeps gameplay
+layers at 1.0 to align sprites and colliders; backgrounds use <1 for depth.
+Projectiles have a 0.1s grace period to avoid self-collision and enforce
+lifetime-based removal. Atlas is finalized once after map load to lock sprite
+rects/IDs. We reuse prior helpers (EntityManager, MathUtil) and extend with
+spells, enemies, hp/checkpoint, and scenes.
+

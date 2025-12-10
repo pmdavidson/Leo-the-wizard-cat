@@ -239,7 +239,7 @@ namespace ECSEngine
                        SpellComponent &spellComp, SoundManager &soundManager)
         {
             auto &entityManager = scene.GetEntityManager();
-            auto &spriteManager = scene.GetSpriteManager();
+            [[maybe_unused]] auto &spriteManager = scene.GetSpriteManager();
 
             // Get caster position and collision box
             if (!entityManager.template HasComponent<LocationComponent>(casterId) ||

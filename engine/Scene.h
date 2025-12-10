@@ -27,6 +27,7 @@ namespace ECSEngine
 	class Scene
 	{
 	public:
+		virtual ~Scene() = default;
 		/**
 		 * @brief Constructs a Scene with a shared pointer to the window.
 		 *
@@ -42,8 +43,9 @@ namespace ECSEngine
 		 *
 		 * @param engine Reference to the ECS engine managing this scene.
 		 */
-		void Run(ECSEngine<Components...> &engine)
+		virtual void Run(ECSEngine<Components...> &engine)
 		{
+			(void)engine; 
 			mDeltaTime = mClock.restart();   // update deltaTime
 			
 			// Clamp delta time to prevent physics explosions on first frame or lag spikes
@@ -152,7 +154,7 @@ namespace ECSEngine
 		 *
 		 * @return true if the scene is marked as complete, false otherwise.
 		 */
-		bool IsComplete() const
+		virtual bool IsComplete() const
 		{
 			return mIsComplete;
 		}
@@ -165,6 +167,16 @@ namespace ECSEngine
 		sf::RenderWindow *GetWindow() const
 		{
 			return mWindow.get();
+		}
+
+		/**
+		 * @brief Gets the shared pointer to the render window.
+		 *
+		 * @return std::shared_ptr<sf::RenderWindow> Shared pointer to the render window.
+		 */
+		std::shared_ptr<sf::RenderWindow> GetWindowPtr() const
+		{
+			return mWindow;
 		}
 
 	private:
