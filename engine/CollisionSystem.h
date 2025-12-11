@@ -119,17 +119,6 @@ namespace ECSEngine
 					bool isPlayerCampfireCollision = (isPlayerA && isCampfireB) || (isPlayerB && isCampfireA);
 					bool isWaterTileCollision = (isPlayerA && isWaterTileB) || (isPlayerB && isWaterTileA);
 
-					bool isStarA = !isPlayerA && !isSpawnerA && !isEnemyA && !isProjectileA && !isCampfireA &&
-								   entityManager.template HasComponent<CollisionComponent>(idA) &&
-								   !entityManager.template GetComponent<CollisionComponent>(idA).isStatic &&
-								   (entityManager.template HasComponent<GravityComponent>(idA) ||
-									!entityManager.template HasComponent<MovementComponent>(idA));
-					bool isStarB = !isPlayerB && !isSpawnerB && !isEnemyB && !isProjectileB && !isCampfireB &&
-								   entityManager.template HasComponent<CollisionComponent>(idB) &&
-								   !entityManager.template GetComponent<CollisionComponent>(idB).isStatic &&
-								   (entityManager.template HasComponent<GravityComponent>(idB) ||
-									!entityManager.template HasComponent<MovementComponent>(idB));
-
 					// Skip collision resolution entirely if a projectile overlaps its owner (avoid pushback/stick)
 					if ((isProjectileA && isPlayerB &&
 						 entityManager.template GetComponent<ProjectileComponent>(idA).ownerEntityId == idB) ||
@@ -340,33 +329,6 @@ namespace ECSEngine
 
 					bool removedA = false;
 					bool removedB = false;
-
-					// Handle player-star collisions
-					if ((isPlayerA && isStarB) || (isPlayerB && isStarA))
-					{
-						soundManager.PlaySound("star_collect");
-
-						for (auto scoreIt = entityManager.begin(); scoreIt != entityManager.end(); ++scoreIt)
-						{
-							EntityID scoreEntityId = scoreIt->getID();
-							if (entityManager.template HasComponent<ScoreComponent>(scoreEntityId))
-							{
-								entityManager.template GetComponent<ScoreComponent>(scoreEntityId).currentScore += 10;
-								break;
-							}
-						}
-
-						if (isStarA)
-						{
-							entityManager.RemoveEntity(idA);
-							removedA = true;
-						}
-						else
-						{
-							entityManager.RemoveEntity(idB);
-							removedB = true;
-						}
-					}
 
 					// Handle player-enemy collisions
 					if ((isPlayerA && isEnemyB) || (isPlayerB && isEnemyA))
@@ -740,85 +702,6 @@ namespace ECSEngine
 
 							// Deactivate the projectile
 							projectile.active = false;
-						}
-					}
-
-					// Handle star collisions
-					if (!removedA && isStarA && entityManager.template HasComponent<MovementComponent>(idA))
-					{
-						auto &movementCompA = entityManager.template GetComponent<MovementComponent>(idA);
-
-						if (colB.isStatic)
-						{
-							const float speedLoss = 0.5f;
-							if (colA.collidedSides.left || colA.collidedSides.right)
-								movementCompA.velocity.x = -movementCompA.velocity.x * speedLoss;
-							if (colA.collidedSides.top || colA.collidedSides.bottom)
-							{
-								movementCompA.velocity.y = -movementCompA.velocity.y * speedLoss;
-							}
-						}
-						else if (!removedB && isStarB)
-						{
-							bool isVerticalCollision = colA.collidedSides.top || colA.collidedSides.bottom ||
-													   colB.collidedSides.top || colB.collidedSides.bottom;
-
-							if (isVerticalCollision)
-							{
-								if (entityManager.template HasComponent<GravityComponent>(idA))
-									entityManager.template RemoveComponent<GravityComponent>(idA);
-								if (entityManager.template HasComponent<MovementComponent>(idA))
-									entityManager.template RemoveComponent<MovementComponent>(idA);
-
-								if (entityManager.template HasComponent<GravityComponent>(idB))
-									entityManager.template RemoveComponent<GravityComponent>(idB);
-								if (entityManager.template HasComponent<MovementComponent>(idB))
-									entityManager.template RemoveComponent<MovementComponent>(idB);
-							}
-							else
-							{
-								movementCompA.velocity = Point2D(0.0f, 0.0f);
-								if (entityManager.template HasComponent<MovementComponent>(idB))
-									entityManager.template GetComponent<MovementComponent>(idB).velocity = Point2D(0.0f, 0.0f);
-							}
-						}
-					}
-					else if (!removedB && isStarB && entityManager.template HasComponent<MovementComponent>(idB))
-					{
-						auto &movementCompB = entityManager.template GetComponent<MovementComponent>(idB);
-
-						if (colA.isStatic)
-						{
-							const float speedLoss = 0.75f;
-							if (colB.collidedSides.left || colB.collidedSides.right)
-								movementCompB.velocity.x = -movementCompB.velocity.x * speedLoss;
-							if (colB.collidedSides.top || colB.collidedSides.bottom)
-							{
-								movementCompB.velocity.y = -movementCompB.velocity.y * speedLoss;
-							}
-						}
-						else if (!removedA && isStarA)
-						{
-							bool isVerticalCollision = colA.collidedSides.top || colA.collidedSides.bottom ||
-													   colB.collidedSides.top || colB.collidedSides.bottom;
-
-							if (isVerticalCollision)
-							{
-								if (entityManager.template HasComponent<GravityComponent>(idA))
-									entityManager.template RemoveComponent<GravityComponent>(idA);
-								if (entityManager.template HasComponent<MovementComponent>(idA))
-									entityManager.template RemoveComponent<MovementComponent>(idA);
-								if (entityManager.template HasComponent<GravityComponent>(idB))
-									entityManager.template RemoveComponent<GravityComponent>(idB);
-								if (entityManager.template HasComponent<MovementComponent>(idB))
-									entityManager.template RemoveComponent<MovementComponent>(idB);
-							}
-							else
-							{
-								movementCompB.velocity = Point2D(0.0f, 0.0f);
-								if (entityManager.template HasComponent<MovementComponent>(idA))
-									entityManager.template GetComponent<MovementComponent>(idA).velocity = Point2D(0.0f, 0.0f);
-							}
 						}
 					}
 				}

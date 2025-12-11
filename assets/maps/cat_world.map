@@ -13,11 +13,10 @@ l swampTile_idle_10.png 0 0 32 32 0 0 32 32
 r swampTile_idle_12.png 0 0 32 32 0 0 32 32
 z water_idle_1.png 0 0 32 32 0 0 32 32
 
-map origin 0 0 tile 32 32 size 90 7
-.................G.....................................GGG.................GGG1..........G
-.................G.......G..............z...............GG...................GG...........
-.................G.......Gz......S......z0...............G...........S.......SG...........
-.................G.......GzzG.........GzzGz.......S.....zG................................
-.................G.......GzzzGGGGGGGGGzzzGzz...........zzG.......GGGGGGGGGGGGGG...........
+map origin 0 0 tile 32 32 size 90 6
+G................G.....................................GGG.................GGG1..........m
+G................G.......G..............z...............GG...................GG..........G
+G................G.......Gz......S......z0...............G...........S.......SG..........G
+G................G.......GzzG.........GzzGz.......S.....zG...............................G
+G................G.......GzzzGGGGGGGGGzzzGzz...........zzG.......GGGGGGGGGGGGGG..........G
 hGGGGGGGGGGGGGGGGGzzzzzzzzzzzzzzzzzzzzzzzGGGGGGGGGGGGGGGGGzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz
-zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz
