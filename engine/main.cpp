@@ -241,8 +241,11 @@ void LoadMap(const std::string &path, SceneType &scene)
 		ss >> dummy >> mapW >> mapH;
 	}
 
-	// Register blueSlime sprite for spawning
+	// Register slime sprites for spawning
 	ECSEngine::AnimationComponent blueSlimeAnimComp;
+	ECSEngine::AnimationComponent redSlimeAnimComp;
+	ECSEngine::AnimationComponent greenSlimeAnimComp;
+	ECSEngine::AnimationComponent brownSlimeAnimComp;
 
 	sf::Image original;
 	if (!original.loadFromFile(gResourcePath + "sprites/blueSlime_idle_0.png"))
@@ -256,6 +259,9 @@ void LoadMap(const std::string &path, SceneType &scene)
 
 	SpriteID blueSlimeSpriteId = scene.GetSpriteManager().RegisterTexture(gResourcePath + "sprites/blueSlime_idle_0.png", imgRect);
 	Textures[gResourcePath + "sprites/blueSlime_idle_0.png"] = blueSlimeSpriteId;
+	SpriteID redSlimeSpriteId = 0;
+	SpriteID greenSlimeSpriteId = 0;
+	SpriteID brownSlimeSpriteId = 0;
 
 	// Add frame to animation map
 	blueSlimeAnimComp.animations["idle"].push_back(blueSlimeSpriteId);
@@ -396,9 +402,9 @@ void LoadMap(const std::string &path, SceneType &scene)
 
 		// Animation components to accumulate frames BEFORE adding to entities
 		ECSEngine::AnimationComponent catAnim;
-		ECSEngine::AnimationComponent redSlimeAnimComp;
-		ECSEngine::AnimationComponent greenSlimeAnimComp;
-		ECSEngine::AnimationComponent brownSlimeAnimComp;
+		bool redFirstSet = false;
+		bool greenFirstSet = false;
+		bool brownFirstSet = false;
 
 		// Track first sprite and bounds for each entity
 		SpriteID catFirstSprite = 0;
@@ -483,6 +489,11 @@ void LoadMap(const std::string &path, SceneType &scene)
 					Textures[fullpath] = spriteId;
 
 					redSlimeAnimComp.animations[animation].push_back(spriteId);
+					if (!redFirstSet)
+					{
+						redSlimeSpriteId = spriteId;
+						redFirstSet = true;
+					}
 				}
 				else if (name == "greenSlime")
 				{
@@ -490,6 +501,11 @@ void LoadMap(const std::string &path, SceneType &scene)
 					Textures[fullpath] = spriteId;
 
 					greenSlimeAnimComp.animations[animation].push_back(spriteId);
+					if (!greenFirstSet)
+					{
+						greenSlimeSpriteId = spriteId;
+						greenFirstSet = true;
+					}
 				}
 				else if (name == "brownSlime")
 				{
@@ -497,6 +513,11 @@ void LoadMap(const std::string &path, SceneType &scene)
 					Textures[fullpath] = spriteId;
 
 					brownSlimeAnimComp.animations[animation].push_back(spriteId);
+					if (!brownFirstSet)
+					{
+						brownSlimeSpriteId = spriteId;
+						brownFirstSet = true;
+					}
 				}
 				else
 				{
@@ -504,6 +525,32 @@ void LoadMap(const std::string &path, SceneType &scene)
 				}
 			}
 		}
+
+		// Helpers to get a default frame for sprites/animations
+		auto getFirstFrame = [](const std::unordered_map<std::string, std::vector<SpriteID>>& anims) -> SpriteID
+		{
+			auto idleIt = anims.find("idle");
+			if (idleIt != anims.end() && !idleIt->second.empty())
+				return idleIt->second.front();
+			for (const auto& kv : anims)
+			{
+				if (!kv.second.empty())
+					return kv.second.front();
+			}
+			return 0;
+		};
+
+		auto ensureSpriteId = [&](SpriteID current, const std::unordered_map<std::string, std::vector<SpriteID>>& anims) -> SpriteID
+		{
+			if (current != 0)
+				return current;
+			return getFirstFrame(anims);
+		};
+
+		blueSlimeSpriteId = ensureSpriteId(blueSlimeSpriteId, blueSlimeAnimComp.animations);
+		redSlimeSpriteId = ensureSpriteId(redSlimeSpriteId, redSlimeAnimComp.animations);
+		greenSlimeSpriteId = ensureSpriteId(greenSlimeSpriteId, greenSlimeAnimComp.animations);
+		brownSlimeSpriteId = ensureSpriteId(brownSlimeSpriteId, brownSlimeAnimComp.animations);
 
 		// Now add the accumulated animation components to entities ONCE
 		if (catHasSprite)
@@ -535,21 +582,23 @@ void LoadMap(const std::string &path, SceneType &scene)
 			if (scene.GetEntityManager().template HasComponent<ECSEngine::SpawnComponent>(spawnerId))
 			{
 				auto &spawnComp = scene.GetEntityManager().template GetComponent<ECSEngine::SpawnComponent>(spawnerId);
-				if (spawnComp.spawnDescription == "blueSlime")
+				// Allow spawner to pick any slime color randomly
+				spawnComp.variants.clear();
+				if (!blueSlimeAnimComp.animations.empty())
+					spawnComp.variants.push_back({"blueSlime", blueSlimeSpriteId, blueSlimeAnimComp.animations});
+				if (!redSlimeAnimComp.animations.empty() && redSlimeSpriteId != 0)
+					spawnComp.variants.push_back({"redSlime", redSlimeSpriteId, redSlimeAnimComp.animations});
+				if (!greenSlimeAnimComp.animations.empty() && greenSlimeSpriteId != 0)
+					spawnComp.variants.push_back({"greenSlime", greenSlimeSpriteId, greenSlimeAnimComp.animations});
+				if (!brownSlimeAnimComp.animations.empty() && brownSlimeSpriteId != 0)
+					spawnComp.variants.push_back({"brownSlime", brownSlimeSpriteId, brownSlimeAnimComp.animations});
+
+				// Just in case
+				if (!blueSlimeAnimComp.animations.empty())
 				{
+					spawnComp.spawnDescription = "blueSlime";
+					spawnComp.spriteId = blueSlimeSpriteId;
 					spawnComp.animations = blueSlimeAnimComp.animations;
-				}
-				else if (spawnComp.spawnDescription == "redSlime")
-				{
-					spawnComp.animations = redSlimeAnimComp.animations;
-				}
-				else if (spawnComp.spawnDescription == "greenSlime")
-				{
-					spawnComp.animations = greenSlimeAnimComp.animations;
-				}
-				else if (spawnComp.spawnDescription == "brownSlime")
-				{
-					spawnComp.animations = brownSlimeAnimComp.animations;
 				}
 			}
 		}

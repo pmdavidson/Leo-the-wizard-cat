@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Project 3 Platformer: ECSEngine::SoundManager Class Reference</title>
+<title>Project 4 (Leo the Cat Wizard): ECSEngine::SoundManager Class Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -21,7 +21,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">Project 3 Platformer
+   <div id="projectname">Project 4 (Leo the Cat Wizard)
    </div>
   </td>
  </tr>
@@ -69,7 +69,7 @@ $(function() {
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="namespaceECSEngine.html">ECSEngine</a></li><li class="navelem"><a class="el" href="classECSEngine_1_1SoundManager.html">SoundManager</a></li>  </ul>
+<li class="navelem"><b>ECSEngine</b></li><li class="navelem"><a class="el" href="classECSEngine_1_1SoundManager.html">SoundManager</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -87,76 +87,24 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a1109739510e6619c9832643dbf967a3b" id="r_a1109739510e6619c9832643dbf967a3b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classECSEngine_1_1SoundManager.html#a1109739510e6619c9832643dbf967a3b">SoundManager</a> ()=default</td></tr>
-<tr class="separator:a1109739510e6619c9832643dbf967a3b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a50b534a5eee550fea8975548b27617c0" id="r_a50b534a5eee550fea8975548b27617c0"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classECSEngine_1_1SoundManager.html#a50b534a5eee550fea8975548b27617c0">~SoundManager</a> ()=default</td></tr>
-<tr class="separator:a50b534a5eee550fea8975548b27617c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adcd8167f2de2fd4b6fe7844db9857c6a" id="r_adcd8167f2de2fd4b6fe7844db9857c6a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classECSEngine_1_1SoundManager.html#adcd8167f2de2fd4b6fe7844db9857c6a">RegisterSound</a> (const std::string &amp;soundPath, const std::string &amp;soundName)</td></tr>
 <tr class="memdesc:adcd8167f2de2fd4b6fe7844db9857c6a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Registers a sound file and creates a sound instance for playback.  <br /></td></tr>
 <tr class="separator:adcd8167f2de2fd4b6fe7844db9857c6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac5395744308446ef3be0e7022e3d324c" id="r_ac5395744308446ef3be0e7022e3d324c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classECSEngine_1_1SoundManager.html#ac5395744308446ef3be0e7022e3d324c">PlaySound</a> (const std::string &amp;soundName)</td></tr>
 <tr class="memdesc:ac5395744308446ef3be0e7022e3d324c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Plays a registered sound by name.  <br /></td></tr>
 <tr class="separator:ac5395744308446ef3be0e7022e3d324c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a70e61517c967d18767822dfa07fc9c0a" id="r_a70e61517c967d18767822dfa07fc9c0a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classECSEngine_1_1SoundManager.html#a70e61517c967d18767822dfa07fc9c0a">PlaySound</a> (const std::string &amp;soundName, float volume)</td></tr>
+<tr class="memdesc:a70e61517c967d18767822dfa07fc9c0a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Plays a registered sound by name with specified volume.  <br /></td></tr>
+<tr class="separator:a70e61517c967d18767822dfa07fc9c0a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Manages sound resources and audio playback for the ECS engine. </p>
 <h1><a class="anchor" id="Lifetime"></a>
 and Validity</h1>
 <p>Sound buffers and sound instances are stored in unordered_maps and remain valid for the <a class="el" href="classECSEngine_1_1SoundManager.html" title="Manages sound resources and audio playback for the ECS engine.">SoundManager</a>'s lifetime. Sound names remain valid identifiers for the <a class="el" href="classECSEngine_1_1SoundManager.html" title="Manages sound resources and audio playback for the ECS engine.">SoundManager</a>'s lifetime. <a class="el" href="classECSEngine_1_1SoundManager.html#ac5395744308446ef3be0e7022e3d324c" title="Plays a registered sound by name.">PlaySound()</a> allows multiple sounds to play simultaneously. </p>
-</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a1109739510e6619c9832643dbf967a3b" name="a1109739510e6619c9832643dbf967a3b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1109739510e6619c9832643dbf967a3b">&#9670;&#160;</a></span>SoundManager()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">ECSEngine::SoundManager::SoundManager </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">default</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a50b534a5eee550fea8975548b27617c0" name="a50b534a5eee550fea8975548b27617c0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a50b534a5eee550fea8975548b27617c0">&#9670;&#160;</a></span>~SoundManager()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">ECSEngine::SoundManager::~SoundManager </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">default</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<h2 class="groupheader">Member Function Documentation</h2>
+</div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="ac5395744308446ef3be0e7022e3d324c" name="ac5395744308446ef3be0e7022e3d324c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac5395744308446ef3be0e7022e3d324c">&#9670;&#160;</a></span>PlaySound()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ac5395744308446ef3be0e7022e3d324c">&#9670;&#160;</a></span>PlaySound() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -180,6 +128,43 @@ and Validity</h1>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>Playback is non-blocking. Multiple sounds can play simultaneously. </dd></dl>
 <dl class="section warning"><dt>Warning</dt><dd>The sound must be registered before it can be played. </dd></dl>
+
+</div>
+</div>
+<a id="a70e61517c967d18767822dfa07fc9c0a" name="a70e61517c967d18767822dfa07fc9c0a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a70e61517c967d18767822dfa07fc9c0a">&#9670;&#160;</a></span>PlaySound() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void ECSEngine::SoundManager::PlaySound </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>soundName</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>volume</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Plays a registered sound by name with specified volume. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">soundName</td><td>The name identifier of the sound to play. </td></tr>
+    <tr><td class="paramname">volume</td><td>Volume level (0.0 = silent, 100.0 = full volume, can go higher for boost) </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -224,7 +209,7 @@ and Validity</h1>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
 <li>engine/<a class="el" href="SoundManager_8h_source.html">SoundManager.h</a></li>
-<li>engine/<a class="el" href="SoundManager_8cpp.html">SoundManager.cpp</a></li>
+<li>engine/<b>SoundManager.cpp</b></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

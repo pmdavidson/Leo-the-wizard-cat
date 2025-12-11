@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['distance_0',['Distance',['../structECSEngine_1_1Point2D.html#a3595617cb3230316209e71111c7e57ec',1,'ECSEngine::Point2D']]],
-  ['dot_1',['dot',['../structECSEngine_1_1Point2D.html#a6ea123c494921aca63b2baae9a9cb0de',1,'ECSEngine::Point2D::Dot(Point2D b) const'],['../structECSEngine_1_1Point2D.html#a9d20d9a8dc5dc31abb05703cc836624b',1,'ECSEngine::Point2D::Dot(Point2D a, Point2D b)']]]
+  ['ecsengine_0',['ECSEngine',['../classECSEngine_1_1ECSEngine.html#a0d3a97e2272ce28a7b9a9d71b892b5f3',1,'ECSEngine::ECSEngine']]],
+  ['end_1',['end',['../classECSEngine_1_1EntityManager.html#ab244967e4dc241a33097bcfe76cb19f5',1,'ECSEngine::EntityManager']]]
 ];

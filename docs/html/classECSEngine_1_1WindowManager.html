@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Project 3 Platformer: ECSEngine::WindowManager Class Reference</title>
+<title>Project 4 (Leo the Cat Wizard): ECSEngine::WindowManager Class Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -21,7 +21,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">Project 3 Platformer
+   <div id="projectname">Project 4 (Leo the Cat Wizard)
    </div>
   </td>
  </tr>
@@ -69,7 +69,7 @@ $(function() {
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="namespaceECSEngine.html">ECSEngine</a></li><li class="navelem"><a class="el" href="classECSEngine_1_1WindowManager.html">WindowManager</a></li>  </ul>
+<li class="navelem"><b>ECSEngine</b></li><li class="navelem"><a class="el" href="classECSEngine_1_1WindowManager.html">WindowManager</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -90,8 +90,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a1b865de496f3b3cd5303d59388ed5093" id="r_a1b865de496f3b3cd5303d59388ed5093"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classECSEngine_1_1WindowManager.html#a1b865de496f3b3cd5303d59388ed5093">WindowManager</a> (unsigned int width, unsigned int height, const std::string &amp;title)</td></tr>
 <tr class="memdesc:a1b865de496f3b3cd5303d59388ed5093"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs a <a class="el" href="classECSEngine_1_1WindowManager.html" title="Manages the render window and camera transformations for the engine.">WindowManager</a> and creates the render window.  <br /></td></tr>
 <tr class="separator:a1b865de496f3b3cd5303d59388ed5093"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0d841eeccc507c18b110241d430d6f66" id="r_a0d841eeccc507c18b110241d430d6f66"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classECSEngine_1_1WindowManager.html#a0d841eeccc507c18b110241d430d6f66">~WindowManager</a> ()</td></tr>
-<tr class="memdesc:a0d841eeccc507c18b110241d430d6f66"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroys the <a class="el" href="classECSEngine_1_1WindowManager.html" title="Manages the render window and camera transformations for the engine.">WindowManager</a> and closes the render window.  <br /></td></tr>
+<tr class="memitem:aa928b48b84a732b54796db0b1cc0c41e" id="r_aa928b48b84a732b54796db0b1cc0c41e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classECSEngine_1_1WindowManager.html#aa928b48b84a732b54796db0b1cc0c41e">WindowManager</a> (sf::RenderWindow *window, unsigned int width, unsigned int height)</td></tr>
+<tr class="memdesc:aa928b48b84a732b54796db0b1cc0c41e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs a <a class="el" href="classECSEngine_1_1WindowManager.html" title="Manages the render window and camera transformations for the engine.">WindowManager</a> using an existing window.  <br /></td></tr>
+<tr class="separator:aa928b48b84a732b54796db0b1cc0c41e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0d841eeccc507c18b110241d430d6f66" id="r_a0d841eeccc507c18b110241d430d6f66"><td class="memItemLeft" align="right" valign="top"><a id="a0d841eeccc507c18b110241d430d6f66" name="a0d841eeccc507c18b110241d430d6f66"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>~WindowManager</b> ()</td></tr>
+<tr class="memdesc:a0d841eeccc507c18b110241d430d6f66"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroys the <a class="el" href="classECSEngine_1_1WindowManager.html" title="Manages the render window and camera transformations for the engine.">WindowManager</a> and closes the render window if owned. <br /></td></tr>
 <tr class="separator:a0d841eeccc507c18b110241d430d6f66"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8d63a54377fd3d8eec45c4299b5d44e1" id="r_a8d63a54377fd3d8eec45c4299b5d44e1"><td class="memItemLeft" align="right" valign="top">sf::RenderWindow *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classECSEngine_1_1WindowManager.html#a8d63a54377fd3d8eec45c4299b5d44e1">GetWindow</a> () const</td></tr>
 <tr class="memdesc:a8d63a54377fd3d8eec45c4299b5d44e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a pointer to the managed render window.  <br /></td></tr>
@@ -137,7 +141,7 @@ and Validity</h1>
 <p><a class="el" href="classECSEngine_1_1WindowManager.html#a8d63a54377fd3d8eec45c4299b5d44e1" title="Gets a pointer to the managed render window.">GetWindow()</a> returns a pointer valid for the <a class="el" href="classECSEngine_1_1WindowManager.html" title="Manages the render window and camera transformations for the engine.">WindowManager</a>'s lifetime. The window is created in the constructor and destroyed in the destructor. Camera settings persist until explicitly changed. Coordinate transformation functions return values independent of the <a class="el" href="classECSEngine_1_1WindowManager.html" title="Manages the render window and camera transformations for the engine.">WindowManager</a>'s lifetime, but depend on current camera settings. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a1b865de496f3b3cd5303d59388ed5093" name="a1b865de496f3b3cd5303d59388ed5093"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1b865de496f3b3cd5303d59388ed5093">&#9670;&#160;</a></span>WindowManager()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a1b865de496f3b3cd5303d59388ed5093">&#9670;&#160;</a></span>WindowManager() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -180,22 +184,48 @@ and Validity</h1>
 
 </div>
 </div>
-<a id="a0d841eeccc507c18b110241d430d6f66" name="a0d841eeccc507c18b110241d430d6f66"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0d841eeccc507c18b110241d430d6f66">&#9670;&#160;</a></span>~WindowManager()</h2>
+<a id="aa928b48b84a732b54796db0b1cc0c41e" name="aa928b48b84a732b54796db0b1cc0c41e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa928b48b84a732b54796db0b1cc0c41e">&#9670;&#160;</a></span>WindowManager() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">ECSEngine::WindowManager::~WindowManager </td>
+          <td class="memname">ECSEngine::WindowManager::WindowManager </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">sf::RenderWindow *&#160;</td>
+          <td class="paramname"><em>window</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">unsigned int&#160;</td>
+          <td class="paramname"><em>width</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned int&#160;</td>
+          <td class="paramname"><em>height</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Destroys the <a class="el" href="classECSEngine_1_1WindowManager.html" title="Manages the render window and camera transformations for the engine.">WindowManager</a> and closes the render window. </p>
+<p>Constructs a <a class="el" href="classECSEngine_1_1WindowManager.html" title="Manages the render window and camera transformations for the engine.">WindowManager</a> using an existing window. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">window</td><td>Pointer to an existing render window. </td></tr>
+    <tr><td class="paramname">width</td><td>Width of the window in pixels. </td></tr>
+    <tr><td class="paramname">height</td><td>Height of the window in pixels.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Note</dt><dd>The <a class="el" href="classECSEngine_1_1WindowManager.html" title="Manages the render window and camera transformations for the engine.">WindowManager</a> will not delete the window in its destructor. </dd></dl>
 
 </div>
 </div>
@@ -531,7 +561,7 @@ and Validity</h1>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
 <li>engine/<a class="el" href="WindowManager_8h_source.html">WindowManager.h</a></li>
-<li>engine/<a class="el" href="WindowManager_8cpp.html">WindowManager.cpp</a></li>
+<li>engine/<b>WindowManager.cpp</b></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

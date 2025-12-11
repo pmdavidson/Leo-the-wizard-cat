@@ -1,9 +1,0 @@
-<map id="engine/WindowManager.h" name="engine/WindowManager.h">
-<area shape="rect" id="Node000001" title=" " alt="" coords="87,5,277,31"/>
-<area shape="rect" id="Node000002" href="$ECSEngine_8h.html" title=" " alt="" coords="5,79,156,104"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="156,41,99,81,96,76,153,36"/>
-<area shape="rect" id="Node000004" href="$WindowManager_8cpp.html" title=" " alt="" coords="181,79,386,104"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="211,36,268,76,265,81,208,41"/>
-<area shape="rect" id="Node000003" href="$main_8cpp.html" title=" " alt="" coords="15,152,146,177"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="83,118,83,152,78,152,78,118"/>
-</map>

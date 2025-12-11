@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Project 3 Platformer: engine/CameraComponent.h Source File</title>
+<title>Project 4 (Leo the Cat Wizard): engine/CameraComponent.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -21,7 +21,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">Project 3 Platformer
+   <div id="projectname">Project 4 (Leo the Cat Wizard)
    </div>
   </td>
  </tr>
@@ -81,53 +81,42 @@ $(document).ready(function() { init_codefold(0); });
   <div class="headertitle"><div class="title">CameraComponent.h</div></div>
 </div><!--header-->
 <div class="contents">
-<a href="CameraComponent_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#pragma once</span></div>
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#pragma once</span></div>
 <div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span> </div>
-<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &quot;<a class="code" href="MathUtil_8h.html">MathUtil.h</a>&quot;</span></div>
-<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &quot;<a class="code" href="Entity_8h.html">Entity.h</a>&quot;</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &quot;MathUtil.h&quot;</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &quot;Entity.h&quot;</span></div>
 <div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span> </div>
-<div class="foldopen" id="foldopen00006" data-start="{" data-end="}">
-<div class="line"><a id="l00006" name="l00006"></a><span class="lineno"><a class="line" href="namespaceECSEngine.html">    6</a></span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespaceECSEngine.html">ECSEngine</a></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="keyword">namespace </span>ECSEngine</div>
 <div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span>{</div>
 <div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span> </div>
 <div class="foldopen" id="foldopen00009" data-start="{" data-end="};">
 <div class="line"><a id="l00009" name="l00009"></a><span class="lineno"><a class="line" href="structECSEngine_1_1CameraComponent.html">    9</a></span>    <span class="keyword">struct </span><a class="code hl_struct" href="structECSEngine_1_1CameraComponent.html">CameraComponent</a></div>
 <div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span>    {</div>
-<div class="line"><a id="l00011" name="l00011"></a><span class="lineno"><a class="line" href="structECSEngine_1_1CameraComponent.html#adcc76491591f190f0a9a7e484e2800ac">   11</a></span>        <a class="code hl_struct" href="structECSEngine_1_1Point2D.html">Point2D</a> <a class="code hl_variable" href="structECSEngine_1_1CameraComponent.html#adcc76491591f190f0a9a7e484e2800ac">position</a>; <span class="comment">// Position of the camera in world coordinates</span></div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno"><a class="line" href="structECSEngine_1_1CameraComponent.html#a78d6998eb40167eeba61a97d4f2f80c5">   12</a></span>        <span class="keywordtype">float</span> <a class="code hl_variable" href="structECSEngine_1_1CameraComponent.html#a78d6998eb40167eeba61a97d4f2f80c5">scale</a>;      <span class="comment">// Scale of the camera in world coordinates</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span>        <a class="code hl_struct" href="structECSEngine_1_1Point2D.html">Point2D</a> position; <span class="comment">// Position of the camera in world coordinates</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span>        <span class="keywordtype">float</span> scale;      <span class="comment">// Scale of the camera in world coordinates</span></div>
 <div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>    };</div>
 </div>
 <div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span> </div>
 <div class="foldopen" id="foldopen00015" data-start="{" data-end="};">
 <div class="line"><a id="l00015" name="l00015"></a><span class="lineno"><a class="line" href="structECSEngine_1_1CameraFollower.html">   15</a></span>    <span class="keyword">struct </span><a class="code hl_struct" href="structECSEngine_1_1CameraFollower.html">CameraFollower</a></div>
 <div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>    {</div>
-<div class="line"><a id="l00017" name="l00017"></a><span class="lineno"><a class="line" href="structECSEngine_1_1CameraFollower.html#a66998e4a5482ac05958765c5cfb4bb46">   17</a></span>        <a class="code hl_typedef" href="namespaceECSEngine.html#a58263079733ecf551a2e3054f3ccc708">EntityID</a> <a class="code hl_variable" href="structECSEngine_1_1CameraFollower.html#a66998e4a5482ac05958765c5cfb4bb46">entityId</a>; <span class="comment">// Entity id being tracked by the camera</span></div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>        EntityID entityId; <span class="comment">// Entity id being tracked by the camera</span></div>
 <div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>    };</div>
 </div>
 <div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span> </div>
 <div class="foldopen" id="foldopen00020" data-start="{" data-end="};">
 <div class="line"><a id="l00020" name="l00020"></a><span class="lineno"><a class="line" href="structECSEngine_1_1CameraShake.html">   20</a></span>    <span class="keyword">struct </span><a class="code hl_struct" href="structECSEngine_1_1CameraShake.html">CameraShake</a></div>
 <div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>    {</div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno"><a class="line" href="structECSEngine_1_1CameraShake.html#a32259b9c9e752245b10c33c9901d6339">   22</a></span>        <span class="keywordtype">int</span> <a class="code hl_variable" href="structECSEngine_1_1CameraShake.html#a32259b9c9e752245b10c33c9901d6339">framesRemaining</a>; <span class="comment">// How many frames the shake should last</span></div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno"><a class="line" href="structECSEngine_1_1CameraShake.html#a4978992d669211c4f500f664126a904b">   23</a></span>        <a class="code hl_struct" href="structECSEngine_1_1Point2D.html">Point2D</a> <a class="code hl_variable" href="structECSEngine_1_1CameraShake.html#a4978992d669211c4f500f664126a904b">magnitude</a>;   <span class="comment">// Magnitude of the shake in each direction (x, y)</span></div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>        <span class="keywordtype">int</span> framesRemaining; <span class="comment">// How many frames the shake should last</span></div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>        <a class="code hl_struct" href="structECSEngine_1_1Point2D.html">Point2D</a> magnitude;   <span class="comment">// Magnitude of the shake in each direction (x, y)</span></div>
 <div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>    };</div>
 </div>
 <div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span> </div>
 <div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>}</div>
-</div>
-<div class="ttc" id="aEntity_8h_html"><div class="ttname"><a href="Entity_8h.html">Entity.h</a></div></div>
-<div class="ttc" id="aMathUtil_8h_html"><div class="ttname"><a href="MathUtil_8h.html">MathUtil.h</a></div></div>
-<div class="ttc" id="anamespaceECSEngine_html"><div class="ttname"><a href="namespaceECSEngine.html">ECSEngine</a></div><div class="ttdef"><b>Definition</b> CameraComponent.h:7</div></div>
-<div class="ttc" id="anamespaceECSEngine_html_a58263079733ecf551a2e3054f3ccc708"><div class="ttname"><a href="namespaceECSEngine.html#a58263079733ecf551a2e3054f3ccc708">ECSEngine::EntityID</a></div><div class="ttdeci">size_t EntityID</div><div class="ttdef"><b>Definition</b> ComponentStorage.h:10</div></div>
 <div class="ttc" id="astructECSEngine_1_1CameraComponent_html"><div class="ttname"><a href="structECSEngine_1_1CameraComponent.html">ECSEngine::CameraComponent</a></div><div class="ttdef"><b>Definition</b> CameraComponent.h:10</div></div>
-<div class="ttc" id="astructECSEngine_1_1CameraComponent_html_a78d6998eb40167eeba61a97d4f2f80c5"><div class="ttname"><a href="structECSEngine_1_1CameraComponent.html#a78d6998eb40167eeba61a97d4f2f80c5">ECSEngine::CameraComponent::scale</a></div><div class="ttdeci">float scale</div><div class="ttdef"><b>Definition</b> CameraComponent.h:12</div></div>
-<div class="ttc" id="astructECSEngine_1_1CameraComponent_html_adcc76491591f190f0a9a7e484e2800ac"><div class="ttname"><a href="structECSEngine_1_1CameraComponent.html#adcc76491591f190f0a9a7e484e2800ac">ECSEngine::CameraComponent::position</a></div><div class="ttdeci">Point2D position</div><div class="ttdef"><b>Definition</b> CameraComponent.h:11</div></div>
 <div class="ttc" id="astructECSEngine_1_1CameraFollower_html"><div class="ttname"><a href="structECSEngine_1_1CameraFollower.html">ECSEngine::CameraFollower</a></div><div class="ttdef"><b>Definition</b> CameraComponent.h:16</div></div>
-<div class="ttc" id="astructECSEngine_1_1CameraFollower_html_a66998e4a5482ac05958765c5cfb4bb46"><div class="ttname"><a href="structECSEngine_1_1CameraFollower.html#a66998e4a5482ac05958765c5cfb4bb46">ECSEngine::CameraFollower::entityId</a></div><div class="ttdeci">EntityID entityId</div><div class="ttdef"><b>Definition</b> CameraComponent.h:17</div></div>
 <div class="ttc" id="astructECSEngine_1_1CameraShake_html"><div class="ttname"><a href="structECSEngine_1_1CameraShake.html">ECSEngine::CameraShake</a></div><div class="ttdef"><b>Definition</b> CameraComponent.h:21</div></div>
-<div class="ttc" id="astructECSEngine_1_1CameraShake_html_a32259b9c9e752245b10c33c9901d6339"><div class="ttname"><a href="structECSEngine_1_1CameraShake.html#a32259b9c9e752245b10c33c9901d6339">ECSEngine::CameraShake::framesRemaining</a></div><div class="ttdeci">int framesRemaining</div><div class="ttdef"><b>Definition</b> CameraComponent.h:22</div></div>
-<div class="ttc" id="astructECSEngine_1_1CameraShake_html_a4978992d669211c4f500f664126a904b"><div class="ttname"><a href="structECSEngine_1_1CameraShake.html#a4978992d669211c4f500f664126a904b">ECSEngine::CameraShake::magnitude</a></div><div class="ttdeci">Point2D magnitude</div><div class="ttdef"><b>Definition</b> CameraComponent.h:23</div></div>
-<div class="ttc" id="astructECSEngine_1_1Point2D_html"><div class="ttname"><a href="structECSEngine_1_1Point2D.html">ECSEngine::Point2D</a></div><div class="ttdef"><b>Definition</b> MathUtil.h:12</div></div>
+<div class="ttc" id="astructECSEngine_1_1Point2D_html"><div class="ttname"><a href="structECSEngine_1_1Point2D.html">ECSEngine::Point2D</a></div><div class="ttdef"><b>Definition</b> MathUtil.h:13</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['loadmap_0',['LoadMap',['../main_8cpp.html#a32e68d610bf670c5ccc2692fff569a00',1,'main.cpp']]],
-  ['locationcomponent_1',['locationcomponent',['../structECSEngine_1_1LocationComponent.html#a453051575700a262896ce2d7e0edb400',1,'ECSEngine::LocationComponent::LocationComponent()'],['../structECSEngine_1_1LocationComponent.html#acface09949ff33714c21c772b4d139b8',1,'ECSEngine::LocationComponent::LocationComponent(const Point2D &amp;pos)']]]
+  ['playsound_0',['playsound',['../classECSEngine_1_1SoundManager.html#ac5395744308446ef3be0e7022e3d324c',1,'ECSEngine::SoundManager::PlaySound(const std::string &amp;soundName)'],['../classECSEngine_1_1SoundManager.html#a70e61517c967d18767822dfa07fc9c0a',1,'ECSEngine::SoundManager::PlaySound(const std::string &amp;soundName, float volume)']]],
+  ['popscene_1',['PopScene',['../classECSEngine_1_1ECSEngine.html#a123400a34251b0bd065d99166232f726',1,'ECSEngine::ECSEngine']]],
+  ['pushscene_2',['PushScene',['../classECSEngine_1_1ECSEngine.html#ae8690144520d751143d4c606545901b0',1,'ECSEngine::ECSEngine']]]
 ];

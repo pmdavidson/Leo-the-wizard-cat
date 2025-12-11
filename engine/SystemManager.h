@@ -25,11 +25,20 @@ namespace ECSEngine
 		virtual bool Run(Scene<Components...> &scene) = 0;
 	};
 
-	template <typename... Components>
-	class SystemManager
-	{
-	public:
-		SystemManager() = default;
+/**
+ * @brief Manages ownership and execution order of all registered systems.
+ *
+ * @section Lifetime and Validity
+ *
+ * Systems are owned by SystemManager for its lifetime and are executed in
+ * the order they are added. References returned by GetSystem() remain valid
+ * until ClearSystems() is called or the manager is destroyed.
+ */
+template <typename... Components>
+class SystemManager
+{
+public:
+	SystemManager() = default;
 
 		/**
 		 * @brief Adds a system to the manager.
@@ -65,16 +74,22 @@ namespace ECSEngine
 			return true;
 		}
 
-		template <typename T>
-		T &GetSystem()
+	/**
+	 * @brief Retrieves a system of the specified concrete type.
+	 *
+	 * @tparam T Concrete system type to retrieve.
+	 * @return T& Reference to the requested system.
+	 */
+	template <typename T>
+	T &GetSystem()
+	{
+		for (auto &system : mSystems)
 		{
-			for (auto &system : mSystems)
-			{
-				if (auto *casted = dynamic_cast<T *>(system.get()))
-					return *casted;
-			}
-			throw std::runtime_error("Requested system not found in SystemManager.");
+			if (auto *casted = dynamic_cast<T *>(system.get()))
+				return *casted;
 		}
+		throw std::runtime_error("Requested system not found in SystemManager.");
+	}
 
 	private:
 		std::vector<std::unique_ptr<System<Components...>>> mSystems;

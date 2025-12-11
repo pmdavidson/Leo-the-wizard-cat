@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Project 3 Platformer: ECSEngine::SpriteManager Class Reference</title>
+<title>Project 4 (Leo the Cat Wizard): ECSEngine::SpriteManager Class Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -21,7 +21,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">Project 3 Platformer
+   <div id="projectname">Project 4 (Leo the Cat Wizard)
    </div>
   </td>
  </tr>
@@ -69,7 +69,7 @@ $(function() {
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="namespaceECSEngine.html">ECSEngine</a></li><li class="navelem"><a class="el" href="classECSEngine_1_1SpriteManager.html">SpriteManager</a></li>  </ul>
+<li class="navelem"><b>ECSEngine</b></li><li class="navelem"><a class="el" href="classECSEngine_1_1SpriteManager.html">SpriteManager</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -80,121 +80,219 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>Manages sprite resources and texture loading for the ECS engine.  
+<p>Packs textures into a single atlas and provides sprite/UV lookups.  
  <a href="classECSEngine_1_1SpriteManager.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="SpriteManager_8h_source.html">SpriteManager.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a8febf151075c9cfd6e64f10548ffd725" id="r_a8febf151075c9cfd6e64f10548ffd725"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classECSEngine_1_1SpriteManager.html#a8febf151075c9cfd6e64f10548ffd725">SpriteManager</a> ()=default</td></tr>
-<tr class="separator:a8febf151075c9cfd6e64f10548ffd725"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afc11d4763c47c099f17094b43b9726fe" id="r_afc11d4763c47c099f17094b43b9726fe"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classECSEngine_1_1SpriteManager.html#afc11d4763c47c099f17094b43b9726fe">~SpriteManager</a> ()=default</td></tr>
-<tr class="separator:afc11d4763c47c099f17094b43b9726fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2de057322f14b93da5b7e7f2ec918a86" id="r_a2de057322f14b93da5b7e7f2ec918a86"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespaceECSEngine.html#a6f1e917d13ee2e1a248af8f6c475eebd">SpriteID</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classECSEngine_1_1SpriteManager.html#a2de057322f14b93da5b7e7f2ec918a86">RegisterTexture</a> (const std::string &amp;texturePath, const <a class="el" href="structECSEngine_1_1Rect.html">Rect</a> &amp;sourceRect)</td></tr>
-<tr class="memdesc:a2de057322f14b93da5b7e7f2ec918a86"><td class="mdescLeft">&#160;</td><td class="mdescRight">Registers a texture and creates a sprite from a rectangle.  <br /></td></tr>
-<tr class="separator:a2de057322f14b93da5b7e7f2ec918a86"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ade4cfa8ba6af91f4de7668abd6cbcc44" id="r_ade4cfa8ba6af91f4de7668abd6cbcc44"><td class="memItemLeft" align="right" valign="top">sf::Sprite &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classECSEngine_1_1SpriteManager.html#ade4cfa8ba6af91f4de7668abd6cbcc44">GetSprite</a> (<a class="el" href="namespaceECSEngine.html#a6f1e917d13ee2e1a248af8f6c475eebd">SpriteID</a> id)</td></tr>
-<tr class="memdesc:ade4cfa8ba6af91f4de7668abd6cbcc44"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieves a sprite by its ID.  <br /></td></tr>
-<tr class="separator:ade4cfa8ba6af91f4de7668abd6cbcc44"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0f85e161a648060e22954de39a258457" id="r_a0f85e161a648060e22954de39a258457"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classECSEngine_1_1SpriteManager.html#a0f85e161a648060e22954de39a258457">SpriteManager</a> (const sf::Vector2u &amp;atlasSize={4096, 4096}, uint padding=0)</td></tr>
+<tr class="memdesc:a0f85e161a648060e22954de39a258457"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs a sprite atlas with optional padding.  <br /></td></tr>
+<tr class="separator:a0f85e161a648060e22954de39a258457"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a496b8960bc482adcbd784373617a62ff" id="r_a496b8960bc482adcbd784373617a62ff"><td class="memItemLeft" align="right" valign="top">SpriteID&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classECSEngine_1_1SpriteManager.html#a496b8960bc482adcbd784373617a62ff">RegisterTexture</a> (const std::string &amp;filepath, const <a class="el" href="structECSEngine_1_1Rect.html">Rect</a> &amp;sourceRect)</td></tr>
+<tr class="memdesc:a496b8960bc482adcbd784373617a62ff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Loads a texture from disk and packs it into the atlas.  <br /></td></tr>
+<tr class="separator:a496b8960bc482adcbd784373617a62ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6c794169c83636ce2b7d6df21d7cef8b" id="r_a6c794169c83636ce2b7d6df21d7cef8b"><td class="memItemLeft" align="right" valign="top">sf::Sprite&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classECSEngine_1_1SpriteManager.html#a6c794169c83636ce2b7d6df21d7cef8b">GetSprite</a> (SpriteID id)</td></tr>
+<tr class="memdesc:a6c794169c83636ce2b7d6df21d7cef8b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an sf::Sprite configured for the packed texture.  <br /></td></tr>
+<tr class="separator:a6c794169c83636ce2b7d6df21d7cef8b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac9b1e4efe27876b5867ba21f862a1209" id="r_ac9b1e4efe27876b5867ba21f862a1209"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classECSEngine_1_1SpriteManager.html#ac9b1e4efe27876b5867ba21f862a1209">FinalizeAtlas</a> ()</td></tr>
+<tr class="memdesc:ac9b1e4efe27876b5867ba21f862a1209"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finalizes the atlas and uploads it to the GPU.  <br /></td></tr>
+<tr class="separator:ac9b1e4efe27876b5867ba21f862a1209"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae70eb9645badddbf37e6e760f788142f" id="r_ae70eb9645badddbf37e6e760f788142f"><td class="memItemLeft" align="right" valign="top">sf::Texture &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classECSEngine_1_1SpriteManager.html#ae70eb9645badddbf37e6e760f788142f">GetTexture</a> ()</td></tr>
+<tr class="memdesc:ae70eb9645badddbf37e6e760f788142f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Accesses the atlas texture.  <br /></td></tr>
+<tr class="separator:ae70eb9645badddbf37e6e760f788142f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab532b9412f3785d62a086228296d0599" id="r_ab532b9412f3785d62a086228296d0599"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structECSEngine_1_1Rect.html">Rect</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classECSEngine_1_1SpriteManager.html#ab532b9412f3785d62a086228296d0599">GetUV</a> (SpriteID id) const</td></tr>
+<tr class="memdesc:ab532b9412f3785d62a086228296d0599"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieves normalized UV coordinates for a packed sprite.  <br /></td></tr>
+<tr class="separator:ab532b9412f3785d62a086228296d0599"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a387b0fa08728a6a3c9f591fdb58dde2e" id="r_a387b0fa08728a6a3c9f591fdb58dde2e"><td class="memItemLeft" align="right" valign="top">sf::Vector2u&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classECSEngine_1_1SpriteManager.html#a387b0fa08728a6a3c9f591fdb58dde2e">GetSize</a> (SpriteID id) const</td></tr>
+<tr class="memdesc:a387b0fa08728a6a3c9f591fdb58dde2e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the pixel size of a packed sprite.  <br /></td></tr>
+<tr class="separator:a387b0fa08728a6a3c9f591fdb58dde2e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Manages sprite resources and texture loading for the ECS engine. </p>
+<div class="textblock"><p>Packs textures into a single atlas and provides sprite/UV lookups. </p>
 <h1><a class="anchor" id="Lifetime"></a>
 and Validity</h1>
-<p>Textures are stored in an unordered_map and remain valid for the <a class="el" href="classECSEngine_1_1SpriteManager.html" title="Manages sprite resources and texture loading for the ECS engine.">SpriteManager</a>'s lifetime. Sprites are stored in a vector and SpriteIDs remain valid for the <a class="el" href="classECSEngine_1_1SpriteManager.html" title="Manages sprite resources and texture loading for the ECS engine.">SpriteManager</a>'s lifetime. <a class="el" href="classECSEngine_1_1SpriteManager.html#ade4cfa8ba6af91f4de7668abd6cbcc44" title="Retrieves a sprite by its ID.">GetSprite()</a> returns a reference that remains valid until vector reallocation occurs. Storing long-lived references to sprites is unsafe if <a class="el" href="classECSEngine_1_1SpriteManager.html#a2de057322f14b93da5b7e7f2ec918a86" title="Registers a texture and creates a sprite from a rectangle.">RegisterTexture()</a> may be called later. </p>
+<p>All textures and sprites are owned by <a class="el" href="classECSEngine_1_1SpriteManager.html" title="Packs textures into a single atlas and provides sprite/UV lookups.">SpriteManager</a> for its lifetime. Sprite IDs returned from <a class="el" href="classECSEngine_1_1SpriteManager.html#a496b8960bc482adcbd784373617a62ff" title="Loads a texture from disk and packs it into the atlas.">RegisterTexture()</a> stay valid until the manager is destroyed. <a class="el" href="classECSEngine_1_1SpriteManager.html#ae70eb9645badddbf37e6e760f788142f" title="Accesses the atlas texture.">GetTexture()</a> returns a reference valid for the manager's lifetime. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a8febf151075c9cfd6e64f10548ffd725" name="a8febf151075c9cfd6e64f10548ffd725"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8febf151075c9cfd6e64f10548ffd725">&#9670;&#160;</a></span>SpriteManager()</h2>
+<a id="a0f85e161a648060e22954de39a258457" name="a0f85e161a648060e22954de39a258457"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0f85e161a648060e22954de39a258457">&#9670;&#160;</a></span>SpriteManager()</h2>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">ECSEngine::SpriteManager::SpriteManager </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td class="paramtype">const sf::Vector2u &amp;&#160;</td>
+          <td class="paramname"><em>atlasSize</em> = <code>{4096,&#160;4096}</code>, </td>
         </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">default</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="afc11d4763c47c099f17094b43b9726fe" name="afc11d4763c47c099f17094b43b9726fe"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afc11d4763c47c099f17094b43b9726fe">&#9670;&#160;</a></span>~SpriteManager()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
         <tr>
-          <td class="memname">ECSEngine::SpriteManager::~SpriteManager </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">uint&#160;</td>
+          <td class="paramname"><em>padding</em> = <code>0</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">default</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
+
+<p>Constructs a sprite atlas with optional padding. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">atlasSize</td><td>Dimensions of the atlas texture. </td></tr>
+    <tr><td class="paramname">padding</td><td>Padding in pixels inserted around packed textures. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="ade4cfa8ba6af91f4de7668abd6cbcc44" name="ade4cfa8ba6af91f4de7668abd6cbcc44"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ade4cfa8ba6af91f4de7668abd6cbcc44">&#9670;&#160;</a></span>GetSprite()</h2>
+<a id="ac9b1e4efe27876b5867ba21f862a1209" name="ac9b1e4efe27876b5867ba21f862a1209"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac9b1e4efe27876b5867ba21f862a1209">&#9670;&#160;</a></span>FinalizeAtlas()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">sf::Sprite &amp; ECSEngine::SpriteManager::GetSprite </td>
+          <td class="memname">void ECSEngine::SpriteManager::FinalizeAtlas </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="namespaceECSEngine.html#a6f1e917d13ee2e1a248af8f6c475eebd">SpriteID</a>&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Finalizes the atlas and uploads it to the GPU. </p>
+<p>Must be called after all textures are registered and before rendering. </p>
+
+</div>
+</div>
+<a id="a387b0fa08728a6a3c9f591fdb58dde2e" name="a387b0fa08728a6a3c9f591fdb58dde2e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a387b0fa08728a6a3c9f591fdb58dde2e">&#9670;&#160;</a></span>GetSize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">sf::Vector2u ECSEngine::SpriteManager::GetSize </td>
+          <td>(</td>
+          <td class="paramtype">SpriteID&#160;</td>
+          <td class="paramname"><em>id</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Returns the pixel size of a packed sprite. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">id</td><td>SpriteID returned by <a class="el" href="classECSEngine_1_1SpriteManager.html#a496b8960bc482adcbd784373617a62ff" title="Loads a texture from disk and packs it into the atlas.">RegisterTexture()</a>. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>sf::Vector2u Width/height in pixels. </dd></dl>
+
+</div>
+</div>
+<a id="a6c794169c83636ce2b7d6df21d7cef8b" name="a6c794169c83636ce2b7d6df21d7cef8b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6c794169c83636ce2b7d6df21d7cef8b">&#9670;&#160;</a></span>GetSprite()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">sf::Sprite ECSEngine::SpriteManager::GetSprite </td>
+          <td>(</td>
+          <td class="paramtype">SpriteID&#160;</td>
           <td class="paramname"><em>id</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Retrieves a sprite by its ID. </p>
+<p>Returns an sf::Sprite configured for the packed texture. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">id</td><td>The SpriteID returned by <a class="el" href="classECSEngine_1_1SpriteManager.html#a2de057322f14b93da5b7e7f2ec918a86" title="Registers a texture and creates a sprite from a rectangle.">RegisterTexture()</a>. </td></tr>
+    <tr><td class="paramname">id</td><td>SpriteID returned by <a class="el" href="classECSEngine_1_1SpriteManager.html#a496b8960bc482adcbd784373617a62ff" title="Loads a texture from disk and packs it into the atlas.">RegisterTexture()</a>. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>sf::Sprite&amp; Reference to the sprite.</dd></dl>
-<dl class="section note"><dt>Note</dt><dd>The returned reference is valid until vector reallocation occurs. </dd></dl>
-<dl class="section warning"><dt>Warning</dt><dd>Storing long-lived references is unsafe if <a class="el" href="classECSEngine_1_1SpriteManager.html#a2de057322f14b93da5b7e7f2ec918a86" title="Registers a texture and creates a sprite from a rectangle.">RegisterTexture()</a> may be called later. Store SpriteIDs instead. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>sf::Sprite Sprite pointing into the atlas texture. </dd></dl>
 
 </div>
 </div>
-<a id="a2de057322f14b93da5b7e7f2ec918a86" name="a2de057322f14b93da5b7e7f2ec918a86"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2de057322f14b93da5b7e7f2ec918a86">&#9670;&#160;</a></span>RegisterTexture()</h2>
+<a id="ae70eb9645badddbf37e6e760f788142f" name="ae70eb9645badddbf37e6e760f788142f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae70eb9645badddbf37e6e760f788142f">&#9670;&#160;</a></span>GetTexture()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">sf::Texture &amp; ECSEngine::SpriteManager::GetTexture </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Accesses the atlas texture. </p>
+<dl class="section return"><dt>Returns</dt><dd>sf::Texture&amp; Reference valid for the manager's lifetime. </dd></dl>
+
+</div>
+</div>
+<a id="ab532b9412f3785d62a086228296d0599" name="ab532b9412f3785d62a086228296d0599"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab532b9412f3785d62a086228296d0599">&#9670;&#160;</a></span>GetUV()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="namespaceECSEngine.html#a6f1e917d13ee2e1a248af8f6c475eebd">SpriteID</a> ECSEngine::SpriteManager::RegisterTexture </td>
+          <td class="memname"><a class="el" href="structECSEngine_1_1Rect.html">Rect</a> ECSEngine::SpriteManager::GetUV </td>
+          <td>(</td>
+          <td class="paramtype">SpriteID&#160;</td>
+          <td class="paramname"><em>id</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Retrieves normalized UV coordinates for a packed sprite. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">id</td><td>SpriteID returned by <a class="el" href="classECSEngine_1_1SpriteManager.html#a496b8960bc482adcbd784373617a62ff" title="Loads a texture from disk and packs it into the atlas.">RegisterTexture()</a>. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="structECSEngine_1_1Rect.html">Rect</a> UV rectangle in normalized coordinates. </dd></dl>
+
+</div>
+</div>
+<a id="a496b8960bc482adcbd784373617a62ff" name="a496b8960bc482adcbd784373617a62ff"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a496b8960bc482adcbd784373617a62ff">&#9670;&#160;</a></span>RegisterTexture()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">SpriteID ECSEngine::SpriteManager::RegisterTexture </td>
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname"><em>texturePath</em>, </td>
+          <td class="paramname"><em>filepath</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -210,23 +308,21 @@ and Validity</h1>
       </table>
 </div><div class="memdoc">
 
-<p>Registers a texture and creates a sprite from a rectangle. </p>
+<p>Loads a texture from disk and packs it into the atlas. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">texturePath</td><td>Path to the texture file to load. </td></tr>
-    <tr><td class="paramname">sourceRect</td><td>Rectangle defining the portion of the texture to use. </td></tr>
+    <tr><td class="paramname">filepath</td><td>Path to the source image on disk. </td></tr>
+    <tr><td class="paramname">sourceRect</td><td>Region of the image to pack into the atlas. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>SpriteID The ID of the newly created sprite. Returns 0 if loading fails.</dd></dl>
-<dl class="section note"><dt>Note</dt><dd>The returned SpriteID is valid for the <a class="el" href="classECSEngine_1_1SpriteManager.html" title="Manages sprite resources and texture loading for the ECS engine.">SpriteManager</a>'s lifetime. </dd></dl>
-<dl class="section warning"><dt>Warning</dt><dd>Calling this function may invalidate previously obtained sprite references if the vector reallocates. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>SpriteID Stable identifier for retrieving the packed sprite. </dd></dl>
 
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
 <li>engine/<a class="el" href="SpriteManager_8h_source.html">SpriteManager.h</a></li>
-<li>engine/<a class="el" href="SpriteManager_8cpp.html">SpriteManager.cpp</a></li>
+<li>engine/<b>SpriteManager.cpp</b></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
