@@ -255,7 +255,7 @@ public:
         }
 
         // Debug: draw collision bounding boxes (purple overlay)
-        const bool debugDrawColliders = true;
+        const bool debugDrawColliders = false;
         if (debugDrawColliders)
         {
             for (auto it = entityManager.begin(); it != entityManager.end(); ++it)

@@ -27,7 +27,11 @@ namespace ECSEngine
 	class Scene
 	{
 	public:
-		virtual ~Scene() = default;
+		virtual ~Scene()
+		{
+			// Ensure systems are destroyed before dependent managers/resources
+			mSystemManager.ClearSystems();
+		}
 		/**
 		 * @brief Constructs a Scene with a shared pointer to the window.
 		 *
