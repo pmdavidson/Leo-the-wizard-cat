@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Project 3 Platformer: engine/SpriteManager.h Source File</title>
+<title>Project 4 (Leo the Cat Wizard): engine/SpriteManager.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -21,7 +21,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">Project 3 Platformer
+   <div id="projectname">Project 4 (Leo the Cat Wizard)
    </div>
   </td>
  </tr>
@@ -81,7 +81,7 @@ $(document).ready(function() { init_codefold(0); });
   <div class="headertitle"><div class="title">SpriteManager.h</div></div>
 </div><!--header-->
 <div class="contents">
-<a href="SpriteManager_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">// SpriteManager.h</span></div>
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">// SpriteManager.h</span></div>
 <div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="preprocessor">#pragma once</span></div>
 <div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span> </div>
 <div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &lt;SFML/Graphics.hpp&gt;</span></div>
@@ -90,29 +90,29 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">#include &lt;string&gt;</span></div>
 <div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#include &lt;limits&gt;</span></div>
 <div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#include &lt;cassert&gt;</span></div>
-<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#include &quot;<a class="code" href="MathUtil_8h.html">MathUtil.h</a>&quot;</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#include &quot;MathUtil.h&quot;</span></div>
 <div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespaceECSEngine.html">ECSEngine</a> {</div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="keyword">namespace </span>ECSEngine {</div>
 <div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span> </div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno"><a class="line" href="namespaceECSEngine.html#a6f1e917d13ee2e1a248af8f6c475eebd">   14</a></span><span class="keyword">using </span><a class="code hl_typedef" href="namespaceECSEngine.html#a6f1e917d13ee2e1a248af8f6c475eebd">SpriteID</a> = size_t;</div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno"><a class="line" href="namespaceECSEngine.html#afdc707b1323865c553ffb074ab1a98b9">   15</a></span><span class="keyword">using </span><a class="code hl_typedef" href="namespaceECSEngine.html#afdc707b1323865c553ffb074ab1a98b9">TextureID</a> = size_t;</div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="keyword">using </span>SpriteID = size_t;</div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="keyword">using </span>TextureID = size_t;</div>
 <div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span> </div>
 <div class="foldopen" id="foldopen00026" data-start="{" data-end="};">
 <div class="line"><a id="l00026" name="l00026"></a><span class="lineno"><a class="line" href="classECSEngine_1_1SpriteManager.html">   26</a></span><span class="keyword">class </span><a class="code hl_class" href="classECSEngine_1_1SpriteManager.html">SpriteManager</a> {</div>
 <div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span><span class="keyword">public</span>:</div>
 <div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>    <a class="code hl_class" href="classECSEngine_1_1SpriteManager.html">SpriteManager</a>(<span class="keyword">const</span> sf::Vector2u&amp; atlasSize = {4096, 4096}, uint padding = 0);</div>
 <div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span> </div>
-<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>    [[nodiscard]] <a class="code hl_typedef" href="namespaceECSEngine.html#a6f1e917d13ee2e1a248af8f6c475eebd">SpriteID</a> <a class="code hl_function" href="classECSEngine_1_1SpriteManager.html#a496b8960bc482adcbd784373617a62ff">RegisterTexture</a>(<span class="keyword">const</span> std::string&amp; filepath, <span class="keyword">const</span> <a class="code hl_struct" href="structECSEngine_1_1Rect.html">Rect</a> &amp;sourceRect);</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>    [[nodiscard]] SpriteID <a class="code hl_function" href="classECSEngine_1_1SpriteManager.html#a496b8960bc482adcbd784373617a62ff">RegisterTexture</a>(<span class="keyword">const</span> std::string&amp; filepath, <span class="keyword">const</span> <a class="code hl_struct" href="structECSEngine_1_1Rect.html">Rect</a> &amp;sourceRect);</div>
 <div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span> </div>
-<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>    sf::Sprite <a class="code hl_function" href="classECSEngine_1_1SpriteManager.html#a6c794169c83636ce2b7d6df21d7cef8b">GetSprite</a>(<a class="code hl_typedef" href="namespaceECSEngine.html#a6f1e917d13ee2e1a248af8f6c475eebd">SpriteID</a> <span class="keywordtype">id</span>);</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>    sf::Sprite <a class="code hl_function" href="classECSEngine_1_1SpriteManager.html#a6c794169c83636ce2b7d6df21d7cef8b">GetSprite</a>(SpriteID <span class="keywordtype">id</span>);</div>
 <div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span> </div>
 <div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classECSEngine_1_1SpriteManager.html#ac9b1e4efe27876b5867ba21f862a1209">FinalizeAtlas</a>();</div>
 <div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span> </div>
 <div class="line"><a id="l00065" name="l00065"></a><span class="lineno"><a class="line" href="classECSEngine_1_1SpriteManager.html#ae70eb9645badddbf37e6e760f788142f">   65</a></span>    sf::Texture&amp; <a class="code hl_function" href="classECSEngine_1_1SpriteManager.html#ae70eb9645badddbf37e6e760f788142f">GetTexture</a>(){<span class="keywordflow">return</span> mTexture;}</div>
 <div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span> </div>
-<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>    <a class="code hl_struct" href="structECSEngine_1_1Rect.html">Rect</a> <a class="code hl_function" href="classECSEngine_1_1SpriteManager.html#ab532b9412f3785d62a086228296d0599">GetUV</a>(<a class="code hl_typedef" href="namespaceECSEngine.html#a6f1e917d13ee2e1a248af8f6c475eebd">SpriteID</a> <span class="keywordtype">id</span>) <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>    <a class="code hl_struct" href="structECSEngine_1_1Rect.html">Rect</a> <a class="code hl_function" href="classECSEngine_1_1SpriteManager.html#ab532b9412f3785d62a086228296d0599">GetUV</a>(SpriteID <span class="keywordtype">id</span>) <span class="keyword">const</span>;</div>
 <div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span> </div>
-<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>    sf::Vector2u <a class="code hl_function" href="classECSEngine_1_1SpriteManager.html#a387b0fa08728a6a3c9f591fdb58dde2e">GetSize</a>(<a class="code hl_typedef" href="namespaceECSEngine.html#a6f1e917d13ee2e1a248af8f6c475eebd">SpriteID</a> <span class="keywordtype">id</span>) <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>    sf::Vector2u <a class="code hl_function" href="classECSEngine_1_1SpriteManager.html#a387b0fa08728a6a3c9f591fdb58dde2e">GetSize</a>(SpriteID <span class="keywordtype">id</span>) <span class="keyword">const</span>;</div>
 <div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span> </div>
 <div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span><span class="keyword">private</span>:</div>
 <div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>    <span class="comment">// Packing helpers</span></div>
@@ -130,12 +130,11 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>    std::vector&lt;Rect&gt; mRects; <span class="comment">// packed positions</span></div>
 <div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>    std::unordered_map&lt;SpriteID, sf::Vector2u&gt; mSizes;</div>
 <div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span> </div>
-<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>    <a class="code hl_typedef" href="namespaceECSEngine.html#a6f1e917d13ee2e1a248af8f6c475eebd">SpriteID</a> mNextID;</div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>    SpriteID mNextID;</div>
 <div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>};</div>
 </div>
 <div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span> </div>
 <div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>}</div>
-<div class="ttc" id="aMathUtil_8h_html"><div class="ttname"><a href="MathUtil_8h.html">MathUtil.h</a></div></div>
 <div class="ttc" id="aclassECSEngine_1_1SpriteManager_html"><div class="ttname"><a href="classECSEngine_1_1SpriteManager.html">ECSEngine::SpriteManager</a></div><div class="ttdoc">Packs textures into a single atlas and provides sprite/UV lookups.</div><div class="ttdef"><b>Definition</b> SpriteManager.h:26</div></div>
 <div class="ttc" id="aclassECSEngine_1_1SpriteManager_html_a387b0fa08728a6a3c9f591fdb58dde2e"><div class="ttname"><a href="classECSEngine_1_1SpriteManager.html#a387b0fa08728a6a3c9f591fdb58dde2e">ECSEngine::SpriteManager::GetSize</a></div><div class="ttdeci">sf::Vector2u GetSize(SpriteID id) const</div><div class="ttdoc">Returns the pixel size of a packed sprite.</div><div class="ttdef"><b>Definition</b> SpriteManager.cpp:137</div></div>
 <div class="ttc" id="aclassECSEngine_1_1SpriteManager_html_a496b8960bc482adcbd784373617a62ff"><div class="ttname"><a href="classECSEngine_1_1SpriteManager.html#a496b8960bc482adcbd784373617a62ff">ECSEngine::SpriteManager::RegisterTexture</a></div><div class="ttdeci">SpriteID RegisterTexture(const std::string &amp;filepath, const Rect &amp;sourceRect)</div><div class="ttdoc">Loads a texture from disk and packs it into the atlas.</div><div class="ttdef"><b>Definition</b> SpriteManager.cpp:32</div></div>
@@ -143,9 +142,6 @@ $(document).ready(function() { init_codefold(0); });
 <div class="ttc" id="aclassECSEngine_1_1SpriteManager_html_ab532b9412f3785d62a086228296d0599"><div class="ttname"><a href="classECSEngine_1_1SpriteManager.html#ab532b9412f3785d62a086228296d0599">ECSEngine::SpriteManager::GetUV</a></div><div class="ttdeci">Rect GetUV(SpriteID id) const</div><div class="ttdoc">Retrieves normalized UV coordinates for a packed sprite.</div><div class="ttdef"><b>Definition</b> SpriteManager.cpp:118</div></div>
 <div class="ttc" id="aclassECSEngine_1_1SpriteManager_html_ac9b1e4efe27876b5867ba21f862a1209"><div class="ttname"><a href="classECSEngine_1_1SpriteManager.html#ac9b1e4efe27876b5867ba21f862a1209">ECSEngine::SpriteManager::FinalizeAtlas</a></div><div class="ttdeci">void FinalizeAtlas()</div><div class="ttdoc">Finalizes the atlas and uploads it to the GPU.</div><div class="ttdef"><b>Definition</b> SpriteManager.cpp:92</div></div>
 <div class="ttc" id="aclassECSEngine_1_1SpriteManager_html_ae70eb9645badddbf37e6e760f788142f"><div class="ttname"><a href="classECSEngine_1_1SpriteManager.html#ae70eb9645badddbf37e6e760f788142f">ECSEngine::SpriteManager::GetTexture</a></div><div class="ttdeci">sf::Texture &amp; GetTexture()</div><div class="ttdoc">Accesses the atlas texture.</div><div class="ttdef"><b>Definition</b> SpriteManager.h:65</div></div>
-<div class="ttc" id="anamespaceECSEngine_html"><div class="ttname"><a href="namespaceECSEngine.html">ECSEngine</a></div><div class="ttdef"><b>Definition</b> AnimationComponent.h:8</div></div>
-<div class="ttc" id="anamespaceECSEngine_html_a6f1e917d13ee2e1a248af8f6c475eebd"><div class="ttname"><a href="namespaceECSEngine.html#a6f1e917d13ee2e1a248af8f6c475eebd">ECSEngine::SpriteID</a></div><div class="ttdeci">size_t SpriteID</div><div class="ttdef"><b>Definition</b> SpriteManager.h:14</div></div>
-<div class="ttc" id="anamespaceECSEngine_html_afdc707b1323865c553ffb074ab1a98b9"><div class="ttname"><a href="namespaceECSEngine.html#afdc707b1323865c553ffb074ab1a98b9">ECSEngine::TextureID</a></div><div class="ttdeci">size_t TextureID</div><div class="ttdef"><b>Definition</b> SpriteManager.h:15</div></div>
 <div class="ttc" id="astructECSEngine_1_1Rect_html"><div class="ttname"><a href="structECSEngine_1_1Rect.html">ECSEngine::Rect</a></div><div class="ttdef"><b>Definition</b> MathUtil.h:117</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->

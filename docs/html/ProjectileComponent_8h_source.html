@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Project 3 Platformer: engine/ProjectileComponent.h Source File</title>
+<title>Project 4 (Leo the Cat Wizard): engine/ProjectileComponent.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -21,7 +21,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">Project 3 Platformer
+   <div id="projectname">Project 4 (Leo the Cat Wizard)
    </div>
   </td>
  </tr>
@@ -81,52 +81,36 @@ $(document).ready(function() { init_codefold(0); });
   <div class="headertitle"><div class="title">ProjectileComponent.h</div></div>
 </div><!--header-->
 <div class="contents">
-<a href="ProjectileComponent_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#pragma once</span></div>
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#pragma once</span></div>
 <div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span> </div>
-<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &quot;<a class="code" href="MathUtil_8h.html">MathUtil.h</a>&quot;</span></div>
-<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &quot;<a class="code" href="SpellComponent_8h.html">SpellComponent.h</a>&quot;</span></div>
-<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#include &quot;<a class="code" href="SpriteManager_8h.html">SpriteManager.h</a>&quot;</span></div>
-<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#include &quot;<a class="code" href="Entity_8h.html">Entity.h</a>&quot;</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &quot;MathUtil.h&quot;</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &quot;SpellComponent.h&quot;</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#include &quot;SpriteManager.h&quot;</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#include &quot;Entity.h&quot;</span></div>
 <div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">#include &lt;vector&gt;</span></div>
 <div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span> </div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespaceECSEngine.html">ECSEngine</a></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="keyword">namespace </span>ECSEngine</div>
 <div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span>{</div>
 <div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
 <div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span>    <span class="comment">// Pure data component for spell projectiles</span></div>
 <div class="foldopen" id="foldopen00013" data-start="{" data-end="};">
 <div class="line"><a id="l00013" name="l00013"></a><span class="lineno"><a class="line" href="structECSEngine_1_1ProjectileComponent.html">   13</a></span>    <span class="keyword">struct </span><a class="code hl_struct" href="structECSEngine_1_1ProjectileComponent.html">ProjectileComponent</a></div>
 <div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>    {</div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno"><a class="line" href="structECSEngine_1_1ProjectileComponent.html#a4c6037344cb6ab1f1b733a000dc666a2">   15</a></span>        <a class="code hl_enumeration" href="namespaceECSEngine.html#a59804d27b30d610c1041960ed510a2f5">SpellType</a> <a class="code hl_variable" href="structECSEngine_1_1ProjectileComponent.html#a4c6037344cb6ab1f1b733a000dc666a2">spellType</a> = <a class="code hl_enumvalue" href="namespaceECSEngine.html#a59804d27b30d610c1041960ed510a2f5abd2b7e5f85a6ea65065c4ebc6d7c95bb">SpellType::Fire</a>;  <span class="comment">// Type of spell (fire, water, wind, earth)</span></div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno"><a class="line" href="structECSEngine_1_1ProjectileComponent.html#ab32db66221a41eaa4af7e1f7b522b35c">   16</a></span>        <span class="keywordtype">float</span> <a class="code hl_variable" href="structECSEngine_1_1ProjectileComponent.html#ab32db66221a41eaa4af7e1f7b522b35c">damage</a> = 0.0f;                     <span class="comment">// Damage dealt on hit</span></div>
-<div class="line"><a id="l00017" name="l00017"></a><span class="lineno"><a class="line" href="structECSEngine_1_1ProjectileComponent.html#a06cbbd9add1473d441c1fc74ae489d7b">   17</a></span>        <span class="keywordtype">float</span> <a class="code hl_variable" href="structECSEngine_1_1ProjectileComponent.html#a06cbbd9add1473d441c1fc74ae489d7b">lifetime</a> = 0.0f;                   <span class="comment">// Time remaining before projectile expires</span></div>
-<div class="line"><a id="l00018" name="l00018"></a><span class="lineno"><a class="line" href="structECSEngine_1_1ProjectileComponent.html#a951ddcafbd60d926c57d26c2e27eee4f">   18</a></span>        <span class="keywordtype">float</span> <a class="code hl_variable" href="structECSEngine_1_1ProjectileComponent.html#a951ddcafbd60d926c57d26c2e27eee4f">maxLifetime</a> = 0.0f;                <span class="comment">// Original lifetime for effects</span></div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno"><a class="line" href="structECSEngine_1_1ProjectileComponent.html#a4534aff46e8d2baaab47c070b0ca4b84">   19</a></span>        <a class="code hl_typedef" href="namespaceECSEngine.html#a58263079733ecf551a2e3054f3ccc708">EntityID</a> <a class="code hl_variable" href="structECSEngine_1_1ProjectileComponent.html#a4534aff46e8d2baaab47c070b0ca4b84">ownerEntityId</a> = 0;              <span class="comment">// Entity that cast the spell (to avoid self-damage)</span></div>
-<div class="line"><a id="l00020" name="l00020"></a><span class="lineno"><a class="line" href="structECSEngine_1_1ProjectileComponent.html#a7c900d3d4418325d75c00b9c370fe2a8">   20</a></span>        <span class="keywordtype">bool</span> <a class="code hl_variable" href="structECSEngine_1_1ProjectileComponent.html#a7c900d3d4418325d75c00b9c370fe2a8">active</a> = <span class="keyword">true</span>;                      <span class="comment">// Whether the projectile is still active</span></div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>        SpellType spellType = SpellType::Fire;  <span class="comment">// Type of spell (fire, water, wind, earth)</span></div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>        <span class="keywordtype">float</span> damage = 0.0f;                     <span class="comment">// Damage dealt on hit</span></div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>        <span class="keywordtype">float</span> lifetime = 0.0f;                   <span class="comment">// Time remaining before projectile expires</span></div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>        <span class="keywordtype">float</span> maxLifetime = 0.0f;                <span class="comment">// Original lifetime for effects</span></div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>        EntityID ownerEntityId = 0;              <span class="comment">// Entity that cast the spell (to avoid self-damage)</span></div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>        <span class="keywordtype">bool</span> active = <span class="keyword">true</span>;                      <span class="comment">// Whether the projectile is still active</span></div>
 <div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>        </div>
 <div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>        <span class="comment">// Explosion animation data</span></div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno"><a class="line" href="structECSEngine_1_1ProjectileComponent.html#a7851211c3b379a4d2add7f74f960aeee">   23</a></span>        std::vector&lt;SpriteID&gt; <a class="code hl_variable" href="structECSEngine_1_1ProjectileComponent.html#a7851211c3b379a4d2add7f74f960aeee">explosionFrames</a>;</div>
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno"><a class="line" href="structECSEngine_1_1ProjectileComponent.html#ab60e55db0643f4201756283b382c6714">   24</a></span>        <span class="keywordtype">float</span> <a class="code hl_variable" href="structECSEngine_1_1ProjectileComponent.html#ab60e55db0643f4201756283b382c6714">explosionSize</a> = 32.0f;</div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>        std::vector&lt;SpriteID&gt; explosionFrames;</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>        <span class="keywordtype">float</span> explosionSize = 32.0f;</div>
 <div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>    };</div>
 </div>
 <div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span> </div>
 <div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>}</div>
-<div class="ttc" id="aEntity_8h_html"><div class="ttname"><a href="Entity_8h.html">Entity.h</a></div></div>
-<div class="ttc" id="aMathUtil_8h_html"><div class="ttname"><a href="MathUtil_8h.html">MathUtil.h</a></div></div>
-<div class="ttc" id="aSpellComponent_8h_html"><div class="ttname"><a href="SpellComponent_8h.html">SpellComponent.h</a></div></div>
-<div class="ttc" id="aSpriteManager_8h_html"><div class="ttname"><a href="SpriteManager_8h.html">SpriteManager.h</a></div></div>
-<div class="ttc" id="anamespaceECSEngine_html"><div class="ttname"><a href="namespaceECSEngine.html">ECSEngine</a></div><div class="ttdef"><b>Definition</b> AnimationComponent.h:8</div></div>
-<div class="ttc" id="anamespaceECSEngine_html_a58263079733ecf551a2e3054f3ccc708"><div class="ttname"><a href="namespaceECSEngine.html#a58263079733ecf551a2e3054f3ccc708">ECSEngine::EntityID</a></div><div class="ttdeci">size_t EntityID</div><div class="ttdef"><b>Definition</b> ComponentStorage.h:11</div></div>
-<div class="ttc" id="anamespaceECSEngine_html_a59804d27b30d610c1041960ed510a2f5"><div class="ttname"><a href="namespaceECSEngine.html#a59804d27b30d610c1041960ed510a2f5">ECSEngine::SpellType</a></div><div class="ttdeci">SpellType</div><div class="ttdef"><b>Definition</b> SpellComponent.h:13</div></div>
-<div class="ttc" id="anamespaceECSEngine_html_a59804d27b30d610c1041960ed510a2f5abd2b7e5f85a6ea65065c4ebc6d7c95bb"><div class="ttname"><a href="namespaceECSEngine.html#a59804d27b30d610c1041960ed510a2f5abd2b7e5f85a6ea65065c4ebc6d7c95bb">ECSEngine::SpellType::Fire</a></div><div class="ttdeci">@ Fire</div></div>
 <div class="ttc" id="astructECSEngine_1_1ProjectileComponent_html"><div class="ttname"><a href="structECSEngine_1_1ProjectileComponent.html">ECSEngine::ProjectileComponent</a></div><div class="ttdef"><b>Definition</b> ProjectileComponent.h:14</div></div>
-<div class="ttc" id="astructECSEngine_1_1ProjectileComponent_html_a06cbbd9add1473d441c1fc74ae489d7b"><div class="ttname"><a href="structECSEngine_1_1ProjectileComponent.html#a06cbbd9add1473d441c1fc74ae489d7b">ECSEngine::ProjectileComponent::lifetime</a></div><div class="ttdeci">float lifetime</div><div class="ttdef"><b>Definition</b> ProjectileComponent.h:17</div></div>
-<div class="ttc" id="astructECSEngine_1_1ProjectileComponent_html_a4534aff46e8d2baaab47c070b0ca4b84"><div class="ttname"><a href="structECSEngine_1_1ProjectileComponent.html#a4534aff46e8d2baaab47c070b0ca4b84">ECSEngine::ProjectileComponent::ownerEntityId</a></div><div class="ttdeci">EntityID ownerEntityId</div><div class="ttdef"><b>Definition</b> ProjectileComponent.h:19</div></div>
-<div class="ttc" id="astructECSEngine_1_1ProjectileComponent_html_a4c6037344cb6ab1f1b733a000dc666a2"><div class="ttname"><a href="structECSEngine_1_1ProjectileComponent.html#a4c6037344cb6ab1f1b733a000dc666a2">ECSEngine::ProjectileComponent::spellType</a></div><div class="ttdeci">SpellType spellType</div><div class="ttdef"><b>Definition</b> ProjectileComponent.h:15</div></div>
-<div class="ttc" id="astructECSEngine_1_1ProjectileComponent_html_a7851211c3b379a4d2add7f74f960aeee"><div class="ttname"><a href="structECSEngine_1_1ProjectileComponent.html#a7851211c3b379a4d2add7f74f960aeee">ECSEngine::ProjectileComponent::explosionFrames</a></div><div class="ttdeci">std::vector&lt; SpriteID &gt; explosionFrames</div><div class="ttdef"><b>Definition</b> ProjectileComponent.h:23</div></div>
-<div class="ttc" id="astructECSEngine_1_1ProjectileComponent_html_a7c900d3d4418325d75c00b9c370fe2a8"><div class="ttname"><a href="structECSEngine_1_1ProjectileComponent.html#a7c900d3d4418325d75c00b9c370fe2a8">ECSEngine::ProjectileComponent::active</a></div><div class="ttdeci">bool active</div><div class="ttdef"><b>Definition</b> ProjectileComponent.h:20</div></div>
-<div class="ttc" id="astructECSEngine_1_1ProjectileComponent_html_a951ddcafbd60d926c57d26c2e27eee4f"><div class="ttname"><a href="structECSEngine_1_1ProjectileComponent.html#a951ddcafbd60d926c57d26c2e27eee4f">ECSEngine::ProjectileComponent::maxLifetime</a></div><div class="ttdeci">float maxLifetime</div><div class="ttdef"><b>Definition</b> ProjectileComponent.h:18</div></div>
-<div class="ttc" id="astructECSEngine_1_1ProjectileComponent_html_ab32db66221a41eaa4af7e1f7b522b35c"><div class="ttname"><a href="structECSEngine_1_1ProjectileComponent.html#ab32db66221a41eaa4af7e1f7b522b35c">ECSEngine::ProjectileComponent::damage</a></div><div class="ttdeci">float damage</div><div class="ttdef"><b>Definition</b> ProjectileComponent.h:16</div></div>
-<div class="ttc" id="astructECSEngine_1_1ProjectileComponent_html_ab60e55db0643f4201756283b382c6714"><div class="ttname"><a href="structECSEngine_1_1ProjectileComponent.html#ab60e55db0643f4201756283b382c6714">ECSEngine::ProjectileComponent::explosionSize</a></div><div class="ttdeci">float explosionSize</div><div class="ttdef"><b>Definition</b> ProjectileComponent.h:24</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

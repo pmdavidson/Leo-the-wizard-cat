@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Project 3 Platformer: engine/AnimationComponent.h Source File</title>
+<title>Project 4 (Leo the Cat Wizard): engine/AnimationComponent.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -21,7 +21,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">Project 3 Platformer
+   <div id="projectname">Project 4 (Leo the Cat Wizard)
    </div>
   </td>
  </tr>
@@ -81,92 +81,67 @@ $(document).ready(function() { init_codefold(0); });
   <div class="headertitle"><div class="title">AnimationComponent.h</div></div>
 </div><!--header-->
 <div class="contents">
-<a href="AnimationComponent_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#pragma once</span></div>
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#pragma once</span></div>
 <div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="preprocessor">#include &lt;unordered_map&gt;</span></div>
 <div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &lt;vector&gt;</span></div>
 <div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &lt;string&gt;</span></div>
-<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#include &quot;<a class="code" href="SpriteManager_8h.html">SpriteManager.h</a>&quot;</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#include &quot;SpriteManager.h&quot;</span></div>
 <div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span> </div>
-<div class="foldopen" id="foldopen00007" data-start="{" data-end="}">
-<div class="line"><a id="l00007" name="l00007"></a><span class="lineno"><a class="line" href="namespaceECSEngine.html">    7</a></span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespaceECSEngine.html">ECSEngine</a></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="keyword">namespace </span>ECSEngine</div>
 <div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span>{</div>
 <div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span> </div>
 <div class="foldopen" id="foldopen00010" data-start="{" data-end="};">
 <div class="line"><a id="l00010" name="l00010"></a><span class="lineno"><a class="line" href="structECSEngine_1_1AnimationComponent.html">   10</a></span>    <span class="keyword">struct </span><a class="code hl_struct" href="structECSEngine_1_1AnimationComponent.html">AnimationComponent</a></div>
 <div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span>    {</div>
 <div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span>        <span class="comment">// Stores animations by name (e.g., &quot;idle&quot;, &quot;hurt&quot;)</span></div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno"><a class="line" href="structECSEngine_1_1AnimationComponent.html#aa9d1c725954a8bd0e7ce0672a105a3d4">   13</a></span>        std::unordered_map&lt;std::string, std::vector&lt;SpriteID&gt;&gt; <a class="code hl_variable" href="structECSEngine_1_1AnimationComponent.html#aa9d1c725954a8bd0e7ce0672a105a3d4">animations</a>;</div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>        std::unordered_map&lt;std::string, std::vector&lt;SpriteID&gt;&gt; animations;</div>
 <div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span> </div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno"><a class="line" href="structECSEngine_1_1AnimationComponent.html#ac8107c6ca78e3d32eedad5d8c926edbd">   15</a></span>        std::string <a class="code hl_variable" href="structECSEngine_1_1AnimationComponent.html#ac8107c6ca78e3d32eedad5d8c926edbd">currentAnimation</a>;     <span class="comment">// Active animation name</span></div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno"><a class="line" href="structECSEngine_1_1AnimationComponent.html#ad766b83c772c3e7b925ca33c16476931">   16</a></span>        <span class="keywordtype">float</span> <a class="code hl_variable" href="structECSEngine_1_1AnimationComponent.html#ad766b83c772c3e7b925ca33c16476931">frameDuration</a> = 0.1f;</div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>        std::string currentAnimation;     <span class="comment">// Active animation name</span></div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>        <span class="keywordtype">float</span> frameDuration = 0.1f;</div>
 <div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span> </div>
-<div class="line"><a id="l00018" name="l00018"></a><span class="lineno"><a class="line" href="structECSEngine_1_1AnimationComponent.html#ad80bdc49907dcaacc45a6fe71e640c2b">   18</a></span>        <span class="keywordtype">size_t</span> <a class="code hl_variable" href="structECSEngine_1_1AnimationComponent.html#ad80bdc49907dcaacc45a6fe71e640c2b">currentFrame</a> = 0;</div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno"><a class="line" href="structECSEngine_1_1AnimationComponent.html#a2ff793de33c8dfab2c99a1a7e8cec77d">   19</a></span>        <span class="keywordtype">float</span> <a class="code hl_variable" href="structECSEngine_1_1AnimationComponent.html#a2ff793de33c8dfab2c99a1a7e8cec77d">frameTimer</a> = 0.0f;</div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>        <span class="keywordtype">size_t</span> currentFrame = 0;</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>        <span class="keywordtype">float</span> frameTimer = 0.0f;</div>
 <div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span> </div>
-<div class="line"><a id="l00021" name="l00021"></a><span class="lineno"><a class="line" href="structECSEngine_1_1AnimationComponent.html#a61e7abfa9d75c1b1e403986e1b7eb06f">   21</a></span>        <span class="keywordtype">bool</span> <a class="code hl_variable" href="structECSEngine_1_1AnimationComponent.html#a61e7abfa9d75c1b1e403986e1b7eb06f">looping</a> = <span class="keyword">true</span>;</div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno"><a class="line" href="structECSEngine_1_1AnimationComponent.html#a48a8a195475c0691a4650b1663a6e9ec">   22</a></span>        <span class="keywordtype">bool</span> <a class="code hl_variable" href="structECSEngine_1_1AnimationComponent.html#a48a8a195475c0691a4650b1663a6e9ec">playing</a> = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>        <span class="keywordtype">bool</span> looping = <span class="keyword">true</span>;</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>        <span class="keywordtype">bool</span> playing = <span class="keyword">false</span>;</div>
 <div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span> </div>
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno"><a class="line" href="structECSEngine_1_1AnimationComponent.html#ad974f2a5072969a8c317404adbe37029">   24</a></span>        <a class="code hl_function" href="structECSEngine_1_1AnimationComponent.html#ad974f2a5072969a8c317404adbe37029">AnimationComponent</a>() = <span class="keywordflow">default</span>;</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>        <a class="code hl_struct" href="structECSEngine_1_1AnimationComponent.html">AnimationComponent</a>() = <span class="keywordflow">default</span>;</div>
 <div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span> </div>
-<div class="foldopen" id="foldopen00026" data-start="{" data-end="}">
-<div class="line"><a id="l00026" name="l00026"></a><span class="lineno"><a class="line" href="structECSEngine_1_1AnimationComponent.html#ad44dcc6e6899dc76b455566f2080a0b8">   26</a></span>        <a class="code hl_function" href="structECSEngine_1_1AnimationComponent.html#ad44dcc6e6899dc76b455566f2080a0b8">AnimationComponent</a>(<span class="keyword">const</span> std::string&amp; name, <span class="keyword">const</span> <a class="code hl_typedef" href="namespaceECSEngine.html#a6f1e917d13ee2e1a248af8f6c475eebd">SpriteID</a>&amp; frame){</div>
-<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>            <a class="code hl_variable" href="structECSEngine_1_1AnimationComponent.html#aa9d1c725954a8bd0e7ce0672a105a3d4">animations</a>[name].emplace_back(frame);</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>        <a class="code hl_struct" href="structECSEngine_1_1AnimationComponent.html">AnimationComponent</a>(<span class="keyword">const</span> std::string&amp; name, <span class="keyword">const</span> SpriteID&amp; frame){</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>            animations[name].emplace_back(frame);</div>
 <div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>        }</div>
-</div>
 <div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span> </div>
-<div class="foldopen" id="foldopen00030" data-start="{" data-end="}">
-<div class="line"><a id="l00030" name="l00030"></a><span class="lineno"><a class="line" href="structECSEngine_1_1AnimationComponent.html#a3ea0444a73b9d13f92ce2c449c8954d7">   30</a></span>        <span class="keywordtype">void</span> <a class="code hl_function" href="structECSEngine_1_1AnimationComponent.html#a3ea0444a73b9d13f92ce2c449c8954d7">Play</a>(<span class="keyword">const</span> std::string&amp; name, <span class="keywordtype">bool</span> loop = <span class="keyword">true</span>)</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>        <span class="keywordtype">void</span> Play(<span class="keyword">const</span> std::string&amp; name, <span class="keywordtype">bool</span> loop = <span class="keyword">true</span>)</div>
 <div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>        {</div>
 <div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>            <span class="comment">// If switching animations, reset frame state</span></div>
-<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>            <span class="keywordflow">if</span> (<a class="code hl_variable" href="structECSEngine_1_1AnimationComponent.html#ac8107c6ca78e3d32eedad5d8c926edbd">currentAnimation</a> != name)</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>            <span class="keywordflow">if</span> (currentAnimation != name)</div>
 <div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>            {</div>
-<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>                <a class="code hl_variable" href="structECSEngine_1_1AnimationComponent.html#ac8107c6ca78e3d32eedad5d8c926edbd">currentAnimation</a> = name;</div>
-<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>                <a class="code hl_variable" href="structECSEngine_1_1AnimationComponent.html#ad80bdc49907dcaacc45a6fe71e640c2b">currentFrame</a> = 0;</div>
-<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>                <a class="code hl_variable" href="structECSEngine_1_1AnimationComponent.html#a2ff793de33c8dfab2c99a1a7e8cec77d">frameTimer</a> = 0.0f;</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>                currentAnimation = name;</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>                currentFrame = 0;</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>                frameTimer = 0.0f;</div>
 <div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>            }</div>
 <div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span> </div>
-<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>            <a class="code hl_variable" href="structECSEngine_1_1AnimationComponent.html#a61e7abfa9d75c1b1e403986e1b7eb06f">looping</a> = loop;</div>
-<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>            <a class="code hl_variable" href="structECSEngine_1_1AnimationComponent.html#a48a8a195475c0691a4650b1663a6e9ec">playing</a> = <span class="keyword">true</span>;</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>            looping = loop;</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>            playing = <span class="keyword">true</span>;</div>
 <div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>        }</div>
-</div>
 <div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span> </div>
-<div class="foldopen" id="foldopen00044" data-start="{" data-end="}">
-<div class="line"><a id="l00044" name="l00044"></a><span class="lineno"><a class="line" href="structECSEngine_1_1AnimationComponent.html#a03cfa1f049e08bce43f797c5baabd979">   44</a></span>        <span class="keywordtype">void</span> <a class="code hl_function" href="structECSEngine_1_1AnimationComponent.html#a03cfa1f049e08bce43f797c5baabd979">Stop</a>()</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>        <span class="keywordtype">void</span> Stop()</div>
 <div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>        {</div>
-<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>            <a class="code hl_variable" href="structECSEngine_1_1AnimationComponent.html#a48a8a195475c0691a4650b1663a6e9ec">playing</a> = <span class="keyword">false</span>;</div>
-<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>            <a class="code hl_variable" href="structECSEngine_1_1AnimationComponent.html#ad80bdc49907dcaacc45a6fe71e640c2b">currentFrame</a> = 0;</div>
-<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>            <a class="code hl_variable" href="structECSEngine_1_1AnimationComponent.html#a2ff793de33c8dfab2c99a1a7e8cec77d">frameTimer</a> = 0.0f;</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>            playing = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>            currentFrame = 0;</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>            frameTimer = 0.0f;</div>
 <div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>        }</div>
-</div>
 <div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span> </div>
-<div class="foldopen" id="foldopen00051" data-start="{" data-end="}">
-<div class="line"><a id="l00051" name="l00051"></a><span class="lineno"><a class="line" href="structECSEngine_1_1AnimationComponent.html#a5871a9398d844383b960db81f32205d7">   51</a></span>        <span class="keyword">const</span> std::vector&lt;SpriteID&gt;* <a class="code hl_function" href="structECSEngine_1_1AnimationComponent.html#a5871a9398d844383b960db81f32205d7">GetCurrentFrames</a>()<span class="keyword"> const</span></div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>        <span class="keyword">const</span> std::vector&lt;SpriteID&gt;* GetCurrentFrames()<span class="keyword"> const</span></div>
 <div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span><span class="keyword">        </span>{</div>
-<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>            <span class="keyword">auto</span> it = <a class="code hl_variable" href="structECSEngine_1_1AnimationComponent.html#aa9d1c725954a8bd0e7ce0672a105a3d4">animations</a>.find(<a class="code hl_variable" href="structECSEngine_1_1AnimationComponent.html#ac8107c6ca78e3d32eedad5d8c926edbd">currentAnimation</a>);</div>
-<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>            <span class="keywordflow">return</span> (it != <a class="code hl_variable" href="structECSEngine_1_1AnimationComponent.html#aa9d1c725954a8bd0e7ce0672a105a3d4">animations</a>.end()) ? &amp;it-&gt;second : <span class="keyword">nullptr</span>;</div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>            <span class="keyword">auto</span> it = animations.find(currentAnimation);</div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>            <span class="keywordflow">return</span> (it != animations.end()) ? &amp;it-&gt;second : <span class="keyword">nullptr</span>;</div>
 <div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>        }</div>
-</div>
 <div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>    };</div>
 </div>
 <div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span> </div>
 <div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>} <span class="comment">// namespace ECSEngine</span></div>
-</div>
-<div class="ttc" id="aSpriteManager_8h_html"><div class="ttname"><a href="SpriteManager_8h.html">SpriteManager.h</a></div></div>
-<div class="ttc" id="anamespaceECSEngine_html"><div class="ttname"><a href="namespaceECSEngine.html">ECSEngine</a></div><div class="ttdef"><b>Definition</b> AnimationComponent.h:8</div></div>
-<div class="ttc" id="anamespaceECSEngine_html_a6f1e917d13ee2e1a248af8f6c475eebd"><div class="ttname"><a href="namespaceECSEngine.html#a6f1e917d13ee2e1a248af8f6c475eebd">ECSEngine::SpriteID</a></div><div class="ttdeci">size_t SpriteID</div><div class="ttdef"><b>Definition</b> SpriteManager.h:14</div></div>
 <div class="ttc" id="astructECSEngine_1_1AnimationComponent_html"><div class="ttname"><a href="structECSEngine_1_1AnimationComponent.html">ECSEngine::AnimationComponent</a></div><div class="ttdef"><b>Definition</b> AnimationComponent.h:11</div></div>
-<div class="ttc" id="astructECSEngine_1_1AnimationComponent_html_a03cfa1f049e08bce43f797c5baabd979"><div class="ttname"><a href="structECSEngine_1_1AnimationComponent.html#a03cfa1f049e08bce43f797c5baabd979">ECSEngine::AnimationComponent::Stop</a></div><div class="ttdeci">void Stop()</div><div class="ttdef"><b>Definition</b> AnimationComponent.h:44</div></div>
-<div class="ttc" id="astructECSEngine_1_1AnimationComponent_html_a2ff793de33c8dfab2c99a1a7e8cec77d"><div class="ttname"><a href="structECSEngine_1_1AnimationComponent.html#a2ff793de33c8dfab2c99a1a7e8cec77d">ECSEngine::AnimationComponent::frameTimer</a></div><div class="ttdeci">float frameTimer</div><div class="ttdef"><b>Definition</b> AnimationComponent.h:19</div></div>
-<div class="ttc" id="astructECSEngine_1_1AnimationComponent_html_a3ea0444a73b9d13f92ce2c449c8954d7"><div class="ttname"><a href="structECSEngine_1_1AnimationComponent.html#a3ea0444a73b9d13f92ce2c449c8954d7">ECSEngine::AnimationComponent::Play</a></div><div class="ttdeci">void Play(const std::string &amp;name, bool loop=true)</div><div class="ttdef"><b>Definition</b> AnimationComponent.h:30</div></div>
-<div class="ttc" id="astructECSEngine_1_1AnimationComponent_html_a48a8a195475c0691a4650b1663a6e9ec"><div class="ttname"><a href="structECSEngine_1_1AnimationComponent.html#a48a8a195475c0691a4650b1663a6e9ec">ECSEngine::AnimationComponent::playing</a></div><div class="ttdeci">bool playing</div><div class="ttdef"><b>Definition</b> AnimationComponent.h:22</div></div>
-<div class="ttc" id="astructECSEngine_1_1AnimationComponent_html_a5871a9398d844383b960db81f32205d7"><div class="ttname"><a href="structECSEngine_1_1AnimationComponent.html#a5871a9398d844383b960db81f32205d7">ECSEngine::AnimationComponent::GetCurrentFrames</a></div><div class="ttdeci">const std::vector&lt; SpriteID &gt; * GetCurrentFrames() const</div><div class="ttdef"><b>Definition</b> AnimationComponent.h:51</div></div>
-<div class="ttc" id="astructECSEngine_1_1AnimationComponent_html_a61e7abfa9d75c1b1e403986e1b7eb06f"><div class="ttname"><a href="structECSEngine_1_1AnimationComponent.html#a61e7abfa9d75c1b1e403986e1b7eb06f">ECSEngine::AnimationComponent::looping</a></div><div class="ttdeci">bool looping</div><div class="ttdef"><b>Definition</b> AnimationComponent.h:21</div></div>
-<div class="ttc" id="astructECSEngine_1_1AnimationComponent_html_aa9d1c725954a8bd0e7ce0672a105a3d4"><div class="ttname"><a href="structECSEngine_1_1AnimationComponent.html#aa9d1c725954a8bd0e7ce0672a105a3d4">ECSEngine::AnimationComponent::animations</a></div><div class="ttdeci">std::unordered_map&lt; std::string, std::vector&lt; SpriteID &gt; &gt; animations</div><div class="ttdef"><b>Definition</b> AnimationComponent.h:13</div></div>
-<div class="ttc" id="astructECSEngine_1_1AnimationComponent_html_ac8107c6ca78e3d32eedad5d8c926edbd"><div class="ttname"><a href="structECSEngine_1_1AnimationComponent.html#ac8107c6ca78e3d32eedad5d8c926edbd">ECSEngine::AnimationComponent::currentAnimation</a></div><div class="ttdeci">std::string currentAnimation</div><div class="ttdef"><b>Definition</b> AnimationComponent.h:15</div></div>
-<div class="ttc" id="astructECSEngine_1_1AnimationComponent_html_ad44dcc6e6899dc76b455566f2080a0b8"><div class="ttname"><a href="structECSEngine_1_1AnimationComponent.html#ad44dcc6e6899dc76b455566f2080a0b8">ECSEngine::AnimationComponent::AnimationComponent</a></div><div class="ttdeci">AnimationComponent(const std::string &amp;name, const SpriteID &amp;frame)</div><div class="ttdef"><b>Definition</b> AnimationComponent.h:26</div></div>
-<div class="ttc" id="astructECSEngine_1_1AnimationComponent_html_ad766b83c772c3e7b925ca33c16476931"><div class="ttname"><a href="structECSEngine_1_1AnimationComponent.html#ad766b83c772c3e7b925ca33c16476931">ECSEngine::AnimationComponent::frameDuration</a></div><div class="ttdeci">float frameDuration</div><div class="ttdef"><b>Definition</b> AnimationComponent.h:16</div></div>
-<div class="ttc" id="astructECSEngine_1_1AnimationComponent_html_ad80bdc49907dcaacc45a6fe71e640c2b"><div class="ttname"><a href="structECSEngine_1_1AnimationComponent.html#ad80bdc49907dcaacc45a6fe71e640c2b">ECSEngine::AnimationComponent::currentFrame</a></div><div class="ttdeci">size_t currentFrame</div><div class="ttdef"><b>Definition</b> AnimationComponent.h:18</div></div>
-<div class="ttc" id="astructECSEngine_1_1AnimationComponent_html_ad974f2a5072969a8c317404adbe37029"><div class="ttname"><a href="structECSEngine_1_1AnimationComponent.html#ad974f2a5072969a8c317404adbe37029">ECSEngine::AnimationComponent::AnimationComponent</a></div><div class="ttdeci">AnimationComponent()=default</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

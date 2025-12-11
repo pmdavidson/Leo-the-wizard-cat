@@ -1,29 +1,4 @@
 var searchData=
 [
-  ['indexof_0',['IndexOf',['../structECSEngine_1_1IndexOf.html',1,'ECSEngine']]],
-  ['indexof_3c_20t_2c_20t_2c_20ts_2e_2e_2e_20_3e_1',['IndexOf&lt; T, T, Ts... &gt;',['../structECSEngine_1_1IndexOf_3_01T_00_01T_00_01Ts_8_8_8_01_4.html',1,'ECSEngine']]],
-  ['indexof_3c_20t_2c_20u_2c_20ts_2e_2e_2e_20_3e_2',['IndexOf&lt; T, U, Ts... &gt;',['../structECSEngine_1_1IndexOf_3_01T_00_01U_00_01Ts_8_8_8_01_4.html',1,'ECSEngine']]],
-  ['info_5farch_3',['info_arch',['../CMakeCXXCompilerId_8cpp.html#a59647e99d304ed33b15cb284c27ed391',1,'info_arch:&#160;CMakeCXXCompilerId.cpp'],['../CMakeCCompilerId_8c.html#a59647e99d304ed33b15cb284c27ed391',1,'info_arch:&#160;CMakeCCompilerId.c']]],
-  ['info_5fcompiler_4',['info_compiler',['../CMakeCXXCompilerId_8cpp.html#a4b0efeb7a5d59313986b3a0390f050f6',1,'info_compiler:&#160;CMakeCXXCompilerId.cpp'],['../CMakeCCompilerId_8c.html#a4b0efeb7a5d59313986b3a0390f050f6',1,'info_compiler:&#160;CMakeCCompilerId.c']]],
-  ['info_5flanguage_5fextensions_5fdefault_5',['info_language_extensions_default',['../CMakeCXXCompilerId_8cpp.html#a0f46a8a39e09d9b803c4766904fd7e99',1,'info_language_extensions_default:&#160;CMakeCXXCompilerId.cpp'],['../CMakeCCompilerId_8c.html#a0f46a8a39e09d9b803c4766904fd7e99',1,'info_language_extensions_default:&#160;CMakeCCompilerId.c']]],
-  ['info_5flanguage_5fstandard_5fdefault_6',['info_language_standard_default',['../CMakeCXXCompilerId_8cpp.html#a4607cccf070750927b458473ca82c090',1,'info_language_standard_default:&#160;CMakeCXXCompilerId.cpp'],['../CMakeCCompilerId_8c.html#a4607cccf070750927b458473ca82c090',1,'info_language_standard_default:&#160;CMakeCCompilerId.c']]],
-  ['info_5fplatform_7',['info_platform',['../CMakeCXXCompilerId_8cpp.html#a2321403dee54ee23f0c2fa849c60f7d4',1,'info_platform:&#160;CMakeCXXCompilerId.cpp'],['../CMakeCCompilerId_8c.html#a2321403dee54ee23f0c2fa849c60f7d4',1,'info_platform:&#160;CMakeCCompilerId.c']]],
-  ['initialspawnposition_8',['initialspawnposition',['../structECSEngine_1_1CheckpointComponent.html#a2a57025d8bfce2d5d847f25a92b062ec',1,'ECSEngine::CheckpointComponent::initialSpawnPosition'],['../structECSEngine_1_1HpComponent.html#ae077b8719ef4a616f78cf321e72d2703',1,'ECSEngine::HpComponent::initialSpawnPosition']]],
-  ['inputcomponent_9',['inputcomponent',['../structECSEngine_1_1InputComponent.html',1,'ECSEngine::InputComponent'],['../structECSEngine_1_1InputComponent.html#a103b32e7dc9d85f3f012e832f1702fb1',1,'ECSEngine::InputComponent::InputComponent()']]],
-  ['inputcomponent_2eh_10',['InputComponent.h',['../InputComponent_8h.html',1,'']]],
-  ['inputsystem_11',['InputSystem',['../classECSEngine_1_1InputSystem.html',1,'ECSEngine']]],
-  ['inputsystem_2eh_12',['InputSystem.h',['../InputSystem_8h.html',1,'']]],
-  ['inset_13',['Inset',['../structECSEngine_1_1Rect.html#a5ecc6ac87eb30f5639bfa87b4e32100c',1,'ECSEngine::Rect']]],
-  ['intersects_14',['intersects',['../structECSEngine_1_1Rect.html#aa422000f73618e15d3e10ae7c3d94f00',1,'ECSEngine::Rect']]],
-  ['invincibilityduration_15',['invincibilityDuration',['../structECSEngine_1_1HpComponent.html#a752560a6467feede5c24db0591b45900',1,'ECSEngine::HpComponent']]],
-  ['invincibilitytimer_16',['invincibilityTimer',['../structECSEngine_1_1HpComponent.html#a1109d80a26ad129b831109df8dac7cb2',1,'ECSEngine::HpComponent']]],
-  ['inworldspace_17',['inWorldSpace',['../classECSEngine_1_1SpriteComponent.html#a79f382a4d010f0661d1b0dad32e9e139',1,'ECSEngine::SpriteComponent']]],
-  ['isactive_18',['isActive',['../classECSEngine_1_1Entity.html#a83a346e5c875be2929e3261a3b8c7281',1,'ECSEngine::Entity']]],
-  ['isalive_19',['isalive',['../structECSEngine_1_1HpComponent.html#a93f325e6a35a1dc5b8b2c79974b03ddb',1,'ECSEngine::HpComponent::isAlive'],['../structECSEngine_1_1EnemyComponent.html#abedd1fe82b581b6cff1f59c422707605',1,'ECSEngine::EnemyComponent::isAlive']]],
-  ['ischeckpointactive_20',['IsCheckpointActive',['../structECSEngine_1_1CheckpointComponent.html#a5ef40cbcfdfda905732093af87680040',1,'ECSEngine::CheckpointComponent']]],
-  ['iscomplete_21',['iscomplete',['../classECSEngine_1_1Scene.html#a676055d5b11e985e6731d40dd835d440',1,'ECSEngine::Scene::IsComplete()'],['../classPauseScene.html#acdf43ae0e0cd3d6aa02f3f70c97c3a6b',1,'PauseScene::IsComplete()'],['../classMainMenuScene.html#aa2aa4333e99cdf5fecf9a6272d0bfd77',1,'MainMenuScene::IsComplete()']]],
-  ['isdying_22',['isdying',['../structECSEngine_1_1HpComponent.html#ab65ef188acae44614e12da09f33b9212',1,'ECSEngine::HpComponent::isDying'],['../structECSEngine_1_1EnemyComponent.html#ad409839848a763deddeb31bb51080304',1,'ECSEngine::EnemyComponent::isDying']]],
-  ['isinside_23',['IsInside',['../structECSEngine_1_1Rect.html#a45bca950a07be3319ec0410bd724b964',1,'ECSEngine::Rect']]],
-  ['islit_24',['isLit',['../structECSEngine_1_1CampfireComponent.html#a5773e956f503d4114f98c6aa01934021',1,'ECSEngine::CampfireComponent']]],
-  ['isstatic_25',['isStatic',['../structECSEngine_1_1CollisionComponent.html#a0cf621cd192b304f567c7abff0dd68e1',1,'ECSEngine::CollisionComponent']]]
+  ['locationcomponent_0',['LocationComponent',['../structECSEngine_1_1LocationComponent.html',1,'ECSEngine']]]
 ];

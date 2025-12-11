@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Project 3 Platformer: engine/AnimationSystem.h Source File</title>
+<title>Project 4 (Leo the Cat Wizard): engine/AnimationSystem.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -21,7 +21,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">Project 3 Platformer
+   <div id="projectname">Project 4 (Leo the Cat Wizard)
    </div>
   </td>
  </tr>
@@ -81,14 +81,14 @@ $(document).ready(function() { init_codefold(0); });
   <div class="headertitle"><div class="title">AnimationSystem.h</div></div>
 </div><!--header-->
 <div class="contents">
-<a href="AnimationSystem_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#pragma once</span></div>
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#pragma once</span></div>
 <div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span> </div>
-<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &quot;<a class="code" href="SystemManager_8h.html">SystemManager.h</a>&quot;</span></div>
-<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &quot;<a class="code" href="Scene_8h.html">Scene.h</a>&quot;</span></div>
-<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#include &quot;<a class="code" href="SpriteComponent_8h.html">SpriteComponent.h</a>&quot;</span></div>
-<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#include &quot;<a class="code" href="AnimationComponent_8h.html">AnimationComponent.h</a>&quot;</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &quot;SystemManager.h&quot;</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &quot;Scene.h&quot;</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#include &quot;SpriteComponent.h&quot;</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#include &quot;AnimationComponent.h&quot;</span></div>
 <div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
-<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespaceECSEngine.html">ECSEngine</a></div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="keyword">namespace </span>ECSEngine</div>
 <div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span>{</div>
 <div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span> </div>
 <div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span>    <span class="keyword">template</span> &lt;<span class="keyword">typename</span>... Components&gt;</div>
@@ -106,7 +106,7 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>                <span class="keywordflow">if</span> (!it-&gt;isActive())</div>
 <div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>                    <span class="keywordflow">continue</span>;</div>
 <div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span> </div>
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>                <a class="code hl_typedef" href="namespaceECSEngine.html#a58263079733ecf551a2e3054f3ccc708">EntityID</a> <span class="keywordtype">id</span> = it-&gt;getID();</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>                EntityID <span class="keywordtype">id</span> = it-&gt;getID();</div>
 <div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span> </div>
 <div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>                <span class="keywordflow">if</span> (!entityManager.template HasComponent&lt;SpriteComponent&gt;(<span class="keywordtype">id</span>) ||</div>
 <div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>                    !entityManager.template HasComponent&lt;AnimationComponent&gt;(<span class="keywordtype">id</span>))</div>
@@ -155,17 +155,11 @@ $(document).ready(function() { init_codefold(0); });
 </div>
 <div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span> </div>
 <div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>}</div>
-<div class="ttc" id="aAnimationComponent_8h_html"><div class="ttname"><a href="AnimationComponent_8h.html">AnimationComponent.h</a></div></div>
-<div class="ttc" id="aScene_8h_html"><div class="ttname"><a href="Scene_8h.html">Scene.h</a></div></div>
-<div class="ttc" id="aSpriteComponent_8h_html"><div class="ttname"><a href="SpriteComponent_8h.html">SpriteComponent.h</a></div></div>
-<div class="ttc" id="aSystemManager_8h_html"><div class="ttname"><a href="SystemManager_8h.html">SystemManager.h</a></div></div>
 <div class="ttc" id="aclassECSEngine_1_1AnimationSystem_html"><div class="ttname"><a href="classECSEngine_1_1AnimationSystem.html">ECSEngine::AnimationSystem</a></div><div class="ttdef"><b>Definition</b> AnimationSystem.h:13</div></div>
 <div class="ttc" id="aclassECSEngine_1_1AnimationSystem_html_a27fc30b18febb2355f85682da60a24d5"><div class="ttname"><a href="classECSEngine_1_1AnimationSystem.html#a27fc30b18febb2355f85682da60a24d5">ECSEngine::AnimationSystem::Run</a></div><div class="ttdeci">bool Run(Scene&lt; Components... &gt; &amp;scene) override</div><div class="ttdoc">Runs the systems.</div><div class="ttdef"><b>Definition</b> AnimationSystem.h:15</div></div>
 <div class="ttc" id="aclassECSEngine_1_1Scene_html"><div class="ttname"><a href="classECSEngine_1_1Scene.html">ECSEngine::Scene</a></div><div class="ttdoc">Represents a scene in the game with its own managers and systems.</div><div class="ttdef"><b>Definition</b> Scene.h:28</div></div>
 <div class="ttc" id="aclassECSEngine_1_1Scene_html_a4ae8b155775b577628125b84093fe005"><div class="ttname"><a href="classECSEngine_1_1Scene.html#a4ae8b155775b577628125b84093fe005">ECSEngine::Scene::GetEntityManager</a></div><div class="ttdeci">EntityManager&lt; Components... &gt; &amp; GetEntityManager()</div><div class="ttdoc">Gets a reference to the EntityManager.</div><div class="ttdef"><b>Definition</b> Scene.h:92</div></div>
 <div class="ttc" id="aclassECSEngine_1_1System_html"><div class="ttname"><a href="classECSEngine_1_1System.html">ECSEngine::System</a></div><div class="ttdef"><b>Definition</b> SystemManager.h:15</div></div>
-<div class="ttc" id="anamespaceECSEngine_html"><div class="ttname"><a href="namespaceECSEngine.html">ECSEngine</a></div><div class="ttdef"><b>Definition</b> AnimationComponent.h:8</div></div>
-<div class="ttc" id="anamespaceECSEngine_html_a58263079733ecf551a2e3054f3ccc708"><div class="ttname"><a href="namespaceECSEngine.html#a58263079733ecf551a2e3054f3ccc708">ECSEngine::EntityID</a></div><div class="ttdeci">size_t EntityID</div><div class="ttdef"><b>Definition</b> ComponentStorage.h:11</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

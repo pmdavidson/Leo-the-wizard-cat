@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Project 3 Platformer: engine/WindowManager.h Source File</title>
+<title>Project 4 (Leo the Cat Wizard): engine/WindowManager.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -21,7 +21,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">Project 3 Platformer
+   <div id="projectname">Project 4 (Leo the Cat Wizard)
    </div>
   </td>
  </tr>
@@ -81,14 +81,14 @@ $(document).ready(function() { init_codefold(0); });
   <div class="headertitle"><div class="title">WindowManager.h</div></div>
 </div><!--header-->
 <div class="contents">
-<a href="WindowManager_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#pragma once</span></div>
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#pragma once</span></div>
 <div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span> </div>
 <div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &lt;unordered_map&gt;</span></div>
 <div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &lt;SFML/Window.hpp&gt;</span></div>
 <div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#include &lt;SFML/Graphics.hpp&gt;</span></div>
-<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#include &quot;<a class="code" href="MathUtil_8h.html">MathUtil.h</a>&quot;</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#include &quot;MathUtil.h&quot;</span></div>
 <div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
-<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespaceECSEngine.html">ECSEngine</a></div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="keyword">namespace </span>ECSEngine</div>
 <div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span>{</div>
 <div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span> </div>
 <div class="foldopen" id="foldopen00022" data-start="{" data-end="};">
@@ -135,7 +135,6 @@ $(document).ready(function() { init_codefold(0); });
 </div>
 <div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span> </div>
 <div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span>}</div>
-<div class="ttc" id="aMathUtil_8h_html"><div class="ttname"><a href="MathUtil_8h.html">MathUtil.h</a></div></div>
 <div class="ttc" id="aclassECSEngine_1_1WindowManager_html"><div class="ttname"><a href="classECSEngine_1_1WindowManager.html">ECSEngine::WindowManager</a></div><div class="ttdoc">Manages the render window and camera transformations for the engine.</div><div class="ttdef"><b>Definition</b> WindowManager.h:23</div></div>
 <div class="ttc" id="aclassECSEngine_1_1WindowManager_html_a0d841eeccc507c18b110241d430d6f66"><div class="ttname"><a href="classECSEngine_1_1WindowManager.html#a0d841eeccc507c18b110241d430d6f66">ECSEngine::WindowManager::~WindowManager</a></div><div class="ttdeci">~WindowManager()</div><div class="ttdoc">Destroys the WindowManager and closes the render window if owned.</div><div class="ttdef"><b>Definition</b> WindowManager.cpp:20</div></div>
 <div class="ttc" id="aclassECSEngine_1_1WindowManager_html_a35e4af60dbce88feedbb77325a13ab42"><div class="ttname"><a href="classECSEngine_1_1WindowManager.html#a35e4af60dbce88feedbb77325a13ab42">ECSEngine::WindowManager::SetWorldScale</a></div><div class="ttdeci">void SetWorldScale(float worldUnitsPerPixel)</div><div class="ttdoc">Sets the world scale (world units per pixel).</div><div class="ttdef"><b>Definition</b> WindowManager.cpp:47</div></div>
@@ -147,7 +146,6 @@ $(document).ready(function() { init_codefold(0); });
 <div class="ttc" id="aclassECSEngine_1_1WindowManager_html_ab2ad40f9718057159b1ae5b867907ad9"><div class="ttname"><a href="classECSEngine_1_1WindowManager.html#ab2ad40f9718057159b1ae5b867907ad9">ECSEngine::WindowManager::WorldToWindow</a></div><div class="ttdeci">Rect WorldToWindow(const Rect &amp;rect) const</div><div class="ttdoc">Converts a world rectangle to window rectangle.</div><div class="ttdef"><b>Definition</b> WindowManager.cpp:78</div></div>
 <div class="ttc" id="aclassECSEngine_1_1WindowManager_html_ac202056b290238e2b74be14b800ff402"><div class="ttname"><a href="classECSEngine_1_1WindowManager.html#ac202056b290238e2b74be14b800ff402">ECSEngine::WindowManager::WindowToWorld</a></div><div class="ttdeci">Rect WindowToWorld(const Rect &amp;rect) const</div><div class="ttdoc">Converts a window rectangle to world rectangle.</div><div class="ttdef"><b>Definition</b> WindowManager.cpp:72</div></div>
 <div class="ttc" id="aclassECSEngine_1_1WindowManager_html_ac612c11d66a6acce6a6428609c348423"><div class="ttname"><a href="classECSEngine_1_1WindowManager.html#ac612c11d66a6acce6a6428609c348423">ECSEngine::WindowManager::WorldToWindowY</a></div><div class="ttdeci">float WorldToWindowY(float y) const</div><div class="ttdoc">Converts a world Y coordinate to window Y coordinate.</div><div class="ttdef"><b>Definition</b> WindowManager.cpp:67</div></div>
-<div class="ttc" id="anamespaceECSEngine_html"><div class="ttname"><a href="namespaceECSEngine.html">ECSEngine</a></div><div class="ttdef"><b>Definition</b> AnimationComponent.h:8</div></div>
 <div class="ttc" id="astructECSEngine_1_1Point2D_html"><div class="ttname"><a href="structECSEngine_1_1Point2D.html">ECSEngine::Point2D</a></div><div class="ttdef"><b>Definition</b> MathUtil.h:13</div></div>
 <div class="ttc" id="astructECSEngine_1_1Rect_html"><div class="ttname"><a href="structECSEngine_1_1Rect.html">ECSEngine::Rect</a></div><div class="ttdef"><b>Definition</b> MathUtil.h:117</div></div>
 </div><!-- fragment --></div><!-- contents -->

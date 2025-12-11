@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Project 3 Platformer: engine/PauseScene.h Source File</title>
+<title>Project 4 (Leo the Cat Wizard): engine/PauseScene.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -21,7 +21,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">Project 3 Platformer
+   <div id="projectname">Project 4 (Leo the Cat Wizard)
    </div>
   </td>
  </tr>
@@ -81,31 +81,29 @@ $(document).ready(function() { init_codefold(0); });
   <div class="headertitle"><div class="title">PauseScene.h</div></div>
 </div><!--header-->
 <div class="contents">
-<a href="PauseScene_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#pragma once</span></div>
-<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="preprocessor">#include &quot;<a class="code" href="Scene_8h.html">Scene.h</a>&quot;</span></div>
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="preprocessor">#include &quot;Scene.h&quot;</span></div>
 <div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &lt;SFML/Graphics.hpp&gt;</span></div>
 <div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &lt;SFML/Window/Event.hpp&gt;</span></div>
 <div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#include &lt;memory&gt;</span></div>
 <div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span> </div>
-<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="keyword">extern</span> std::string <a class="code hl_variable" href="PauseScene_8h.html#afd5a938abda5a44bf0ae7010e5563f10">gResourcePath</a>;</div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="keyword">extern</span> std::string gResourcePath;</div>
 <div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span> </div>
 <div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span>... Components&gt;</div>
 <div class="foldopen" id="foldopen00010" data-start="{" data-end="};">
 <div class="line"><a id="l00010" name="l00010"></a><span class="lineno"><a class="line" href="classPauseScene.html">   10</a></span><span class="keyword">class </span><a class="code hl_class" href="classPauseScene.html">PauseScene</a> : <span class="keyword">public</span> <a class="code hl_class" href="classECSEngine_1_1Scene.html">ECSEngine::Scene</a>&lt;Components...&gt; {</div>
 <div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="keyword">public</span>:</div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno"><a class="line" href="classPauseScene.html#af393024d0dffdbdbc64bbcc4d44ddf85">   12</a></span>    <span class="keyword">using </span><a class="code hl_class" href="classECSEngine_1_1Scene.html">BaseScene</a> = <a class="code hl_class" href="classECSEngine_1_1Scene.html">ECSEngine::Scene</a>&lt;Components...&gt;;</div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span>    <span class="keyword">using </span><a class="code hl_class" href="classECSEngine_1_1Scene.html">BaseScene</a> = <a class="code hl_class" href="classECSEngine_1_1Scene.html">ECSEngine::Scene</a>&lt;Components...&gt;;</div>
 <div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span> </div>
-<div class="foldopen" id="foldopen00014" data-start="{" data-end="}">
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno"><a class="line" href="classPauseScene.html#afb5a4ca7fce2d4d1c3397dedfba8b265">   14</a></span>    <span class="keyword">explicit</span> <a class="code hl_function" href="classPauseScene.html#afb5a4ca7fce2d4d1c3397dedfba8b265">PauseScene</a>(std::shared_ptr&lt;sf::RenderWindow&gt; window)</div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>        : <a class="code hl_class" href="classECSEngine_1_1Scene.html">BaseScene</a>(window), mTitle(mFont), mPrompt(mFont), mFontLoaded(false), mResume(false), mLogged(false) {</div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>        mFontPath = <a class="code hl_variable" href="PauseScene_8h.html#afd5a938abda5a44bf0ae7010e5563f10">gResourcePath</a> + <span class="stringliteral">&quot;fonts/ARIAL.TTF&quot;</span>;</div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>    <span class="keyword">explicit</span> <a class="code hl_class" href="classPauseScene.html">PauseScene</a>(std::shared_ptr&lt;sf::RenderWindow&gt; window)</div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>        : <a class="code hl_class" href="classECSEngine_1_1Scene.html">BaseScene</a>(window), mTitle(mFont), mPrompt(mFont), mFontLoaded(<span class="keyword">false</span>), mResume(<span class="keyword">false</span>), mLogged(<span class="keyword">false</span>) {</div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>        mFontPath = gResourcePath + <span class="stringliteral">&quot;fonts/ARIAL.TTF&quot;</span>;</div>
 <div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>        <span class="keywordflow">if</span> (mFont.openFromFile(mFontPath)) {</div>
 <div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>            mFontLoaded = <span class="keyword">true</span>;</div>
 <div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>            SetupText(mTitle, <span class="stringliteral">&quot;Paused&quot;</span>, 48, sf::Vector2f(120.f, 180.f));</div>
 <div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>            SetupText(mPrompt, <span class="stringliteral">&quot;Press Enter or Esc to resume&quot;</span>, 28, sf::Vector2f(120.f, 260.f));</div>
 <div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>        }</div>
 <div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>    }</div>
-</div>
 <div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span> </div>
 <div class="foldopen" id="foldopen00024" data-start="{" data-end="}">
 <div class="line"><a id="l00024" name="l00024"></a><span class="lineno"><a class="line" href="classPauseScene.html#a528d0f435529361db888943feeb4d6f0">   24</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classPauseScene.html#a528d0f435529361db888943feeb4d6f0">Run</a>(<a class="code hl_class" href="classECSEngine_1_1ECSEngine.html">ECSEngine::ECSEngine&lt;Components...&gt;</a> &amp;engine)</div>
@@ -178,8 +176,6 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>};</div>
 </div>
 <div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span> </div>
-<div class="ttc" id="aPauseScene_8h_html_afd5a938abda5a44bf0ae7010e5563f10"><div class="ttname"><a href="PauseScene_8h.html#afd5a938abda5a44bf0ae7010e5563f10">gResourcePath</a></div><div class="ttdeci">std::string gResourcePath</div><div class="ttdef"><b>Definition</b> main.cpp:46</div></div>
-<div class="ttc" id="aScene_8h_html"><div class="ttname"><a href="Scene_8h.html">Scene.h</a></div></div>
 <div class="ttc" id="aclassECSEngine_1_1ECSEngine_html"><div class="ttname"><a href="classECSEngine_1_1ECSEngine.html">ECSEngine::ECSEngine</a></div><div class="ttdef"><b>Definition</b> ECSEngine.h:20</div></div>
 <div class="ttc" id="aclassECSEngine_1_1Scene_html"><div class="ttname"><a href="classECSEngine_1_1Scene.html">ECSEngine::Scene</a></div><div class="ttdoc">Represents a scene in the game with its own managers and systems.</div><div class="ttdef"><b>Definition</b> Scene.h:28</div></div>
 <div class="ttc" id="aclassECSEngine_1_1Scene_html_a7aafd4569c60d97a62a980ab96c44ed8"><div class="ttname"><a href="classECSEngine_1_1Scene.html#a7aafd4569c60d97a62a980ab96c44ed8">ECSEngine::Scene&lt; Components... &gt;::SetComplete</a></div><div class="ttdeci">void SetComplete()</div><div class="ttdoc">Marks the scene as complete.</div><div class="ttdef"><b>Definition</b> Scene.h:147</div></div>
@@ -188,7 +184,6 @@ $(document).ready(function() { init_codefold(0); });
 <div class="ttc" id="aclassPauseScene_html"><div class="ttname"><a href="classPauseScene.html">PauseScene</a></div><div class="ttdef"><b>Definition</b> PauseScene.h:10</div></div>
 <div class="ttc" id="aclassPauseScene_html_a528d0f435529361db888943feeb4d6f0"><div class="ttname"><a href="classPauseScene.html#a528d0f435529361db888943feeb4d6f0">PauseScene::Run</a></div><div class="ttdeci">void Run(ECSEngine::ECSEngine&lt; Components... &gt; &amp;engine)</div><div class="ttdoc">Runs the scene by executing all systems.</div><div class="ttdef"><b>Definition</b> PauseScene.h:24</div></div>
 <div class="ttc" id="aclassPauseScene_html_acdf43ae0e0cd3d6aa02f3f70c97c3a6b"><div class="ttname"><a href="classPauseScene.html#acdf43ae0e0cd3d6aa02f3f70c97c3a6b">PauseScene::IsComplete</a></div><div class="ttdeci">bool IsComplete() const</div><div class="ttdoc">Checks if the scene is complete.</div><div class="ttdef"><b>Definition</b> PauseScene.h:71</div></div>
-<div class="ttc" id="aclassPauseScene_html_afb5a4ca7fce2d4d1c3397dedfba8b265"><div class="ttname"><a href="classPauseScene.html#afb5a4ca7fce2d4d1c3397dedfba8b265">PauseScene::PauseScene</a></div><div class="ttdeci">PauseScene(std::shared_ptr&lt; sf::RenderWindow &gt; window)</div><div class="ttdef"><b>Definition</b> PauseScene.h:14</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

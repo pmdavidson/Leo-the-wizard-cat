@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Project 3 Platformer: engine/SpriteSystem.h Source File</title>
+<title>Project 4 (Leo the Cat Wizard): engine/SpriteSystem.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -21,7 +21,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">Project 3 Platformer
+   <div id="projectname">Project 4 (Leo the Cat Wizard)
    </div>
   </td>
  </tr>
@@ -81,18 +81,18 @@ $(document).ready(function() { init_codefold(0); });
   <div class="headertitle"><div class="title">SpriteSystem.h</div></div>
 </div><!--header-->
 <div class="contents">
-<a href="SpriteSystem_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#pragma once</span></div>
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#pragma once</span></div>
 <div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span> </div>
-<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &quot;<a class="code" href="SystemManager_8h.html">SystemManager.h</a>&quot;</span></div>
-<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &quot;<a class="code" href="Scene_8h.html">Scene.h</a>&quot;</span></div>
-<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#include &quot;<a class="code" href="SpriteComponent_8h.html">SpriteComponent.h</a>&quot;</span></div>
-<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#include &quot;<a class="code" href="LocationComponent_8h.html">LocationComponent.h</a>&quot;</span></div>
-<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">#include &quot;<a class="code" href="CollisionComponent_8h.html">CollisionComponent.h</a>&quot;</span></div>
-<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#include &quot;<a class="code" href="HpComponent_8h.html">HpComponent.h</a>&quot;</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &quot;SystemManager.h&quot;</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &quot;Scene.h&quot;</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#include &quot;SpriteComponent.h&quot;</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#include &quot;LocationComponent.h&quot;</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">#include &quot;CollisionComponent.h&quot;</span></div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#include &quot;HpComponent.h&quot;</span></div>
 <div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#include &lt;cmath&gt;</span></div>
 <div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#include &lt;SFML/Graphics/RectangleShape.hpp&gt;</span></div>
 <div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespaceECSEngine.html">ECSEngine</a></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="keyword">namespace </span>ECSEngine</div>
 <div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>{</div>
 <div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span> </div>
 <div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span>... Components&gt;</div>
@@ -100,24 +100,20 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00016" name="l00016"></a><span class="lineno"><a class="line" href="classECSEngine_1_1SpriteSystem.html">   16</a></span><span class="keyword">class </span><a class="code hl_class" href="classECSEngine_1_1SpriteSystem.html">SpriteSystem</a> : <span class="keyword">public</span> <a class="code hl_class" href="classECSEngine_1_1System.html">System</a>&lt;Components...&gt;</div>
 <div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>{</div>
 <div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="keyword">public</span>:</div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno"><a class="line" href="classECSEngine_1_1SpriteSystem.html#ac4fe3de7502d0a19726ef9cb6cdf23b5">   19</a></span>    <a class="code hl_function" href="classECSEngine_1_1SpriteSystem.html#ac4fe3de7502d0a19726ef9cb6cdf23b5">SpriteSystem</a>() = <span class="keywordflow">default</span>;</div>
-<div class="line"><a id="l00020" name="l00020"></a><span class="lineno"><a class="line" href="classECSEngine_1_1SpriteSystem.html#a0cd044c30c74cadca516845308fee54b">   20</a></span>    <a class="code hl_function" href="classECSEngine_1_1SpriteSystem.html#a0cd044c30c74cadca516845308fee54b">~SpriteSystem</a>() = <span class="keywordflow">default</span>;</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>    <a class="code hl_class" href="classECSEngine_1_1SpriteSystem.html">SpriteSystem</a>() = <span class="keywordflow">default</span>;</div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>    <a class="code hl_class" href="classECSEngine_1_1SpriteSystem.html">~SpriteSystem</a>() = <span class="keywordflow">default</span>;</div>
 <div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span> </div>
 <div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>    <span class="comment">// Parallax control</span></div>
-<div class="foldopen" id="foldopen00023" data-start="{" data-end="}">
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno"><a class="line" href="classECSEngine_1_1SpriteSystem.html#ad97532c63a6259700d1bb578d29c5b32">   23</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classECSEngine_1_1SpriteSystem.html#ad97532c63a6259700d1bb578d29c5b32">SetParallaxFactor</a>(<span class="keywordtype">int</span> layer, <span class="keywordtype">float</span> factor)</div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>    <span class="keywordtype">void</span> SetParallaxFactor(<span class="keywordtype">int</span> layer, <span class="keywordtype">float</span> factor)</div>
 <div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>    {</div>
 <div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>        mParallaxFactors[layer] = factor;</div>
 <div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>    }</div>
-</div>
 <div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span> </div>
-<div class="foldopen" id="foldopen00028" data-start="{" data-end="}">
-<div class="line"><a id="l00028" name="l00028"></a><span class="lineno"><a class="line" href="classECSEngine_1_1SpriteSystem.html#a62b0586888aaf1b27f98e2aac93418a1">   28</a></span>    <span class="keywordtype">float</span> <a class="code hl_function" href="classECSEngine_1_1SpriteSystem.html#a62b0586888aaf1b27f98e2aac93418a1">GetParallaxFactor</a>(<span class="keywordtype">int</span> layer)<span class="keyword"> const</span></div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>    <span class="keywordtype">float</span> GetParallaxFactor(<span class="keywordtype">int</span> layer)<span class="keyword"> const</span></div>
 <div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span><span class="keyword">    </span>{</div>
 <div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>        <span class="keyword">auto</span> it = mParallaxFactors.find(layer);</div>
 <div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>        <span class="keywordflow">return</span> (it != mParallaxFactors.end()) ? it-&gt;second : 1.0f;</div>
 <div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>    }</div>
-</div>
 <div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span> </div>
 <div class="foldopen" id="foldopen00034" data-start="{" data-end="}">
 <div class="line"><a id="l00034" name="l00034"></a><span class="lineno"><a class="line" href="classECSEngine_1_1SpriteSystem.html#a05130b57f98506c7593fe026e5ba3f95">   34</a></span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classECSEngine_1_1SpriteSystem.html#a05130b57f98506c7593fe026e5ba3f95">Run</a>(<a class="code hl_class" href="classECSEngine_1_1Scene.html">Scene&lt;Components...&gt;</a> &amp;scene)<span class="keyword"> override</span></div>
@@ -143,7 +139,7 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>            sf::IntRect texRect; <span class="comment">// atlas rect</span></div>
 <div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>            <span class="keywordtype">bool</span> flipX = <span class="keyword">false</span>; <span class="comment">// Flip horizontally</span></div>
 <div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>            </div>
-<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>            <a class="code hl_typedef" href="namespaceECSEngine.html#a58263079733ecf551a2e3054f3ccc708">EntityID</a> entityId = 0; <span class="comment">// Store entity ID for per-entity shader uniforms</span></div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>            EntityID entityId = 0; <span class="comment">// Store entity ID for per-entity shader uniforms</span></div>
 <div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>            <span class="keywordtype">float</span> flashIntensity = 0.0f; <span class="comment">// Flash intensity for red flash shader</span></div>
 <div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>        };</div>
 <div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span> </div>
@@ -156,7 +152,7 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>            <span class="keywordflow">if</span> (!it-&gt;isActive())</div>
 <div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>                <span class="keywordflow">continue</span>;</div>
 <div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span> </div>
-<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>            <a class="code hl_typedef" href="namespaceECSEngine.html#a58263079733ecf551a2e3054f3ccc708">EntityID</a> <span class="keywordtype">id</span> = it-&gt;getID();</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>            EntityID <span class="keywordtype">id</span> = it-&gt;getID();</div>
 <div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>            <span class="keywordflow">if</span> (!entityManager.template HasComponent&lt;SpriteComponent&gt;(<span class="keywordtype">id</span>))</div>
 <div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>                <span class="keywordflow">continue</span>;</div>
 <div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span> </div>
@@ -200,7 +196,7 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span> </div>
 <div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>            DrawItem item;</div>
 <div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>            item.layer = spriteComp.layer;</div>
-<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>            item.parallax = <a class="code hl_function" href="classECSEngine_1_1SpriteSystem.html#a62b0586888aaf1b27f98e2aac93418a1">GetParallaxFactor</a>(spriteComp.layer);</div>
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>            item.parallax = GetParallaxFactor(spriteComp.layer);</div>
 <div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>            item.entityId = id;</div>
 <div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>            item.dest = screenRect;</div>
 <div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>            item.texRect = texRect;</div>
@@ -351,7 +347,7 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00262" name="l00262"></a><span class="lineno">  262</span>            {</div>
 <div class="line"><a id="l00263" name="l00263"></a><span class="lineno">  263</span>                <span class="keywordflow">if</span> (!it-&gt;isActive())</div>
 <div class="line"><a id="l00264" name="l00264"></a><span class="lineno">  264</span>                    <span class="keywordflow">continue</span>;</div>
-<div class="line"><a id="l00265" name="l00265"></a><span class="lineno">  265</span>                <a class="code hl_typedef" href="namespaceECSEngine.html#a58263079733ecf551a2e3054f3ccc708">EntityID</a> <span class="keywordtype">id</span> = it-&gt;getID();</div>
+<div class="line"><a id="l00265" name="l00265"></a><span class="lineno">  265</span>                EntityID <span class="keywordtype">id</span> = it-&gt;getID();</div>
 <div class="line"><a id="l00266" name="l00266"></a><span class="lineno">  266</span>                <span class="keywordflow">if</span> (!entityManager.template HasComponent&lt;CollisionComponent&gt;(<span class="keywordtype">id</span>))</div>
 <div class="line"><a id="l00267" name="l00267"></a><span class="lineno">  267</span>                    <span class="keywordflow">continue</span>;</div>
 <div class="line"><a id="l00268" name="l00268"></a><span class="lineno">  268</span> </div>
@@ -361,11 +357,11 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00272" name="l00272"></a><span class="lineno">  272</span> </div>
 <div class="line"><a id="l00273" name="l00273"></a><span class="lineno">  273</span>                sf::RectangleShape box;</div>
 <div class="line"><a id="l00274" name="l00274"></a><span class="lineno">  274</span>                box.setPosition(sf::Vector2f(</div>
-<div class="line"><a id="l00275" name="l00275"></a><span class="lineno">  275</span>                    <span class="keyword">static_cast&lt;</span><span class="keywordtype">float</span><span class="keyword">&gt;</span>(screenRect.<a class="code hl_variable" href="structECSEngine_1_1Rect.html#ae2b4254b075db25206de86b0adf27be1">topLeft</a>.<a class="code hl_variable" href="structECSEngine_1_1Point2D.html#ab7acf0cfdafde30d673fb40296947a21">x</a>),</div>
-<div class="line"><a id="l00276" name="l00276"></a><span class="lineno">  276</span>                    <span class="keyword">static_cast&lt;</span><span class="keywordtype">float</span><span class="keyword">&gt;</span>(screenRect.<a class="code hl_variable" href="structECSEngine_1_1Rect.html#ae2b4254b075db25206de86b0adf27be1">topLeft</a>.<a class="code hl_variable" href="structECSEngine_1_1Point2D.html#aaeddfea4d4c964cbcc5574b8bbd40a74">y</a>)));</div>
+<div class="line"><a id="l00275" name="l00275"></a><span class="lineno">  275</span>                    <span class="keyword">static_cast&lt;</span><span class="keywordtype">float</span><span class="keyword">&gt;</span>(screenRect.topLeft.x),</div>
+<div class="line"><a id="l00276" name="l00276"></a><span class="lineno">  276</span>                    <span class="keyword">static_cast&lt;</span><span class="keywordtype">float</span><span class="keyword">&gt;</span>(screenRect.topLeft.y)));</div>
 <div class="line"><a id="l00277" name="l00277"></a><span class="lineno">  277</span>                box.setSize(sf::Vector2f(</div>
-<div class="line"><a id="l00278" name="l00278"></a><span class="lineno">  278</span>                    <span class="keyword">static_cast&lt;</span><span class="keywordtype">float</span><span class="keyword">&gt;</span>(screenRect.<a class="code hl_variable" href="structECSEngine_1_1Rect.html#a23a740ffdba644f216b8560f8684a450">width</a>),</div>
-<div class="line"><a id="l00279" name="l00279"></a><span class="lineno">  279</span>                    <span class="keyword">static_cast&lt;</span><span class="keywordtype">float</span><span class="keyword">&gt;</span>(screenRect.<a class="code hl_variable" href="structECSEngine_1_1Rect.html#a84f7a758e3a667382c79c70353c3dcc1">height</a>)));</div>
+<div class="line"><a id="l00278" name="l00278"></a><span class="lineno">  278</span>                    <span class="keyword">static_cast&lt;</span><span class="keywordtype">float</span><span class="keyword">&gt;</span>(screenRect.width),</div>
+<div class="line"><a id="l00279" name="l00279"></a><span class="lineno">  279</span>                    <span class="keyword">static_cast&lt;</span><span class="keywordtype">float</span><span class="keyword">&gt;</span>(screenRect.height)));</div>
 <div class="line"><a id="l00280" name="l00280"></a><span class="lineno">  280</span>                box.setFillColor(sf::Color(255, 0, 255, 80));      <span class="comment">// purple </span></div>
 <div class="line"><a id="l00281" name="l00281"></a><span class="lineno">  281</span>                box.setOutlineThickness(2.0f);</div>
 <div class="line"><a id="l00282" name="l00282"></a><span class="lineno">  282</span>                box.setOutlineColor(sf::Color(255, 0, 255, 220)); <span class="comment">// bright purple outline</span></div>
@@ -383,12 +379,6 @@ $(document).ready(function() { init_codefold(0); });
 </div>
 <div class="line"><a id="l00293" name="l00293"></a><span class="lineno">  293</span> </div>
 <div class="line"><a id="l00294" name="l00294"></a><span class="lineno">  294</span>}</div>
-<div class="ttc" id="aCollisionComponent_8h_html"><div class="ttname"><a href="CollisionComponent_8h.html">CollisionComponent.h</a></div></div>
-<div class="ttc" id="aHpComponent_8h_html"><div class="ttname"><a href="HpComponent_8h.html">HpComponent.h</a></div></div>
-<div class="ttc" id="aLocationComponent_8h_html"><div class="ttname"><a href="LocationComponent_8h.html">LocationComponent.h</a></div></div>
-<div class="ttc" id="aScene_8h_html"><div class="ttname"><a href="Scene_8h.html">Scene.h</a></div></div>
-<div class="ttc" id="aSpriteComponent_8h_html"><div class="ttname"><a href="SpriteComponent_8h.html">SpriteComponent.h</a></div></div>
-<div class="ttc" id="aSystemManager_8h_html"><div class="ttname"><a href="SystemManager_8h.html">SystemManager.h</a></div></div>
 <div class="ttc" id="aclassECSEngine_1_1Scene_html"><div class="ttname"><a href="classECSEngine_1_1Scene.html">ECSEngine::Scene</a></div><div class="ttdoc">Represents a scene in the game with its own managers and systems.</div><div class="ttdef"><b>Definition</b> Scene.h:28</div></div>
 <div class="ttc" id="aclassECSEngine_1_1Scene_html_a34d2943fce998b2c3ec769943bf6c983"><div class="ttname"><a href="classECSEngine_1_1Scene.html#a34d2943fce998b2c3ec769943bf6c983">ECSEngine::Scene::GetSpriteManager</a></div><div class="ttdeci">SpriteManager &amp; GetSpriteManager()</div><div class="ttdoc">Gets a reference to the SpriteManager.</div><div class="ttdef"><b>Definition</b> Scene.h:82</div></div>
 <div class="ttc" id="aclassECSEngine_1_1Scene_html_a4ae8b155775b577628125b84093fe005"><div class="ttname"><a href="classECSEngine_1_1Scene.html#a4ae8b155775b577628125b84093fe005">ECSEngine::Scene::GetEntityManager</a></div><div class="ttdeci">EntityManager&lt; Components... &gt; &amp; GetEntityManager()</div><div class="ttdoc">Gets a reference to the EntityManager.</div><div class="ttdef"><b>Definition</b> Scene.h:92</div></div>
@@ -396,19 +386,8 @@ $(document).ready(function() { init_codefold(0); });
 <div class="ttc" id="aclassECSEngine_1_1Scene_html_addfff14c5b4b9b5c145da95d3da5ec6b"><div class="ttname"><a href="classECSEngine_1_1Scene.html#addfff14c5b4b9b5c145da95d3da5ec6b">ECSEngine::Scene::GetShaderManager</a></div><div class="ttdeci">ShaderManager &amp; GetShaderManager()</div><div class="ttdoc">Gets a reference to the ShaderManager.</div><div class="ttdef"><b>Definition</b> Scene.h:122</div></div>
 <div class="ttc" id="aclassECSEngine_1_1SpriteSystem_html"><div class="ttname"><a href="classECSEngine_1_1SpriteSystem.html">ECSEngine::SpriteSystem</a></div><div class="ttdef"><b>Definition</b> SpriteSystem.h:17</div></div>
 <div class="ttc" id="aclassECSEngine_1_1SpriteSystem_html_a05130b57f98506c7593fe026e5ba3f95"><div class="ttname"><a href="classECSEngine_1_1SpriteSystem.html#a05130b57f98506c7593fe026e5ba3f95">ECSEngine::SpriteSystem::Run</a></div><div class="ttdeci">bool Run(Scene&lt; Components... &gt; &amp;scene) override</div><div class="ttdoc">Runs the systems.</div><div class="ttdef"><b>Definition</b> SpriteSystem.h:34</div></div>
-<div class="ttc" id="aclassECSEngine_1_1SpriteSystem_html_a0cd044c30c74cadca516845308fee54b"><div class="ttname"><a href="classECSEngine_1_1SpriteSystem.html#a0cd044c30c74cadca516845308fee54b">ECSEngine::SpriteSystem::~SpriteSystem</a></div><div class="ttdeci">~SpriteSystem()=default</div></div>
-<div class="ttc" id="aclassECSEngine_1_1SpriteSystem_html_a62b0586888aaf1b27f98e2aac93418a1"><div class="ttname"><a href="classECSEngine_1_1SpriteSystem.html#a62b0586888aaf1b27f98e2aac93418a1">ECSEngine::SpriteSystem::GetParallaxFactor</a></div><div class="ttdeci">float GetParallaxFactor(int layer) const</div><div class="ttdef"><b>Definition</b> SpriteSystem.h:28</div></div>
-<div class="ttc" id="aclassECSEngine_1_1SpriteSystem_html_ac4fe3de7502d0a19726ef9cb6cdf23b5"><div class="ttname"><a href="classECSEngine_1_1SpriteSystem.html#ac4fe3de7502d0a19726ef9cb6cdf23b5">ECSEngine::SpriteSystem::SpriteSystem</a></div><div class="ttdeci">SpriteSystem()=default</div></div>
-<div class="ttc" id="aclassECSEngine_1_1SpriteSystem_html_ad97532c63a6259700d1bb578d29c5b32"><div class="ttname"><a href="classECSEngine_1_1SpriteSystem.html#ad97532c63a6259700d1bb578d29c5b32">ECSEngine::SpriteSystem::SetParallaxFactor</a></div><div class="ttdeci">void SetParallaxFactor(int layer, float factor)</div><div class="ttdef"><b>Definition</b> SpriteSystem.h:23</div></div>
 <div class="ttc" id="aclassECSEngine_1_1System_html"><div class="ttname"><a href="classECSEngine_1_1System.html">ECSEngine::System</a></div><div class="ttdef"><b>Definition</b> SystemManager.h:15</div></div>
-<div class="ttc" id="anamespaceECSEngine_html"><div class="ttname"><a href="namespaceECSEngine.html">ECSEngine</a></div><div class="ttdef"><b>Definition</b> AnimationComponent.h:8</div></div>
-<div class="ttc" id="anamespaceECSEngine_html_a58263079733ecf551a2e3054f3ccc708"><div class="ttname"><a href="namespaceECSEngine.html#a58263079733ecf551a2e3054f3ccc708">ECSEngine::EntityID</a></div><div class="ttdeci">size_t EntityID</div><div class="ttdef"><b>Definition</b> ComponentStorage.h:11</div></div>
-<div class="ttc" id="astructECSEngine_1_1Point2D_html_aaeddfea4d4c964cbcc5574b8bbd40a74"><div class="ttname"><a href="structECSEngine_1_1Point2D.html#aaeddfea4d4c964cbcc5574b8bbd40a74">ECSEngine::Point2D::y</a></div><div class="ttdeci">float y</div><div class="ttdef"><b>Definition</b> MathUtil.h:14</div></div>
-<div class="ttc" id="astructECSEngine_1_1Point2D_html_ab7acf0cfdafde30d673fb40296947a21"><div class="ttname"><a href="structECSEngine_1_1Point2D.html#ab7acf0cfdafde30d673fb40296947a21">ECSEngine::Point2D::x</a></div><div class="ttdeci">float x</div><div class="ttdef"><b>Definition</b> MathUtil.h:14</div></div>
 <div class="ttc" id="astructECSEngine_1_1Rect_html"><div class="ttname"><a href="structECSEngine_1_1Rect.html">ECSEngine::Rect</a></div><div class="ttdef"><b>Definition</b> MathUtil.h:117</div></div>
-<div class="ttc" id="astructECSEngine_1_1Rect_html_a23a740ffdba644f216b8560f8684a450"><div class="ttname"><a href="structECSEngine_1_1Rect.html#a23a740ffdba644f216b8560f8684a450">ECSEngine::Rect::width</a></div><div class="ttdeci">int width</div><div class="ttdef"><b>Definition</b> MathUtil.h:119</div></div>
-<div class="ttc" id="astructECSEngine_1_1Rect_html_a84f7a758e3a667382c79c70353c3dcc1"><div class="ttname"><a href="structECSEngine_1_1Rect.html#a84f7a758e3a667382c79c70353c3dcc1">ECSEngine::Rect::height</a></div><div class="ttdeci">int height</div><div class="ttdef"><b>Definition</b> MathUtil.h:119</div></div>
-<div class="ttc" id="astructECSEngine_1_1Rect_html_ae2b4254b075db25206de86b0adf27be1"><div class="ttname"><a href="structECSEngine_1_1Rect.html#ae2b4254b075db25206de86b0adf27be1">ECSEngine::Rect::topLeft</a></div><div class="ttdeci">Point2D topLeft</div><div class="ttdef"><b>Definition</b> MathUtil.h:118</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

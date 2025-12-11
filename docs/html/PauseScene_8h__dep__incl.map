@@ -1,8 +1,0 @@
-<map id="engine/PauseScene.h" name="engine/PauseScene.h">
-<area shape="rect" id="Node000001" title=" " alt="" coords="85,5,244,31"/>
-<area shape="rect" id="Node000002" href="$GameplayScene_8h.html" title=" " alt="" coords="5,79,193,104"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="147,43,112,80,108,77,143,39"/>
-<area shape="rect" id="Node000003" href="$main_8cpp.html" title=" " alt="" coords="99,152,230,177"/>
-<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="188,40,206,69,210,87,209,105,195,132,178,153,174,150,190,129,203,103,205,87,201,72,184,43"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="121,113,156,150,152,154,117,116"/>
-</map>

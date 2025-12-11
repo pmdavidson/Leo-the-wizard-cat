@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Project 3 Platformer: engine/HpSystem.h Source File</title>
+<title>Project 4 (Leo the Cat Wizard): engine/HpSystem.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -21,7 +21,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">Project 3 Platformer
+   <div id="projectname">Project 4 (Leo the Cat Wizard)
    </div>
   </td>
  </tr>
@@ -81,17 +81,17 @@ $(document).ready(function() { init_codefold(0); });
   <div class="headertitle"><div class="title">HpSystem.h</div></div>
 </div><!--header-->
 <div class="contents">
-<a href="HpSystem_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#pragma once</span></div>
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#pragma once</span></div>
 <div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span> </div>
-<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &quot;<a class="code" href="SystemManager_8h.html">SystemManager.h</a>&quot;</span></div>
-<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &quot;<a class="code" href="Scene_8h.html">Scene.h</a>&quot;</span></div>
-<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#include &quot;<a class="code" href="HpComponent_8h.html">HpComponent.h</a>&quot;</span></div>
-<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#include &quot;<a class="code" href="SpriteComponent_8h.html">SpriteComponent.h</a>&quot;</span></div>
-<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">#include &quot;<a class="code" href="LocationComponent_8h.html">LocationComponent.h</a>&quot;</span></div>
-<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#include &quot;<a class="code" href="AnimationComponent_8h.html">AnimationComponent.h</a>&quot;</span></div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#include &quot;<a class="code" href="CheckpointComponent_8h.html">CheckpointComponent.h</a>&quot;</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &quot;SystemManager.h&quot;</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &quot;Scene.h&quot;</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#include &quot;HpComponent.h&quot;</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#include &quot;SpriteComponent.h&quot;</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">#include &quot;LocationComponent.h&quot;</span></div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#include &quot;AnimationComponent.h&quot;</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#include &quot;CheckpointComponent.h&quot;</span></div>
 <div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span> </div>
-<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespaceECSEngine.html">ECSEngine</a></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="keyword">namespace </span>ECSEngine</div>
 <div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span>{</div>
 <div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span> </div>
 <div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>    <span class="keyword">template</span> &lt;<span class="keyword">typename</span>... Components&gt;</div>
@@ -109,7 +109,7 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>            {</div>
 <div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>                <span class="keywordflow">if</span> (!it-&gt;isActive())</div>
 <div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>                    <span class="keywordflow">continue</span>;</div>
-<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>                <a class="code hl_typedef" href="namespaceECSEngine.html#a58263079733ecf551a2e3054f3ccc708">EntityID</a> entityId = it-&gt;getID();</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>                EntityID entityId = it-&gt;getID();</div>
 <div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span> </div>
 <div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>                <span class="keywordflow">if</span> (!entityManager.template HasComponent&lt;HpComponent&gt;(entityId))</div>
 <div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>                    <span class="keywordflow">continue</span>;</div>
@@ -136,7 +136,7 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>                <span class="comment">// Update heart display sprites based on current HP</span></div>
 <div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>                <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; hpComp.heartDisplayEntityIds.size(); ++i)</div>
 <div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>                {</div>
-<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>                    <a class="code hl_typedef" href="namespaceECSEngine.html#a58263079733ecf551a2e3054f3ccc708">EntityID</a> heartEntityId = hpComp.heartDisplayEntityIds[i];</div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>                    EntityID heartEntityId = hpComp.heartDisplayEntityIds[i];</div>
 <div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span> </div>
 <div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>                    <span class="keywordflow">if</span> (!entityManager.template HasComponent&lt;SpriteComponent&gt;(heartEntityId))</div>
 <div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>                        <span class="keywordflow">continue</span>;</div>
@@ -162,21 +162,21 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span> </div>
 <div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>    <span class="keyword">private</span>:</div>
 <div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>        <span class="keyword">template</span> &lt;<span class="keyword">typename</span> EntityManagerType&gt;</div>
-<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>        <span class="keywordtype">void</span> RestartGame(EntityManagerType &amp;entityManager, <a class="code hl_typedef" href="namespaceECSEngine.html#a58263079733ecf551a2e3054f3ccc708">EntityID</a> playerId, <a class="code hl_struct" href="structECSEngine_1_1HpComponent.html">HpComponent</a> &amp;hpComp)</div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>        <span class="keywordtype">void</span> RestartGame(EntityManagerType &amp;entityManager, EntityID playerId, <a class="code hl_struct" href="structECSEngine_1_1HpComponent.html">HpComponent</a> &amp;hpComp)</div>
 <div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>        {</div>
 <div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>            <span class="comment">// Reset HP</span></div>
-<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>            hpComp.<a class="code hl_variable" href="structECSEngine_1_1HpComponent.html#a59975207b72008a20034d31d8b3dc6ad">currentHp</a> = hpComp.<a class="code hl_variable" href="structECSEngine_1_1HpComponent.html#a9e8fa4be13558588cd05b750cc1d092b">maxHp</a>;</div>
-<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>            hpComp.<a class="code hl_variable" href="structECSEngine_1_1HpComponent.html#a75b06c1af25aa80bf0c6f5a455c01318">previousHp</a> = hpComp.<a class="code hl_variable" href="structECSEngine_1_1HpComponent.html#a9e8fa4be13558588cd05b750cc1d092b">maxHp</a>;</div>
-<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>            hpComp.<a class="code hl_variable" href="structECSEngine_1_1HpComponent.html#a93f325e6a35a1dc5b8b2c79974b03ddb">isAlive</a> = <span class="keyword">true</span>;</div>
-<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>            hpComp.<a class="code hl_variable" href="structECSEngine_1_1HpComponent.html#ab65ef188acae44614e12da09f33b9212">isDying</a> = <span class="keyword">false</span>;</div>
-<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>            hpComp.<a class="code hl_variable" href="structECSEngine_1_1HpComponent.html#af669135b00d6c5b823cd347dddaa16a1">deathAnimTimer</a> = 0.0f;</div>
-<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>            hpComp.<a class="code hl_variable" href="structECSEngine_1_1HpComponent.html#a1109d80a26ad129b831109df8dac7cb2">invincibilityTimer</a> = hpComp.<a class="code hl_variable" href="structECSEngine_1_1HpComponent.html#a752560a6467feede5c24db0591b45900">invincibilityDuration</a>; <span class="comment">// Brief invincibility after restart</span></div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>            hpComp.currentHp = hpComp.maxHp;</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>            hpComp.previousHp = hpComp.maxHp;</div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>            hpComp.isAlive = <span class="keyword">true</span>;</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>            hpComp.isDying = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>            hpComp.deathAnimTimer = 0.0f;</div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>            hpComp.invincibilityTimer = hpComp.invincibilityDuration; <span class="comment">// Brief invincibility after restart</span></div>
 <div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span> </div>
 <div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>            <span class="comment">// Reset position to initial spawn</span></div>
 <div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>            <span class="keywordflow">if</span> (entityManager.template HasComponent&lt;LocationComponent&gt;(playerId))</div>
 <div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>            {</div>
 <div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>                <span class="keyword">auto</span> &amp;location = entityManager.template GetComponent&lt;LocationComponent&gt;(playerId);</div>
-<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>                location.position = hpComp.<a class="code hl_variable" href="structECSEngine_1_1HpComponent.html#ae077b8719ef4a616f78cf321e72d2703">initialSpawnPosition</a>;</div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>                location.position = hpComp.initialSpawnPosition;</div>
 <div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>            }</div>
 <div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span> </div>
 <div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>            <span class="comment">// Reset velocity</span></div>
@@ -192,7 +192,7 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>                <span class="keyword">auto</span> &amp;checkpoint = entityManager.template GetComponent&lt;CheckpointComponent&gt;(playerId);</div>
 <div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>                checkpoint.activeCheckpoints.reset(); <span class="comment">// Clear all checkpoints</span></div>
 <div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>                checkpoint.lastCheckpointIndex = -1;</div>
-<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>                checkpoint.respawnPosition = hpComp.<a class="code hl_variable" href="structECSEngine_1_1HpComponent.html#ae077b8719ef4a616f78cf321e72d2703">initialSpawnPosition</a>;</div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>                checkpoint.respawnPosition = hpComp.initialSpawnPosition;</div>
 <div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>            }</div>
 <div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span> </div>
 <div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>            <span class="comment">// Return to idle animation</span></div>
@@ -210,30 +210,12 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span> </div>
 <div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>} <span class="comment">// namespace ECSEngine</span></div>
 <div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span> </div>
-<div class="ttc" id="aAnimationComponent_8h_html"><div class="ttname"><a href="AnimationComponent_8h.html">AnimationComponent.h</a></div></div>
-<div class="ttc" id="aCheckpointComponent_8h_html"><div class="ttname"><a href="CheckpointComponent_8h.html">CheckpointComponent.h</a></div></div>
-<div class="ttc" id="aHpComponent_8h_html"><div class="ttname"><a href="HpComponent_8h.html">HpComponent.h</a></div></div>
-<div class="ttc" id="aLocationComponent_8h_html"><div class="ttname"><a href="LocationComponent_8h.html">LocationComponent.h</a></div></div>
-<div class="ttc" id="aScene_8h_html"><div class="ttname"><a href="Scene_8h.html">Scene.h</a></div></div>
-<div class="ttc" id="aSpriteComponent_8h_html"><div class="ttname"><a href="SpriteComponent_8h.html">SpriteComponent.h</a></div></div>
-<div class="ttc" id="aSystemManager_8h_html"><div class="ttname"><a href="SystemManager_8h.html">SystemManager.h</a></div></div>
 <div class="ttc" id="aclassECSEngine_1_1HpSystem_html"><div class="ttname"><a href="classECSEngine_1_1HpSystem.html">ECSEngine::HpSystem</a></div><div class="ttdef"><b>Definition</b> HpSystem.h:16</div></div>
 <div class="ttc" id="aclassECSEngine_1_1HpSystem_html_ae29571b67f6d8343df1730bb02664e35"><div class="ttname"><a href="classECSEngine_1_1HpSystem.html#ae29571b67f6d8343df1730bb02664e35">ECSEngine::HpSystem::Run</a></div><div class="ttdeci">bool Run(Scene&lt; Components... &gt; &amp;scene) override</div><div class="ttdoc">Runs the systems.</div><div class="ttdef"><b>Definition</b> HpSystem.h:18</div></div>
 <div class="ttc" id="aclassECSEngine_1_1Scene_html"><div class="ttname"><a href="classECSEngine_1_1Scene.html">ECSEngine::Scene</a></div><div class="ttdoc">Represents a scene in the game with its own managers and systems.</div><div class="ttdef"><b>Definition</b> Scene.h:28</div></div>
 <div class="ttc" id="aclassECSEngine_1_1Scene_html_a4ae8b155775b577628125b84093fe005"><div class="ttname"><a href="classECSEngine_1_1Scene.html#a4ae8b155775b577628125b84093fe005">ECSEngine::Scene::GetEntityManager</a></div><div class="ttdeci">EntityManager&lt; Components... &gt; &amp; GetEntityManager()</div><div class="ttdoc">Gets a reference to the EntityManager.</div><div class="ttdef"><b>Definition</b> Scene.h:92</div></div>
 <div class="ttc" id="aclassECSEngine_1_1System_html"><div class="ttname"><a href="classECSEngine_1_1System.html">ECSEngine::System</a></div><div class="ttdef"><b>Definition</b> SystemManager.h:15</div></div>
-<div class="ttc" id="anamespaceECSEngine_html"><div class="ttname"><a href="namespaceECSEngine.html">ECSEngine</a></div><div class="ttdef"><b>Definition</b> AnimationComponent.h:8</div></div>
-<div class="ttc" id="anamespaceECSEngine_html_a58263079733ecf551a2e3054f3ccc708"><div class="ttname"><a href="namespaceECSEngine.html#a58263079733ecf551a2e3054f3ccc708">ECSEngine::EntityID</a></div><div class="ttdeci">size_t EntityID</div><div class="ttdef"><b>Definition</b> ComponentStorage.h:11</div></div>
 <div class="ttc" id="astructECSEngine_1_1HpComponent_html"><div class="ttname"><a href="structECSEngine_1_1HpComponent.html">ECSEngine::HpComponent</a></div><div class="ttdef"><b>Definition</b> HpComponent.h:12</div></div>
-<div class="ttc" id="astructECSEngine_1_1HpComponent_html_a1109d80a26ad129b831109df8dac7cb2"><div class="ttname"><a href="structECSEngine_1_1HpComponent.html#a1109d80a26ad129b831109df8dac7cb2">ECSEngine::HpComponent::invincibilityTimer</a></div><div class="ttdeci">float invincibilityTimer</div><div class="ttdef"><b>Definition</b> HpComponent.h:19</div></div>
-<div class="ttc" id="astructECSEngine_1_1HpComponent_html_a59975207b72008a20034d31d8b3dc6ad"><div class="ttname"><a href="structECSEngine_1_1HpComponent.html#a59975207b72008a20034d31d8b3dc6ad">ECSEngine::HpComponent::currentHp</a></div><div class="ttdeci">int currentHp</div><div class="ttdef"><b>Definition</b> HpComponent.h:14</div></div>
-<div class="ttc" id="astructECSEngine_1_1HpComponent_html_a752560a6467feede5c24db0591b45900"><div class="ttname"><a href="structECSEngine_1_1HpComponent.html#a752560a6467feede5c24db0591b45900">ECSEngine::HpComponent::invincibilityDuration</a></div><div class="ttdeci">float invincibilityDuration</div><div class="ttdef"><b>Definition</b> HpComponent.h:20</div></div>
-<div class="ttc" id="astructECSEngine_1_1HpComponent_html_a75b06c1af25aa80bf0c6f5a455c01318"><div class="ttname"><a href="structECSEngine_1_1HpComponent.html#a75b06c1af25aa80bf0c6f5a455c01318">ECSEngine::HpComponent::previousHp</a></div><div class="ttdeci">int previousHp</div><div class="ttdef"><b>Definition</b> HpComponent.h:16</div></div>
-<div class="ttc" id="astructECSEngine_1_1HpComponent_html_a93f325e6a35a1dc5b8b2c79974b03ddb"><div class="ttname"><a href="structECSEngine_1_1HpComponent.html#a93f325e6a35a1dc5b8b2c79974b03ddb">ECSEngine::HpComponent::isAlive</a></div><div class="ttdeci">bool isAlive</div><div class="ttdef"><b>Definition</b> HpComponent.h:30</div></div>
-<div class="ttc" id="astructECSEngine_1_1HpComponent_html_a9e8fa4be13558588cd05b750cc1d092b"><div class="ttname"><a href="structECSEngine_1_1HpComponent.html#a9e8fa4be13558588cd05b750cc1d092b">ECSEngine::HpComponent::maxHp</a></div><div class="ttdeci">int maxHp</div><div class="ttdef"><b>Definition</b> HpComponent.h:15</div></div>
-<div class="ttc" id="astructECSEngine_1_1HpComponent_html_ab65ef188acae44614e12da09f33b9212"><div class="ttname"><a href="structECSEngine_1_1HpComponent.html#ab65ef188acae44614e12da09f33b9212">ECSEngine::HpComponent::isDying</a></div><div class="ttdeci">bool isDying</div><div class="ttdef"><b>Definition</b> HpComponent.h:33</div></div>
-<div class="ttc" id="astructECSEngine_1_1HpComponent_html_ae077b8719ef4a616f78cf321e72d2703"><div class="ttname"><a href="structECSEngine_1_1HpComponent.html#ae077b8719ef4a616f78cf321e72d2703">ECSEngine::HpComponent::initialSpawnPosition</a></div><div class="ttdeci">Point2D initialSpawnPosition</div><div class="ttdef"><b>Definition</b> HpComponent.h:37</div></div>
-<div class="ttc" id="astructECSEngine_1_1HpComponent_html_af669135b00d6c5b823cd347dddaa16a1"><div class="ttname"><a href="structECSEngine_1_1HpComponent.html#af669135b00d6c5b823cd347dddaa16a1">ECSEngine::HpComponent::deathAnimTimer</a></div><div class="ttdeci">float deathAnimTimer</div><div class="ttdef"><b>Definition</b> HpComponent.h:34</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

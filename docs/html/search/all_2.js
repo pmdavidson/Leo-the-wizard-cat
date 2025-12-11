@@ -1,9 +1,19 @@
 var searchData=
 [
-  ['basescene_0',['basescene',['../classGameplayScene.html#ac3aa217c0b81bf54c21c48ded59ae5a7',1,'GameplayScene::BaseScene'],['../classMainMenuScene.html#a82b2301e68585397bf79df205d05db54',1,'MainMenuScene::BaseScene'],['../classPauseScene.html#af393024d0dffdbdbc64bbcc4d44ddf85',1,'PauseScene::BaseScene']]],
-  ['begin_1',['begin',['../classECSEngine_1_1EntityManager.html#a7d044c90350db8aa281ee8f19a05ff68',1,'ECSEngine::EntityManager']]],
-  ['boss_2',['Boss',['../namespaceECSEngine.html#a879b2fb97ee2d7caf02887a7e46105d7a5859831e2b3db23528c710b1451e13fc',1,'ECSEngine']]],
-  ['bottom_3',['bottom',['../structECSEngine_1_1CollisionFlags.html#a96fd448233f6e6251b28cc442ee573ee',1,'ECSEngine::CollisionFlags']]],
-  ['bounds_4',['bounds',['../classECSEngine_1_1SpriteComponent.html#aec086c7047a8098ec1cb8f07c11eba38',1,'ECSEngine::SpriteComponent']]],
-  ['boundsrect_5',['boundsRect',['../structSpriteEntry.html#a12f2c2e0dbf06ec0c45386e586e073dd',1,'SpriteEntry']]]
+  ['cameracomponent_0',['CameraComponent',['../structECSEngine_1_1CameraComponent.html',1,'ECSEngine']]],
+  ['camerafollower_1',['CameraFollower',['../structECSEngine_1_1CameraFollower.html',1,'ECSEngine']]],
+  ['camerashake_2',['CameraShake',['../structECSEngine_1_1CameraShake.html',1,'ECSEngine']]],
+  ['camerasystem_3',['CameraSystem',['../classECSEngine_1_1CameraSystem.html',1,'ECSEngine']]],
+  ['campfirecomponent_4',['CampfireComponent',['../structECSEngine_1_1CampfireComponent.html',1,'ECSEngine']]],
+  ['cbegin_5',['cbegin',['../classECSEngine_1_1EntityManager.html#ab0708e3279c6b035ccb0e29eba4f0c6d',1,'ECSEngine::EntityManager']]],
+  ['cend_6',['cend',['../classECSEngine_1_1EntityManager.html#a8b52089492244c3ac88cc328630e1376',1,'ECSEngine::EntityManager']]],
+  ['checkpointcomponent_7',['CheckpointComponent',['../structECSEngine_1_1CheckpointComponent.html',1,'ECSEngine']]],
+  ['checkpointsystem_8',['CheckpointSystem',['../classECSEngine_1_1CheckpointSystem.html',1,'ECSEngine']]],
+  ['clearsystems_9',['ClearSystems',['../classECSEngine_1_1SystemManager.html#a565eb0756bd0d3f959a8633485042096',1,'ECSEngine::SystemManager']]],
+  ['collisioncomponent_10',['CollisionComponent',['../structECSEngine_1_1CollisionComponent.html',1,'ECSEngine']]],
+  ['collisionflags_11',['CollisionFlags',['../structECSEngine_1_1CollisionFlags.html',1,'ECSEngine']]],
+  ['collisionsystem_12',['CollisionSystem',['../classECSEngine_1_1CollisionSystem.html',1,'ECSEngine']]],
+  ['collisionupdatesystem_13',['CollisionUpdateSystem',['../classECSEngine_1_1CollisionUpdateSystem.html',1,'ECSEngine']]],
+  ['componentstorage_14',['ComponentStorage',['../classECSEngine_1_1ComponentStorage.html',1,'ECSEngine']]],
+  ['createentity_15',['CreateEntity',['../classECSEngine_1_1EntityManager.html#a52259d7c8c02ceb5a4d9e9868e84a3e9',1,'ECSEngine::EntityManager']]]
 ];

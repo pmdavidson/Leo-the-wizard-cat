@@ -1,9 +1,10 @@
 var searchData=
 [
-  ['pausescene_0',['PauseScene',['../classPauseScene.html#afb5a4ca7fce2d4d1c3397dedfba8b265',1,'PauseScene']]],
-  ['play_1',['Play',['../structECSEngine_1_1AnimationComponent.html#a3ea0444a73b9d13f92ce2c449c8954d7',1,'ECSEngine::AnimationComponent']]],
-  ['playsound_2',['playsound',['../classECSEngine_1_1SoundManager.html#ac5395744308446ef3be0e7022e3d324c',1,'ECSEngine::SoundManager::PlaySound(const std::string &amp;soundName)'],['../classECSEngine_1_1SoundManager.html#a70e61517c967d18767822dfa07fc9c0a',1,'ECSEngine::SoundManager::PlaySound(const std::string &amp;soundName, float volume)']]],
-  ['point2d_3',['Point2D',['../structECSEngine_1_1Point2D.html#aa19e5d08cff6576a797e6d6aa78ab9c0',1,'ECSEngine::Point2D']]],
-  ['popscene_4',['PopScene',['../classECSEngine_1_1ECSEngine.html#a123400a34251b0bd065d99166232f726',1,'ECSEngine::ECSEngine']]],
-  ['pushscene_5',['PushScene',['../classECSEngine_1_1ECSEngine.html#ae8690144520d751143d4c606545901b0',1,'ECSEngine::ECSEngine']]]
+  ['windowmanager_0',['windowmanager',['../classECSEngine_1_1WindowManager.html#a1b865de496f3b3cd5303d59388ed5093',1,'ECSEngine::WindowManager::WindowManager(unsigned int width, unsigned int height, const std::string &amp;title)'],['../classECSEngine_1_1WindowManager.html#aa928b48b84a732b54796db0b1cc0c41e',1,'ECSEngine::WindowManager::WindowManager(sf::RenderWindow *window, unsigned int width, unsigned int height)']]],
+  ['windowtoworld_1',['windowtoworld',['../classECSEngine_1_1WindowManager.html#ac202056b290238e2b74be14b800ff402',1,'ECSEngine::WindowManager::WindowToWorld(const Rect &amp;rect) const'],['../classECSEngine_1_1WindowManager.html#a2173986a1f192092ce14768f1140a47d',1,'ECSEngine::WindowManager::WindowToWorld(const Point2D &amp;pt) const']]],
+  ['windowtoworldx_2',['WindowToWorldX',['../classECSEngine_1_1WindowManager.html#aa7673ee3d8ce9dd8a27c0c049221d9db',1,'ECSEngine::WindowManager']]],
+  ['windowtoworldy_3',['WindowToWorldY',['../classECSEngine_1_1WindowManager.html#aa123e420b6e700abba304d7f5446cb12',1,'ECSEngine::WindowManager']]],
+  ['worldtowindow_4',['worldtowindow',['../classECSEngine_1_1WindowManager.html#ab2ad40f9718057159b1ae5b867907ad9',1,'ECSEngine::WindowManager::WorldToWindow(const Rect &amp;rect) const'],['../classECSEngine_1_1WindowManager.html#a06d002ef02e7c6ed37573e0b0c96aa84',1,'ECSEngine::WindowManager::WorldToWindow(const Point2D &amp;pt) const']]],
+  ['worldtowindowx_5',['WorldToWindowX',['../classECSEngine_1_1WindowManager.html#a729f175a710849d3bad7f57b078d7f02',1,'ECSEngine::WindowManager']]],
+  ['worldtowindowy_6',['WorldToWindowY',['../classECSEngine_1_1WindowManager.html#ac612c11d66a6acce6a6428609c348423',1,'ECSEngine::WindowManager']]]
 ];

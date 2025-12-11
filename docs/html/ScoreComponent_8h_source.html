@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Project 3 Platformer: engine/ScoreComponent.h Source File</title>
+<title>Project 4 (Leo the Cat Wizard): engine/ScoreComponent.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -21,7 +21,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">Project 3 Platformer
+   <div id="projectname">Project 4 (Leo the Cat Wizard)
    </div>
   </td>
  </tr>
@@ -81,37 +81,29 @@ $(document).ready(function() { init_codefold(0); });
   <div class="headertitle"><div class="title">ScoreComponent.h</div></div>
 </div><!--header-->
 <div class="contents">
-<a href="ScoreComponent_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#pragma once</span></div>
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#pragma once</span></div>
 <div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span> </div>
 <div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &lt;unordered_map&gt;</span></div>
-<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &quot;<a class="code" href="MathUtil_8h.html">MathUtil.h</a>&quot;</span></div>
-<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#include &quot;<a class="code" href="SpriteManager_8h.html">SpriteManager.h</a>&quot;</span></div>
-<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#include &quot;<a class="code" href="Entity_8h.html">Entity.h</a>&quot;</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &quot;MathUtil.h&quot;</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#include &quot;SpriteManager.h&quot;</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#include &quot;Entity.h&quot;</span></div>
 <div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">#include &lt;vector&gt;</span></div>
 <div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span> </div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespaceECSEngine.html">ECSEngine</a></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="keyword">namespace </span>ECSEngine</div>
 <div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span>{</div>
 <div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
 <div class="foldopen" id="foldopen00012" data-start="{" data-end="};">
 <div class="line"><a id="l00012" name="l00012"></a><span class="lineno"><a class="line" href="structECSEngine_1_1ScoreComponent.html">   12</a></span>    <span class="keyword">struct </span><a class="code hl_struct" href="structECSEngine_1_1ScoreComponent.html">ScoreComponent</a></div>
 <div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>    {</div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno"><a class="line" href="structECSEngine_1_1ScoreComponent.html#a7bf9772781350e027f4e9866ff76f12c">   14</a></span>        <span class="keywordtype">int</span> <a class="code hl_variable" href="structECSEngine_1_1ScoreComponent.html#a7bf9772781350e027f4e9866ff76f12c">currentScore</a>;                       <span class="comment">// Current score of the game</span></div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno"><a class="line" href="structECSEngine_1_1ScoreComponent.html#a8eaad826e26128e7c90392755a7aed91">   15</a></span>        std::vector&lt;EntityID&gt; <a class="code hl_variable" href="structECSEngine_1_1ScoreComponent.html#a8eaad826e26128e7c90392755a7aed91">displayEntityIds</a>; <span class="comment">// Entity ids used to display the score</span></div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno"><a class="line" href="structECSEngine_1_1ScoreComponent.html#a21a866931b96b385cbf2be0f02266f70">   16</a></span>        std::vector&lt;SpriteID&gt; <a class="code hl_variable" href="structECSEngine_1_1ScoreComponent.html#a21a866931b96b385cbf2be0f02266f70">digitSpriteIds</a>;   <span class="comment">// Sprite ids corresponding to numbers 0-9 (index 0-9)</span></div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>        <span class="keywordtype">int</span> currentScore;                       <span class="comment">// Current score of the game</span></div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>        std::vector&lt;EntityID&gt; displayEntityIds; <span class="comment">// Entity ids used to display the score</span></div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>        std::vector&lt;SpriteID&gt; digitSpriteIds;   <span class="comment">// Sprite ids corresponding to numbers 0-9 (index 0-9)</span></div>
 <div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span> </div>
-<div class="line"><a id="l00018" name="l00018"></a><span class="lineno"><a class="line" href="structECSEngine_1_1ScoreComponent.html#a4ab3b8a911efac84bc499dc79322819b">   18</a></span>        <a class="code hl_function" href="structECSEngine_1_1ScoreComponent.html#a4ab3b8a911efac84bc499dc79322819b">ScoreComponent</a>() : <a class="code hl_variable" href="structECSEngine_1_1ScoreComponent.html#a7bf9772781350e027f4e9866ff76f12c">currentScore</a>(0) {}</div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>        <a class="code hl_struct" href="structECSEngine_1_1ScoreComponent.html">ScoreComponent</a>() : currentScore(0) {}</div>
 <div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>    };</div>
 </div>
 <div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>}</div>
-<div class="ttc" id="aEntity_8h_html"><div class="ttname"><a href="Entity_8h.html">Entity.h</a></div></div>
-<div class="ttc" id="aMathUtil_8h_html"><div class="ttname"><a href="MathUtil_8h.html">MathUtil.h</a></div></div>
-<div class="ttc" id="aSpriteManager_8h_html"><div class="ttname"><a href="SpriteManager_8h.html">SpriteManager.h</a></div></div>
-<div class="ttc" id="anamespaceECSEngine_html"><div class="ttname"><a href="namespaceECSEngine.html">ECSEngine</a></div><div class="ttdef"><b>Definition</b> AnimationComponent.h:8</div></div>
 <div class="ttc" id="astructECSEngine_1_1ScoreComponent_html"><div class="ttname"><a href="structECSEngine_1_1ScoreComponent.html">ECSEngine::ScoreComponent</a></div><div class="ttdef"><b>Definition</b> ScoreComponent.h:13</div></div>
-<div class="ttc" id="astructECSEngine_1_1ScoreComponent_html_a21a866931b96b385cbf2be0f02266f70"><div class="ttname"><a href="structECSEngine_1_1ScoreComponent.html#a21a866931b96b385cbf2be0f02266f70">ECSEngine::ScoreComponent::digitSpriteIds</a></div><div class="ttdeci">std::vector&lt; SpriteID &gt; digitSpriteIds</div><div class="ttdef"><b>Definition</b> ScoreComponent.h:16</div></div>
-<div class="ttc" id="astructECSEngine_1_1ScoreComponent_html_a4ab3b8a911efac84bc499dc79322819b"><div class="ttname"><a href="structECSEngine_1_1ScoreComponent.html#a4ab3b8a911efac84bc499dc79322819b">ECSEngine::ScoreComponent::ScoreComponent</a></div><div class="ttdeci">ScoreComponent()</div><div class="ttdef"><b>Definition</b> ScoreComponent.h:18</div></div>
-<div class="ttc" id="astructECSEngine_1_1ScoreComponent_html_a7bf9772781350e027f4e9866ff76f12c"><div class="ttname"><a href="structECSEngine_1_1ScoreComponent.html#a7bf9772781350e027f4e9866ff76f12c">ECSEngine::ScoreComponent::currentScore</a></div><div class="ttdeci">int currentScore</div><div class="ttdef"><b>Definition</b> ScoreComponent.h:14</div></div>
-<div class="ttc" id="astructECSEngine_1_1ScoreComponent_html_a8eaad826e26128e7c90392755a7aed91"><div class="ttname"><a href="structECSEngine_1_1ScoreComponent.html#a8eaad826e26128e7c90392755a7aed91">ECSEngine::ScoreComponent::displayEntityIds</a></div><div class="ttdeci">std::vector&lt; EntityID &gt; displayEntityIds</div><div class="ttdef"><b>Definition</b> ScoreComponent.h:15</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Project 3 Platformer: ECSEngine::SystemManager&lt; Components &gt; Class Template Reference</title>
+<title>Project 4 (Leo the Cat Wizard): ECSEngine::SystemManager&lt; Components &gt; Class Template Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -21,7 +21,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">Project 3 Platformer
+   <div id="projectname">Project 4 (Leo the Cat Wizard)
    </div>
   </td>
  </tr>
@@ -69,7 +69,7 @@ $(function() {
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="namespaceECSEngine.html">ECSEngine</a></li><li class="navelem"><a class="el" href="classECSEngine_1_1SystemManager.html">SystemManager</a></li>  </ul>
+<li class="navelem"><b>ECSEngine</b></li><li class="navelem"><a class="el" href="classECSEngine_1_1SystemManager.html">SystemManager</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -87,13 +87,12 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:aeb0156549f3a6a7b8ce59fd5d8789ec2" id="r_aeb0156549f3a6a7b8ce59fd5d8789ec2"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classECSEngine_1_1SystemManager.html#aeb0156549f3a6a7b8ce59fd5d8789ec2">SystemManager</a> ()=default</td></tr>
-<tr class="separator:aeb0156549f3a6a7b8ce59fd5d8789ec2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab9fdcd9eaf2357945e6cf138eedcde31" id="r_ab9fdcd9eaf2357945e6cf138eedcde31"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classECSEngine_1_1SystemManager.html#ab9fdcd9eaf2357945e6cf138eedcde31">AddSystem</a> (std::unique_ptr&lt; <a class="el" href="classECSEngine_1_1System.html">System</a>&lt; Components... &gt; &gt; &amp;&amp;system)</td></tr>
 <tr class="memdesc:ab9fdcd9eaf2357945e6cf138eedcde31"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a system to the manager.  <br /></td></tr>
 <tr class="separator:ab9fdcd9eaf2357945e6cf138eedcde31"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a565eb0756bd0d3f959a8633485042096" id="r_a565eb0756bd0d3f959a8633485042096"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classECSEngine_1_1SystemManager.html#a565eb0756bd0d3f959a8633485042096">ClearSystems</a> ()</td></tr>
-<tr class="memdesc:a565eb0756bd0d3f959a8633485042096"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes all systems from the manager.  <br /></td></tr>
+<tr class="memitem:a565eb0756bd0d3f959a8633485042096" id="r_a565eb0756bd0d3f959a8633485042096"><td class="memItemLeft" align="right" valign="top"><a id="a565eb0756bd0d3f959a8633485042096" name="a565eb0756bd0d3f959a8633485042096"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>ClearSystems</b> ()</td></tr>
+<tr class="memdesc:a565eb0756bd0d3f959a8633485042096"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes all systems from the manager. <br /></td></tr>
 <tr class="separator:a565eb0756bd0d3f959a8633485042096"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1eced7b2e4c8034f2b1a1545eb247ab9" id="r_a1eced7b2e4c8034f2b1a1545eb247ab9"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classECSEngine_1_1SystemManager.html#a1eced7b2e4c8034f2b1a1545eb247ab9">Run</a> (<a class="el" href="classECSEngine_1_1Scene.html">Scene</a>&lt; Components... &gt; &amp;scene)</td></tr>
 <tr class="memdesc:a1eced7b2e4c8034f2b1a1545eb247ab9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Runs all systems in the order they were added.  <br /></td></tr>
@@ -109,35 +108,7 @@ class ECSEngine::SystemManager&lt; Components &gt;</div><p>Manages ownership and
 <h1><a class="anchor" id="Lifetime"></a>
 and Validity</h1>
 <p>Systems are owned by <a class="el" href="classECSEngine_1_1SystemManager.html" title="Manages ownership and execution order of all registered systems.">SystemManager</a> for its lifetime and are executed in the order they are added. References returned by <a class="el" href="classECSEngine_1_1SystemManager.html#ac9177a6ec5a3e18ec6e58a182b0c92c6" title="Retrieves a system of the specified concrete type.">GetSystem()</a> remain valid until <a class="el" href="classECSEngine_1_1SystemManager.html#a565eb0756bd0d3f959a8633485042096" title="Removes all systems from the manager.">ClearSystems()</a> is called or the manager is destroyed. </p>
-</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="aeb0156549f3a6a7b8ce59fd5d8789ec2" name="aeb0156549f3a6a7b8ce59fd5d8789ec2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aeb0156549f3a6a7b8ce59fd5d8789ec2">&#9670;&#160;</a></span>SystemManager()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename... Components&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classECSEngine_1_1SystemManager.html">ECSEngine::SystemManager</a>&lt; Components &gt;::SystemManager </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">default</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<h2 class="groupheader">Member Function Documentation</h2>
+</div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="ab9fdcd9eaf2357945e6cf138eedcde31" name="ab9fdcd9eaf2357945e6cf138eedcde31"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ab9fdcd9eaf2357945e6cf138eedcde31">&#9670;&#160;</a></span>AddSystem()</h2>
 
@@ -171,35 +142,6 @@ template&lt;typename... Components&gt; </div>
   </table>
   </dd>
 </dl>
-
-</div>
-</div>
-<a id="a565eb0756bd0d3f959a8633485042096" name="a565eb0756bd0d3f959a8633485042096"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a565eb0756bd0d3f959a8633485042096">&#9670;&#160;</a></span>ClearSystems()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename... Components&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void <a class="el" href="classECSEngine_1_1SystemManager.html">ECSEngine::SystemManager</a>&lt; Components &gt;::ClearSystems </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Removes all systems from the manager. </p>
 
 </div>
 </div>

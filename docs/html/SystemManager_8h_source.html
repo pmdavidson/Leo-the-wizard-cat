@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Project 3 Platformer: engine/SystemManager.h Source File</title>
+<title>Project 4 (Leo the Cat Wizard): engine/SystemManager.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -21,7 +21,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">Project 3 Platformer
+   <div id="projectname">Project 4 (Leo the Cat Wizard)
    </div>
   </td>
  </tr>
@@ -81,13 +81,13 @@ $(document).ready(function() { init_codefold(0); });
   <div class="headertitle"><div class="title">SystemManager.h</div></div>
 </div><!--header-->
 <div class="contents">
-<a href="SystemManager_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#pragma once</span></div>
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#pragma once</span></div>
 <div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span> </div>
 <div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &lt;memory&gt;</span></div>
 <div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &lt;vector&gt;</span></div>
-<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#include &quot;<a class="code" href="ShaderManager_8h.html">ShaderManager.h</a>&quot;</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#include &quot;ShaderManager.h&quot;</span></div>
 <div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span> </div>
-<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespaceECSEngine.html">ECSEngine</a></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="keyword">namespace </span>ECSEngine</div>
 <div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span>{</div>
 <div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span> </div>
 <div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span>    <span class="keyword">template</span> &lt;<span class="keyword">typename</span>... Components&gt;</div>
@@ -98,7 +98,7 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00014" name="l00014"></a><span class="lineno"><a class="line" href="classECSEngine_1_1System.html">   14</a></span>    <span class="keyword">class </span><a class="code hl_class" href="classECSEngine_1_1System.html">System</a></div>
 <div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>    {</div>
 <div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>    <span class="keyword">public</span>:</div>
-<div class="line"><a id="l00017" name="l00017"></a><span class="lineno"><a class="line" href="classECSEngine_1_1System.html#ad2b4f366ea902844f86815ab61575d61">   17</a></span>        <span class="keyword">virtual</span> <a class="code hl_function" href="classECSEngine_1_1System.html#ad2b4f366ea902844f86815ab61575d61">~System</a>() = <span class="keywordflow">default</span>;</div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>        <span class="keyword">virtual</span> <a class="code hl_class" href="classECSEngine_1_1System.html">~System</a>() = <span class="keywordflow">default</span>;</div>
 <div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span> </div>
 <div class="line"><a id="l00025" name="l00025"></a><span class="lineno"><a class="line" href="classECSEngine_1_1System.html#a1a57d1147a9f80880207dc35d132adfc">   25</a></span>        <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="classECSEngine_1_1System.html#a1a57d1147a9f80880207dc35d132adfc">Run</a>(<a class="code hl_class" href="classECSEngine_1_1Scene.html">Scene&lt;Components...&gt;</a> &amp;scene) = 0;</div>
 <div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>    };</div>
@@ -109,7 +109,7 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00038" name="l00038"></a><span class="lineno"><a class="line" href="classECSEngine_1_1SystemManager.html">   38</a></span><span class="keyword">class </span><a class="code hl_class" href="classECSEngine_1_1SystemManager.html">SystemManager</a></div>
 <div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>{</div>
 <div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span><span class="keyword">public</span>:</div>
-<div class="line"><a id="l00041" name="l00041"></a><span class="lineno"><a class="line" href="classECSEngine_1_1SystemManager.html#aeb0156549f3a6a7b8ce59fd5d8789ec2">   41</a></span>    <a class="code hl_function" href="classECSEngine_1_1SystemManager.html#aeb0156549f3a6a7b8ce59fd5d8789ec2">SystemManager</a>() = <span class="keywordflow">default</span>;</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>    <a class="code hl_class" href="classECSEngine_1_1SystemManager.html">SystemManager</a>() = <span class="keywordflow">default</span>;</div>
 <div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span> </div>
 <div class="foldopen" id="foldopen00048" data-start="{" data-end="}">
 <div class="line"><a id="l00048" name="l00048"></a><span class="lineno"><a class="line" href="classECSEngine_1_1SystemManager.html#ab9fdcd9eaf2357945e6cf138eedcde31">   48</a></span>        <span class="keywordtype">void</span> <a class="code hl_function" href="classECSEngine_1_1SystemManager.html#ab9fdcd9eaf2357945e6cf138eedcde31">AddSystem</a>(std::unique_ptr&lt;<a class="code hl_class" href="classECSEngine_1_1System.html">System&lt;Components...&gt;</a>&gt; &amp;&amp;system)</div>
@@ -156,18 +156,14 @@ $(document).ready(function() { init_codefold(0); });
 </div>
 <div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span> </div>
 <div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>} <span class="comment">// namespace ECSEngine</span></div>
-<div class="ttc" id="aShaderManager_8h_html"><div class="ttname"><a href="ShaderManager_8h.html">ShaderManager.h</a></div></div>
 <div class="ttc" id="aclassECSEngine_1_1Scene_html"><div class="ttname"><a href="classECSEngine_1_1Scene.html">ECSEngine::Scene</a></div><div class="ttdoc">Represents a scene in the game with its own managers and systems.</div><div class="ttdef"><b>Definition</b> Scene.h:28</div></div>
 <div class="ttc" id="aclassECSEngine_1_1SystemManager_html"><div class="ttname"><a href="classECSEngine_1_1SystemManager.html">ECSEngine::SystemManager</a></div><div class="ttdoc">Manages ownership and execution order of all registered systems.</div><div class="ttdef"><b>Definition</b> SystemManager.h:39</div></div>
 <div class="ttc" id="aclassECSEngine_1_1SystemManager_html_a1eced7b2e4c8034f2b1a1545eb247ab9"><div class="ttname"><a href="classECSEngine_1_1SystemManager.html#a1eced7b2e4c8034f2b1a1545eb247ab9">ECSEngine::SystemManager::Run</a></div><div class="ttdeci">bool Run(Scene&lt; Components... &gt; &amp;scene)</div><div class="ttdoc">Runs all systems in the order they were added.</div><div class="ttdef"><b>Definition</b> SystemManager.h:67</div></div>
 <div class="ttc" id="aclassECSEngine_1_1SystemManager_html_a565eb0756bd0d3f959a8633485042096"><div class="ttname"><a href="classECSEngine_1_1SystemManager.html#a565eb0756bd0d3f959a8633485042096">ECSEngine::SystemManager::ClearSystems</a></div><div class="ttdeci">void ClearSystems()</div><div class="ttdoc">Removes all systems from the manager.</div><div class="ttdef"><b>Definition</b> SystemManager.h:56</div></div>
 <div class="ttc" id="aclassECSEngine_1_1SystemManager_html_ab9fdcd9eaf2357945e6cf138eedcde31"><div class="ttname"><a href="classECSEngine_1_1SystemManager.html#ab9fdcd9eaf2357945e6cf138eedcde31">ECSEngine::SystemManager::AddSystem</a></div><div class="ttdeci">void AddSystem(std::unique_ptr&lt; System&lt; Components... &gt; &gt; &amp;&amp;system)</div><div class="ttdoc">Adds a system to the manager.</div><div class="ttdef"><b>Definition</b> SystemManager.h:48</div></div>
 <div class="ttc" id="aclassECSEngine_1_1SystemManager_html_ac9177a6ec5a3e18ec6e58a182b0c92c6"><div class="ttname"><a href="classECSEngine_1_1SystemManager.html#ac9177a6ec5a3e18ec6e58a182b0c92c6">ECSEngine::SystemManager::GetSystem</a></div><div class="ttdeci">T &amp; GetSystem()</div><div class="ttdoc">Retrieves a system of the specified concrete type.</div><div class="ttdef"><b>Definition</b> SystemManager.h:84</div></div>
-<div class="ttc" id="aclassECSEngine_1_1SystemManager_html_aeb0156549f3a6a7b8ce59fd5d8789ec2"><div class="ttname"><a href="classECSEngine_1_1SystemManager.html#aeb0156549f3a6a7b8ce59fd5d8789ec2">ECSEngine::SystemManager::SystemManager</a></div><div class="ttdeci">SystemManager()=default</div></div>
 <div class="ttc" id="aclassECSEngine_1_1System_html"><div class="ttname"><a href="classECSEngine_1_1System.html">ECSEngine::System</a></div><div class="ttdef"><b>Definition</b> SystemManager.h:15</div></div>
 <div class="ttc" id="aclassECSEngine_1_1System_html_a1a57d1147a9f80880207dc35d132adfc"><div class="ttname"><a href="classECSEngine_1_1System.html#a1a57d1147a9f80880207dc35d132adfc">ECSEngine::System::Run</a></div><div class="ttdeci">virtual bool Run(Scene&lt; Components... &gt; &amp;scene)=0</div><div class="ttdoc">Runs the systems.</div></div>
-<div class="ttc" id="aclassECSEngine_1_1System_html_ad2b4f366ea902844f86815ab61575d61"><div class="ttname"><a href="classECSEngine_1_1System.html#ad2b4f366ea902844f86815ab61575d61">ECSEngine::System::~System</a></div><div class="ttdeci">virtual ~System()=default</div></div>
-<div class="ttc" id="anamespaceECSEngine_html"><div class="ttname"><a href="namespaceECSEngine.html">ECSEngine</a></div><div class="ttdef"><b>Definition</b> AnimationComponent.h:8</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
