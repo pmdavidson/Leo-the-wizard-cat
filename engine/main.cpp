@@ -986,6 +986,7 @@ int main(int argc, char *argv[])
 	spriteSystem.SetParallaxFactor(2, 1.0f);
 	spriteSystem.SetParallaxFactor(2, 1.0f);
 	spriteSystem.SetParallaxFactor(3, 1.2f);
+	spriteSystem.SetParallaxFactor(4, 1.5f);
 
 	// Load maps into the scene
 	LoadMap("maps/cat_sky_swamp.map", *scene);
