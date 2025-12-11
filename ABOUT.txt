@@ -183,5 +183,6 @@ layers at 1.0 to align sprites and colliders; backgrounds use <1 for depth.
 Projectiles have a 0.1s grace period to avoid self-collision and enforce
 lifetime-based removal. Atlas is finalized once after map load to lock sprite
 rects/IDs. We reuse prior helpers (EntityManager, MathUtil) and extend with
-spells, enemies, hp/checkpoint, and scenes.
+spells, enemies, hp/checkpoint, and scenes. The goal post is indicated with a sign to go next,
+a portal that goes to the next level is pending for next implementation.
 
