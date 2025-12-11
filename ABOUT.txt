@@ -156,7 +156,7 @@ Components
 LocationComponent, MovementComponent, CollisionComponent (local/current AABB),
 SpriteComponent (bounds, layer, flip), GravityComponent, InputComponent,
 CameraComponent/Follower/Shake, ScoreComponent, SpellComponent,
-ProjectileComponent (lifetime, gracePeriod, owner), EnemyComponent, HpComponent,
+ProjectileComponent (lifetime, owner), EnemyComponent, HpComponent,
 CheckpointComponent, CampfireComponent, AnimationComponent.
 
 DESIGN DECISIONS

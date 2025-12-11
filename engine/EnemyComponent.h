@@ -38,7 +38,7 @@ namespace ECSEngine
         float knockbackForce = 300.0f;
 
         bool isAlive = true;
-        bool isDying = false; // Playing death animation
+        bool isDying = false;        // Playing death animation
         float deathAnimTimer = 0.0f; // Time until removal after death
 
         // For wizards - which element they use
@@ -50,10 +50,10 @@ namespace ECSEngine
         // Movement (for future use, enemies can move)
         bool canMove = false;
         float moveSpeed = 50.0f;
-        
+
         // Random movement state for slimes
-        float moveDirection = 1.0f; // 1.0 = right, -1.0 = left
-        float directionChangeTimer = 0.0f; // Timer until next direction change
+        float moveDirection = 1.0f;           // 1.0 = right, -1.0 = left
+        float directionChangeTimer = 0.0f;    // Timer until next direction change
         float directionChangeInterval = 2.0f; // Change direction every 2 seconds
 
         // Sound names for this enemy
@@ -62,4 +62,3 @@ namespace ECSEngine
     };
 
 } // namespace ECSEngine
-

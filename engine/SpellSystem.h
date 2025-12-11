@@ -280,6 +280,9 @@ namespace ECSEngine
                 playerBottom - 22.0f  // 28x22 collision box (height is 22)
             };
 
+            // Fixed spell box size used for both collision and spawn check
+            Rect collisionBounds(0.0f, 0.0f, 28.0f, 22.0f);
+
             // Create projectile entity
             std::string spellName = GetSpellName(spellComp.selectedSpell);
             EntityID projectileId = entityManager.CreateEntity(spellName);
@@ -300,13 +303,11 @@ namespace ECSEngine
             projectile.maxLifetime = props.lifetime;
             projectile.ownerEntityId = casterId;
             projectile.active = true;
-            projectile.gracePeriod = 0.1f; // Brief period to avoid colliding with caster
             projectile.explosionFrames = props.explosionFrames;
             projectile.explosionSize = props.explosionSize;
             entityManager.template AddComponent<ProjectileComponent>(projectileId, projectile);
 
             // Add CollisionComponent - all spells are 28x22
-            Rect collisionBounds(0.0f, 0.0f, 28.0f, 22.0f);
             CollisionComponent collision(collisionBounds, false);
             entityManager.template AddComponent<CollisionComponent>(projectileId, collision);
 

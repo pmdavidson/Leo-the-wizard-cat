@@ -67,10 +67,6 @@ namespace ECSEngine
 
                 auto &projectile = entityManager.template GetComponent<ProjectileComponent>(entityId);
 
-                // Update grace period (ignore collisions briefly after spawn)
-                if (projectile.gracePeriod > 0.0f)
-                    projectile.gracePeriod -= deltaTime;
-
                 // Update projectile lifetime
                 if (projectile.lifetime > 0.0f)
                     projectile.lifetime -= deltaTime;
@@ -111,8 +107,8 @@ namespace ECSEngine
                     continue;
                 }
 
-                // Check collision flags set by CollisionSystem (only after grace period)
-                if (projectile.gracePeriod <= 0.0f && entityManager.template HasComponent<CollisionComponent>(entityId))
+                // Check collision flags set by CollisionSystem
+                if (entityManager.template HasComponent<CollisionComponent>(entityId))
                 {
                     auto &collision = entityManager.template GetComponent<CollisionComponent>(entityId);
 

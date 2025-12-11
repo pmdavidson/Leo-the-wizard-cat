@@ -391,7 +391,7 @@ namespace ECSEngine
 										playerLoc.position.x + spawnOffsetX,
 										playerLoc.position.y
 									};
-
+									
 									// Create projectile entity
 									std::string spellName = this->GetSpellEntityName(currentSpell);
 									EntityID projectileId = entityManager.CreateEntity(spellName);
@@ -408,7 +408,7 @@ namespace ECSEngine
 									projectile.lifetime = props.lifetime;
 									projectile.maxLifetime = props.lifetime;
 									projectile.ownerEntityId = entityId;
-									projectile.active = true;
+									projectile.active = true; // active by default
 									projectile.explosionFrames = props.explosionFrames;
 									projectile.explosionSize = props.explosionSize;
 									entityManager.template AddComponent<ProjectileComponent>(projectileId, projectile);
