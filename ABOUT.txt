@@ -78,16 +78,16 @@ Group A: Peter
 Group B: Eric
 
 Systems:
-Group A: CollisionSystem, CollisionSystemUpdate, SpriteSystem, GravitySystem
-Group B: ProcessEvents, InputSystem, MovementSystem, SpawnSystem, ScoreSystem, CameraSystem 
+Group A: CollisionSystem, CollisionUpdateSystem, GravitySystem, SpriteSystem, ProjectileSystem, EnemySystem, HpSystem, CheckpointSystem, AnimationSystem
+Group B: ProcessEventsSystem, InputSystem, MovementSystem, SpawnSystem, ScoreSystem, CameraSystem, SpellSystem, CameraFollower/Lookahead logic
 
 Components:
-Group A: CollisionComponent, GravityComponent, LocationComponent, SpriteComponent
-Group B: CameraComponent, CameraFollowerComponent, CameraShakeComponent, InputComponent, MovementComponent, ScoreComponent, SpawnComponent
+Group A: CollisionComponent, GravityComponent, LocationComponent, SpriteComponent, ProjectileComponent, EnemyComponent, HpComponent, CheckpointComponent, CampfireComponent, AnimationComponent, WaterComponent
+Group B: CameraComponent, CameraFollowerComponent, CameraShakeComponent, InputComponent, MovementComponent, ScoreComponent, SpawnComponent, SpellComponent
 
 Managers:
-Group A: EntityManager, SoundManager, ECSEngine.h
-Group B: WindowManager, SpriteManager, MathUtil.h, ECSEngine.h
+Group A: EntityManager, SoundManager, ShaderManager, SystemManager, ECSEngine.h
+Group B: WindowManager, SpriteManager, MathUtil.h, ComponentStorage, ECSEngine.h
 
 Project 4
 Managers
@@ -147,17 +147,31 @@ CameraSystem was changed to a lookahead system instead so depending on where the
 AnimationSystem plays and stores animations for player, enemies, spells, explosions.
 
 SpriteSystem renders atlas sprites (world/UI), supports flip and shaders for
-damage/shield, and parallax per layer. we have layers -3 to 3, where 1 and 2 are the neutral 1.0 layers with no parallax
+damage/shield, and parallax per layer. we have layers -4 to 4, where 1 and 2 are the neutral 1.0 layers with no parallax.
 
 SpawnSystem handles map-driven enemy/entity spawns.
 
+ProcessEventsSystem collects all SFML window events and updates global input buffers so other systems can react frame-accurately.
+
+CollisionUpdateSystem updates translated AABBs for all collidable entities and prepares broad-phase collision lists used by CollisionSystem.
+
+ShaderManager loads and caches GLSL fragment shaders (hurt flash, rock shield) and exposes them so SpriteSystem can apply shaders per entity.
+
+SpellSystem listens for casting input, handles element switching, spawns ProjectileComponent entities with inherited spell properties
+
+ProjectileSystem moves projectiles, checks collision, triggers explosion animations, and removes expired projectiles.
+
+EnemySystem controls AI movement, updates state, interacts with HpSystem for damage/death, plays sounds on hit/death.
+
+HpSystem applies damage, handles invulnerability, regenerates shield, triggers death/despawn events.
+
+CheckpointSystem activates campfires when touched, updates respawn location, and resets the scene after death.
+
+ScoreSystem was supposed to add scores when enemies are defeated, but we didn't have time to do so.
+
 Components
 -----------------------
-LocationComponent, MovementComponent, CollisionComponent (local/current AABB),
-SpriteComponent (bounds, layer, flip), GravityComponent, InputComponent,
-CameraComponent/Follower/Shake, ScoreComponent, SpellComponent,
-ProjectileComponent (lifetime, owner), EnemyComponent, HpComponent,
-CheckpointComponent, CampfireComponent, AnimationComponent.
+LocationComponent, MovementComponent, JumpComponent, CollisionComponent, SpriteComponent, GravityComponent, InputComponent, CameraComponent, CameraFollower, CameraShake, ScoreComponent, SpellComponent, ProjectileComponent, EnemyComponent, HpComponent, CheckpointComponent, CampfireComponent, AnimationComponent, WaterComponent, SpawnComponent.
 
 DESIGN DECISIONS
 ---------------
