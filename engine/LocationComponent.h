@@ -31,4 +31,10 @@ namespace ECSEngine
         explicit GravityComponent(const Point2D &acc) : acceleration(acc) {}
     };
 
+    struct JumpComponent {
+        bool hasDoubleJump = false;
+        int jumpsUsed = 0;
+        int maxJumps = 1; // default
+    };
+
 }

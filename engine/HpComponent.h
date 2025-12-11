@@ -42,7 +42,7 @@ namespace ECSEngine
 
         // Rock shield (brown shader that absorbs 1 hit)
         bool hasRockShield = false; // True when rock element is selected and shield is active
-        // bool canWalkonWater = false; // True when water element is selected
+        bool canHeal = false; // True when water element is selected
 
         HpComponent() = default;
 

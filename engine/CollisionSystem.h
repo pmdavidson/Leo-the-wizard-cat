@@ -16,6 +16,7 @@
 #include "CheckpointComponent.h"
 #include "AnimationComponent.h"
 #include "SpriteComponent.h"
+#include "WaterComponent.h"
 #include <cmath>
 #include <random>
 
@@ -110,10 +111,13 @@ namespace ECSEngine
 					bool isProjectileB = entityManager.template HasComponent<ProjectileComponent>(idB);
 					bool isCampfireA = entityManager.template HasComponent<CampfireComponent>(idA);
 					bool isCampfireB = entityManager.template HasComponent<CampfireComponent>(idB);
+					bool isWaterTileA = entityManager.template HasComponent<WaterComponent>(idA);
+					bool isWaterTileB = entityManager.template HasComponent<WaterComponent>(idB);
 
 					// Skip collision resolution for player-campfire (player walks through campfires)
 					// But still process projectile-campfire later
 					bool isPlayerCampfireCollision = (isPlayerA && isCampfireB) || (isPlayerB && isCampfireA);
+					bool isWaterTileCollision = (isPlayerA && isWaterTileB) || (isPlayerB && isWaterTileA);
 
 					bool isStarA = !isPlayerA && !isSpawnerA && !isEnemyA && !isProjectileA && !isCampfireA &&
 								   entityManager.template HasComponent<CollisionComponent>(idA) &&
@@ -143,6 +147,120 @@ namespace ECSEngine
 						preCollisionVelocityA = entityManager.template GetComponent<MovementComponent>(idA).velocity;
 					if (entityManager.template HasComponent<MovementComponent>(idB))
 						preCollisionVelocityB = entityManager.template GetComponent<MovementComponent>(idB).velocity;
+
+					if (isWaterTileCollision){
+						EntityID playerId = isPlayerA ? idA : idB;
+						EntityID tileId = isWaterTileA ? idA : idB;
+						
+						if (entityManager.template HasComponent<SpellComponent>(playerId))
+							{
+								auto &spellComponent = entityManager.template GetComponent<SpellComponent>(playerId);
+
+								// NOT in Water Mode
+								if (spellComponent.selectedSpell != SpellType::Water){
+									bool playerCanTakeDamage = false;
+									auto &playerHp = entityManager.template GetComponent<HpComponent>(playerId);
+
+									bool hasHp = entityManager.template HasComponent<HpComponent>(playerId);
+									if (hasHp)
+									{
+										playerCanTakeDamage = playerHp.isAlive && playerHp.invincibilityTimer <= 0.0f;
+									}
+
+									if (playerCanTakeDamage)
+									{
+										playerHp.previousHp = playerHp.currentHp; // Track previous HP for animation
+										playerHp.currentHp -= 1;
+										// Clamp HP to not go below 0
+										if (playerHp.currentHp < 0)
+											playerHp.currentHp = 0;
+										playerHp.invincibilityTimer = playerHp.invincibilityDuration;
+										// Trigger damage flash effect
+										playerHp.damageFlashTimer = playerHp.damageFlashDuration;
+										
+										// Play catHurt animation
+										if (entityManager.template HasComponent<AnimationComponent>(playerId))
+										{
+											auto &anim = entityManager.template GetComponent<AnimationComponent>(playerId);
+											if (anim.animations.count("hurt") > 0)
+											{
+												anim.Play("hurt", false); // Don't loop hurt animation
+												// Set first frame immediately
+												if (entityManager.template HasComponent<SpriteComponent>(playerId))
+												{
+													auto &sprite = entityManager.template GetComponent<SpriteComponent>(playerId);
+													sprite.spriteId = anim.animations["hurt"][0];
+												}
+											}
+										}
+
+										// Apply knockback to player using previous bounding box
+										if (entityManager.template HasComponent<MovementComponent>(playerId) &&
+											entityManager.template HasComponent<CollisionComponent>(playerId))
+										{
+											auto &playerMovement = entityManager.template GetComponent<MovementComponent>(playerId);
+											auto &playerLoc = entityManager.template GetComponent<LocationComponent>(playerId);
+											auto &playerCollision = entityManager.template GetComponent<CollisionComponent>(playerId);
+
+											// Calculate centers of current and previous bounding boxes
+											Point2D currentCenter = Point2D(
+												playerCollision.currentBounds.topLeft.x + playerCollision.currentBounds.width * 0.5f,
+												playerCollision.currentBounds.topLeft.y + playerCollision.currentBounds.height * 0.5f
+											);
+											Point2D previousCenter = Point2D(
+												playerCollision.previousBounds.topLeft.x + playerCollision.previousBounds.width * 0.5f,
+												playerCollision.previousBounds.topLeft.y + playerCollision.previousBounds.height * 0.5f
+											);
+
+											// Calculate direction from current position back to previous position
+											Point2D knockbackDir = previousCenter - currentCenter;
+											
+											// Normalize the direction vector
+											float distance = std::sqrt(knockbackDir.x * knockbackDir.x + knockbackDir.y * knockbackDir.y);
+											if (distance > 0.0f)
+											{
+												knockbackDir.x /= distance;
+												knockbackDir.y /= distance;
+											}
+											else
+											{
+												// Fallback: push away from enemy if no previous position difference
+												auto &tileLoc = entityManager.template GetComponent<LocationComponent>(tileId);
+												knockbackDir.x = (playerLoc.position.x > tileLoc.position.x) ? 1.0f : -1.0f;
+												knockbackDir.y = -0.5f; // Slight upward
+											}
+
+											// Apply knockback velocity towards previous position
+											playerMovement.velocity.x = knockbackDir.x * 300.0f;
+											playerMovement.velocity.y = knockbackDir.y * 300.0f;
+										}
+
+										// Play random meow sound when player takes damage
+										{
+											static std::mt19937 rng(std::random_device{}());
+											std::uniform_int_distribution<int> dist(1, 3);
+											std::string meowSound = "meow_0" + std::to_string(dist(rng));
+											soundManager.PlaySound(meowSound, 200.0f); // 2x volume
+										}
+										
+									}
+								}
+								// IF WATER MODE
+								else{
+									auto &playerHp = entityManager.template GetComponent<HpComponent>(playerId);
+									if (entityManager.template HasComponent<HpComponent>(playerId) && playerHp.currentHp < playerHp.maxHp && playerHp.currentHp > 0 && playerHp.canHeal)
+									{
+										playerHp.previousHp = playerHp.currentHp; // Track previous HP for animation
+										playerHp.currentHp += 1;
+										// Clamp HP to not go below 0
+										playerHp.invincibilityTimer = playerHp.invincibilityDuration;
+										playerHp.canHeal = false;
+										// Trigger healing flash effect
+										// playerHp.damageFlashTimer = playerHp.damageFlashDuration;
+									}
+								}
+							}
+						}
 
 					// Skip collision resolution for player-campfire (player walks through)
 					// Projectile-campfire is handled separately below

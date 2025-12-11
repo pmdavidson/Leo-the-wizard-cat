@@ -1,16 +1,16 @@
 dictionary 1
-A _swamp_sky_-3.png 0 0 576 324
+A _swamp_sky_-4.png 0 0 576 324
 B _swamp_trees_-2.png 0 0 576 324
 C _swamp_thicket_-1.png 0 0 576 324
-D _swamp_stream_2.png 0 0 576 324
+D _swamp_stream_3.png 0 0 576 324
 E _swamp_water_-3.png 0 0 768 648
 F _swamp_fullness_-3.png 0 0 768 648
 
-map origin -576 -580 tile 128 128 size 36 7
+map origin -540 -540 tile 120 126 size 24 7
 A...A...A...A...A...A...
 F......F......F......F..
 ........................
 C...C...C...C...C...C...
-D..D..D..D..D..D..D..D..
+D...D...D...D....D....D.
 E......E......E......E..
 ........................

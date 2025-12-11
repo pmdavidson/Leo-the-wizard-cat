@@ -33,8 +33,7 @@
 #include "CheckpointSystem.h"
 #include "AnimationComponent.h"
 #include "AnimationSystem.h"
-#include "SpellSystem.h"
-#include "ProjectileSystem.h"
+#include "WaterComponent.h"
 #include "MainMenuScene.h"
 #include "PauseScene.h"
 #include "GameplayScene.h"
@@ -50,6 +49,7 @@ std::string gResourcePath = "../../assets/";
 using GameComponents = std::tuple<
 	ECSEngine::LocationComponent,
 	ECSEngine::MovementComponent,
+	ECSEngine::JumpComponent,
 	ECSEngine::CollisionComponent,
 	ECSEngine::SpriteComponent,
 	ECSEngine::SpawnComponent,
@@ -65,7 +65,8 @@ using GameComponents = std::tuple<
 	ECSEngine::HpComponent,
 	ECSEngine::CheckpointComponent,
 	ECSEngine::CampfireComponent,
-	ECSEngine::AnimationComponent>;
+	ECSEngine::AnimationComponent,
+	ECSEngine::WaterComponent>;
 
 // Helper to create ECSEngine from a tuple of components
 template <typename Tuple>
@@ -365,6 +366,9 @@ void LoadMap(const std::string &path, SceneType &scene)
 			{
 				scene.GetEntityManager().template AddComponent<ECSEngine::SpawnComponent>(id, {id, "blueSlime", blueSlimeSpriteId, 10.f, 10.f, 10, 96.f, 32.f});
 			}
+			else if (tile == 'z'){
+				scene.GetEntityManager().template AddComponent<ECSEngine::WaterComponent>(id, {});
+			}
 		}
 	}
 
@@ -554,6 +558,7 @@ void LoadMap(const std::string &path, SceneType &scene)
 		scene.GetEntityManager().template AddComponent<ECSEngine::LocationComponent>(player, ECSEngine::LocationComponent(ECSEngine::Point2D(spawnX, spawnY)));
 		scene.GetEntityManager().template AddComponent<ECSEngine::GravityComponent>(player, ECSEngine::GravityComponent(ECSEngine::Point2D(0.0f, 600.0f)));
 		scene.GetEntityManager().template AddComponent<ECSEngine::MovementComponent>(player, {});
+		scene.GetEntityManager().template AddComponent<ECSEngine::JumpComponent>(player, {});
 		scene.GetEntityManager().template AddComponent<ECSEngine::InputComponent>(player, {});
 		scene.GetEntityManager().template AddComponent<ECSEngine::CameraFollower>(player, {player});
 		scene.GetEntityManager().template AddComponent<ECSEngine::ScoreComponent>(player, {});
@@ -699,12 +704,12 @@ void LoadMap(const std::string &path, SceneType &scene)
 		// SCORE
 		//  Set up score display system
 		//  Get the ScoreComponent attached to the player entity
-		[[maybe_unused]] auto &scoreComp = scene.GetEntityManager().template GetComponent<ECSEngine::ScoreComponent>(player);
+		// auto &scoreComp = scene.GetEntityManager().template GetComponent<ECSEngine::ScoreComponent>(player);
 
 		// Register digit sprites (0-9) from the spritesheet
 		const float tileSize = 32.f;
-		[[maybe_unused]] const float digitX = 13.f * tileSize;	  // X position of digit column in spritesheet
-		[[maybe_unused]] const float digitStartY = 4.f * tileSize; // Y position where digit 0 starts
+		const float digitX = 13.f * tileSize;	  // X position of digit column in spritesheet
+		const float digitStartY = 4.f * tileSize; // Y position where digit 0 starts
 
 		// for (int digit = 0; digit < 10; ++digit)
 		// {
@@ -717,9 +722,9 @@ void LoadMap(const std::string &path, SceneType &scene)
 		// }
 
 		// Create 3 display entities for the score
-		[[maybe_unused]] const float digitSize = 32.f;
-		[[maybe_unused]] const float startX = 20.f;
-		[[maybe_unused]] const float startY = 20.f;
+		const float digitSize = 32.f;
+		const float startX = 20.f;
+		const float startY = 20.f;
 
 		// for (int i = 0; i < 3; ++i)
 		// {
@@ -923,6 +928,7 @@ int main(int argc, char *argv[])
 
 	// Set up parallax
 	auto &spriteSystem = sm.template GetSystem<GameSpriteSystem>();
+	spriteSystem.SetParallaxFactor(-4, 0.80f);
 	spriteSystem.SetParallaxFactor(-3, 0.85f);
 	spriteSystem.SetParallaxFactor(-2, 0.90f);
 	spriteSystem.SetParallaxFactor(-1, 0.95f);

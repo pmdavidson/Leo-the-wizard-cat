@@ -46,7 +46,8 @@ namespace ECSEngine
 				EntityID entityId = it->getID();
 
 				if (entityManager.template HasComponent<InputComponent>(entityId) &&
-					entityManager.template HasComponent<MovementComponent>(entityId))
+					entityManager.template HasComponent<MovementComponent>(entityId) &&
+					entityManager.template HasComponent<JumpComponent>(entityId))
 				{
 					// Skip input processing if player is dead or dying
 					if (entityManager.template HasComponent<HpComponent>(entityId))
@@ -60,12 +61,13 @@ namespace ECSEngine
 
 					auto &inputComp = entityManager.template GetComponent<InputComponent>(entityId);
 					auto &movementComp = entityManager.template GetComponent<MovementComponent>(entityId);
+					auto &jumpComp = entityManager.template GetComponent<JumpComponent>(entityId);
 
 					// Platformer movement constants
 					const float maxSpeed = 200.0f;
 					const float acceleration = 800.0f;
 					const float deceleration = 1000.0f;
-					const float jumpVelocity = -400.0f;
+					const float jumpVelocity = -300.0f;
 					const float wallJumpVelocityX = 300.0f;
 					const float wallJumpVelocityY = -350.0f;
 
@@ -219,6 +221,20 @@ namespace ECSEngine
 					wasJumpPressed[entityId] = jumpPressed;
 
 					bool justJumped = false;
+
+					bool inWindMode = false;
+					bool inEarthMode = false;
+
+					if (entityManager.template HasComponent<SpellComponent>(entityId))
+					{
+						auto &spell = entityManager.template GetComponent<SpellComponent>(entityId);
+						inWindMode = (spell.selectedSpell == SpellType::Wind);
+						inEarthMode = (spell.selectedSpell == SpellType::Earth);
+					}
+					
+					jumpComp.maxJumps = inWindMode ? 2 : 1;
+				
+
 					if (jumpPressed && !wasJumpPressedLastFrame)
 					{
 						if (onGround)
@@ -226,6 +242,7 @@ namespace ECSEngine
 							movementComp.velocity.y = jumpVelocity;
 							soundManager.PlaySound("jump");
 							recentlyJumped[entityId] = true;
+ 							jumpComp.jumpsUsed = 1; // first jump
 							justJumped = true;
 							
 							// Trigger jump animation immediately
@@ -244,7 +261,7 @@ namespace ECSEngine
 								}
 							}
 						}
-						else if (wasFalling && (onWallLeft || onWallRight))
+						else if (wasFalling && (onWallLeft || onWallRight) && inEarthMode)
 						{
 							// Wall jump
 							if (onWallLeft)
@@ -260,6 +277,32 @@ namespace ECSEngine
 							justJumped = true;
 							
 							// Trigger jump animation for wall jump too
+							if (entityManager.template HasComponent<AnimationComponent>(entityId))
+							{
+								auto &anim = entityManager.template GetComponent<AnimationComponent>(entityId);
+								if (anim.animations.count("jump") > 0)
+								{
+									anim.Play("jump", false);
+									if (entityManager.template HasComponent<SpriteComponent>(entityId))
+									{
+										auto &sprite = entityManager.template GetComponent<SpriteComponent>(entityId);
+										sprite.spriteId = anim.animations["jump"][0];
+									}
+								}
+							}
+						}
+						// DOUBLE JUMP LOGIC — if Wind mode
+						else if (jumpComp.jumpsUsed < jumpComp.maxJumps)
+						{
+							movementComp.velocity.y = jumpVelocity; // reapply upward velocity
+							jumpComp.jumpsUsed++;
+							recentlyJumped[entityId] = true;
+							justJumped = true;
+
+							// optional: play a special wind jump sound
+							soundManager.PlaySound("jump");
+
+							// double-jump animation
 							if (entityManager.template HasComponent<AnimationComponent>(entityId))
 							{
 								auto &anim = entityManager.template GetComponent<AnimationComponent>(entityId);
