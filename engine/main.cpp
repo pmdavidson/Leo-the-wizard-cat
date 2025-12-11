@@ -756,9 +756,9 @@ void LoadMap(const std::string &path, SceneType &scene)
 		// auto &scoreComp = scene.GetEntityManager().template GetComponent<ECSEngine::ScoreComponent>(player);
 
 		// Register digit sprites (0-9) from the spritesheet
-		const float tileSize = 32.f;
-		const float digitX = 13.f * tileSize;	  // X position of digit column in spritesheet
-		const float digitStartY = 4.f * tileSize; // Y position where digit 0 starts
+		// const float tileSize = 32.f;
+		// const float digitX = 13.f * tileSize;	  // X position of digit column in spritesheet
+		// const float digitStartY = 4.f * tileSize; // Y position where digit 0 starts
 
 		// for (int digit = 0; digit < 10; ++digit)
 		// {
@@ -771,9 +771,9 @@ void LoadMap(const std::string &path, SceneType &scene)
 		// }
 
 		// Create 3 display entities for the score
-		const float digitSize = 32.f;
-		const float startX = 20.f;
-		const float startY = 20.f;
+		// const float digitSize = 32.f;
+		// const float startX = 20.f;
+		// const float startY = 20.f;
 
 		// for (int i = 0; i < 3; ++i)
 		// {
