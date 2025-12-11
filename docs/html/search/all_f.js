@@ -1,13 +1,16 @@
 var searchData=
 [
-  ['rect_0',['rect',['../structECSEngine_1_1Rect.html',1,'ECSEngine::Rect'],['../structECSEngine_1_1Rect.html#a7778efbd343312eb31715b8262029381',1,'ECSEngine::Rect::Rect(float left, float top, float width, float height)'],['../structECSEngine_1_1Rect.html#aa91ae1f967a404e448564dac6c3136ed',1,'ECSEngine::Rect::Rect(Point2D tl={0, 0}, int w=0, int h=0)'],['../structECSEngine_1_1Rect.html#a5e3e493eaeae4e1a4c602b182224886a',1,'ECSEngine::Rect::Rect(Point2D p1, Point2D p2)'],['../structECSEngine_1_1Rect.html#abf75d44dd905110f078baab0a4a422de',1,'ECSEngine::Rect::Rect(Point2D center, float radius)']]],
-  ['registersound_1',['RegisterSound',['../classECSEngine_1_1SoundManager.html#adcd8167f2de2fd4b6fe7844db9857c6a',1,'ECSEngine::SoundManager']]],
-  ['registertexture_2',['RegisterTexture',['../classECSEngine_1_1SpriteManager.html#a2de057322f14b93da5b7e7f2ec918a86',1,'ECSEngine::SpriteManager']]],
-  ['remove_3',['Remove',['../classECSEngine_1_1ComponentStorage.html#a9c134ddbf96536bae3b5e651816ca531',1,'ECSEngine::ComponentStorage']]],
-  ['removecomponent_4',['RemoveComponent',['../classECSEngine_1_1EntityManager.html#a87d0c0b30918dd3f2700fc450469eea4',1,'ECSEngine::EntityManager']]],
-  ['removeentity_5',['RemoveEntity',['../classECSEngine_1_1EntityManager.html#a0e8cc1d038a06a38f64b07552260a107',1,'ECSEngine::EntityManager']]],
-  ['resolveaabbcollision_6',['ResolveAABBCollision',['../namespaceECSEngine.html#a2edb6429710ba8b061ef9a717f2d13ce',1,'ECSEngine']]],
-  ['right_7',['right',['../structECSEngine_1_1CollisionFlags.html#a6ba9a1f82be49061deb609722dda3e58',1,'ECSEngine::CollisionFlags']]],
-  ['rotate_8',['Rotate',['../namespaceECSEngine.html#a53f0976b5ec22b224e9fef470ce821e1',1,'ECSEngine']]],
-  ['run_9',['Run',['../classECSEngine_1_1ECSEngine.html#a81ed588018870b6bf0a177732d6056b0',1,'ECSEngine::ECSEngine']]]
+  ['operator_26_3d_0',['operator&amp;=',['../structECSEngine_1_1Rect.html#a1a5557ef903fab0cb183f59c573ee22f',1,'ECSEngine::Rect']]],
+  ['operator_2a_1',['operator*',['../structECSEngine_1_1Point2D.html#a29cde8abbd06eacf1d5e7433663551d1',1,'ECSEngine::Point2D::operator*(const float &amp;scalar) const'],['../structECSEngine_1_1Point2D.html#a6871b7f604ba21fcc1b23701e3fc1968',1,'ECSEngine::Point2D::operator*(const Point2D &amp;other) const'],['../namespaceECSEngine.html#a6ab4f40cc11d407eab60141daf52377f',1,'ECSEngine::operator*()']]],
+  ['operator_2a_3d_2',['operator*=',['../structECSEngine_1_1Point2D.html#a9611da82fb637d7917149c06e4f9de50',1,'ECSEngine::Point2D']]],
+  ['operator_2b_3',['operator+',['../structECSEngine_1_1Point2D.html#abc1c39f99972b62818e65e91e150b9e2',1,'ECSEngine::Point2D::operator+(const Point2D &amp;other) const'],['../structECSEngine_1_1Point2D.html#a3b8be8ef8f815ebd5a7005be30bfc3bf',1,'ECSEngine::Point2D::operator+(const float &amp;other) const']]],
+  ['operator_2b_3d_4',['operator+=',['../structECSEngine_1_1Point2D.html#a50cda7014460de0926a14821fcae2004',1,'ECSEngine::Point2D::operator+=(const float &amp;scalar)'],['../structECSEngine_1_1Point2D.html#a62ead502e804828cc369959fc26b00e5',1,'ECSEngine::Point2D::operator+=(const Point2D &amp;other)']]],
+  ['operator_2d_5',['operator-',['../structECSEngine_1_1Point2D.html#a6293cad5b90b43d131801c80f5da0def',1,'ECSEngine::Point2D::operator-(const float &amp;other) const'],['../structECSEngine_1_1Point2D.html#a948a0f16dca03f464cdac447e2454146',1,'ECSEngine::Point2D::operator-(const Point2D &amp;other) const']]],
+  ['operator_2d_3d_6',['operator-=',['../structECSEngine_1_1Point2D.html#adc153919b486ad123bfd470896325930',1,'ECSEngine::Point2D']]],
+  ['operator_2f_7',['operator/',['../namespaceECSEngine.html#ab5b3615c70bcc62c8f2079b984abec48',1,'ECSEngine']]],
+  ['operator_2f_3d_8',['operator/=',['../structECSEngine_1_1Point2D.html#ae5bd8a9f0ed2fdd1664e0bb96413aa52',1,'ECSEngine::Point2D']]],
+  ['operator_3c_3c_9',['operator&lt;&lt;',['../namespaceECSEngine.html#a56ce8230bff9c0ec90efd4e6e485bdc6',1,'ECSEngine']]],
+  ['operator_3d_3d_10',['operator==',['../structECSEngine_1_1Point2D.html#a43407a6d450353e3b0723aec51fec234',1,'ECSEngine::Point2D']]],
+  ['operator_7c_3d_11',['operator|=',['../structECSEngine_1_1Rect.html#acc7625ce3224547600b64305a60c62a6',1,'ECSEngine::Rect::operator|=(const Rect &amp;other)'],['../structECSEngine_1_1Rect.html#aee406ff3f2990dd9bfa97621203a6cf4',1,'ECSEngine::Rect::operator|=(const Point2D &amp;other)']]],
+  ['ownerentityid_12',['ownerEntityId',['../structECSEngine_1_1ProjectileComponent.html#a4534aff46e8d2baaab47c070b0ca4b84',1,'ECSEngine::ProjectileComponent']]]
 ];

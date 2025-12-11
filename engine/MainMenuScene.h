@@ -5,6 +5,7 @@
 #include <filesystem>
 #include <iostream>
 #include <memory>
+#include <vector>
 
 extern std::string gResourcePath;
 
@@ -15,7 +16,7 @@ public:
 	using EntityId = size_t;
 
 	explicit MainMenuScene(std::shared_ptr<sf::RenderWindow> window)
-		: BaseScene(window), mTitle(mFont), mPrompt(mFont), mFontLoaded(false), mStartGame(false), mLogged(false) {
+		: BaseScene(window), mTitle(mFont), mFontLoaded(false), mStartGame(false), mLogged(false) {
 		mFontPath = gResourcePath + "fonts/ARIAL.TTF";
 		if (mFont.openFromFile(mFontPath)) {
 			mFontLoaded = true;
@@ -23,13 +24,24 @@ public:
 			mTitle.setString("Leo the Wizard Cat");
 			mTitle.setCharacterSize(50);
 			mTitle.setFillColor(sf::Color::White);
-			mTitle.setPosition(sf::Vector2f(150.f, 200.f));
+			mTitle.setPosition(sf::Vector2f(125.f, 200.f));
 
-			mPrompt.setFont(mFont);
-			mPrompt.setString("Press Enter to Start");
-			mPrompt.setCharacterSize(30);
-			mPrompt.setFillColor(sf::Color::White);
-			mPrompt.setPosition(sf::Vector2f(200.f, 300.f));
+			auto addPrompt = [&](const std::string& text, float y) {
+				sf::Text prompt(mFont);
+				prompt.setString(text);
+				prompt.setCharacterSize(30);
+				prompt.setFillColor(sf::Color::White);
+				prompt.setPosition(sf::Vector2f(150.f, y));
+				mPrompts.push_back(prompt);
+			};
+
+			addPrompt("Press Enter to Start", 300.f);
+			addPrompt("Space to jump, E to shoot", 350.f);
+			addPrompt("Numbers 1, 2, 3, 4 corresponds to elements fire, water, wind, rock", 400.f);
+			addPrompt("Fire lights campfires for checkpoints", 450.f);
+			addPrompt("Water lets you walk on water and heal", 500.f);
+			addPrompt("Wind lets you double jump", 550.f);
+			addPrompt("Rock lets you wall jump and absorb 1 hit", 600.f);
 		} 
 	}
 
@@ -84,7 +96,10 @@ public:
 		if (mFontLoaded)
 		{
 			window->draw(mTitle);
-			window->draw(mPrompt);
+			for (const auto& prompt : mPrompts)
+			{
+				window->draw(prompt);
+			}
 		}
 	}
 
@@ -93,7 +108,7 @@ public:
 private:
 	sf::Font mFont;
 	sf::Text mTitle;
-	sf::Text mPrompt;
+	std::vector<sf::Text> mPrompts;
 	std::string mFontPath;
 	bool mFontLoaded;
 	bool mStartGame;

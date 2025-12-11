@@ -101,19 +101,21 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span> </div>
 <div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>        <span class="keywordtype">void</span> <a class="code hl_function" href="classECSEngine_1_1SoundManager.html#ac5395744308446ef3be0e7022e3d324c">PlaySound</a>(<span class="keyword">const</span> std::string &amp;soundName);</div>
 <div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span> </div>
-<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>    <span class="keyword">private</span>:</div>
-<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>        std::unordered_map&lt;std::string, sf::SoundBuffer&gt; mSoundBuffers;</div>
-<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>        std::unordered_map&lt;std::string, sf::Sound&gt; mSounds;</div>
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>    };</div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>        <span class="keywordtype">void</span> <a class="code hl_function" href="classECSEngine_1_1SoundManager.html#ac5395744308446ef3be0e7022e3d324c">PlaySound</a>(<span class="keyword">const</span> std::string &amp;soundName, <span class="keywordtype">float</span> volume);</div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span> </div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>    <span class="keyword">private</span>:</div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>        std::unordered_map&lt;std::string, sf::SoundBuffer&gt; mSoundBuffers;</div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>        std::unordered_map&lt;std::string, sf::Sound&gt; mSounds;</div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>    };</div>
 </div>
-<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span> </div>
-<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>}</div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span> </div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>}</div>
 <div class="ttc" id="aclassECSEngine_1_1SoundManager_html"><div class="ttname"><a href="classECSEngine_1_1SoundManager.html">ECSEngine::SoundManager</a></div><div class="ttdoc">Manages sound resources and audio playback for the ECS engine.</div><div class="ttdef"><b>Definition</b> SoundManager.h:21</div></div>
 <div class="ttc" id="aclassECSEngine_1_1SoundManager_html_a1109739510e6619c9832643dbf967a3b"><div class="ttname"><a href="classECSEngine_1_1SoundManager.html#a1109739510e6619c9832643dbf967a3b">ECSEngine::SoundManager::SoundManager</a></div><div class="ttdeci">SoundManager()=default</div></div>
 <div class="ttc" id="aclassECSEngine_1_1SoundManager_html_a50b534a5eee550fea8975548b27617c0"><div class="ttname"><a href="classECSEngine_1_1SoundManager.html#a50b534a5eee550fea8975548b27617c0">ECSEngine::SoundManager::~SoundManager</a></div><div class="ttdeci">~SoundManager()=default</div></div>
 <div class="ttc" id="aclassECSEngine_1_1SoundManager_html_ac5395744308446ef3be0e7022e3d324c"><div class="ttname"><a href="classECSEngine_1_1SoundManager.html#ac5395744308446ef3be0e7022e3d324c">ECSEngine::SoundManager::PlaySound</a></div><div class="ttdeci">void PlaySound(const std::string &amp;soundName)</div><div class="ttdoc">Plays a registered sound by name.</div><div class="ttdef"><b>Definition</b> SoundManager.cpp:22</div></div>
 <div class="ttc" id="aclassECSEngine_1_1SoundManager_html_adcd8167f2de2fd4b6fe7844db9857c6a"><div class="ttname"><a href="classECSEngine_1_1SoundManager.html#adcd8167f2de2fd4b6fe7844db9857c6a">ECSEngine::SoundManager::RegisterSound</a></div><div class="ttdeci">void RegisterSound(const std::string &amp;soundPath, const std::string &amp;soundName)</div><div class="ttdoc">Registers a sound file and creates a sound instance for playback.</div><div class="ttdef"><b>Definition</b> SoundManager.cpp:7</div></div>
-<div class="ttc" id="anamespaceECSEngine_html"><div class="ttname"><a href="namespaceECSEngine.html">ECSEngine</a></div><div class="ttdef"><b>Definition</b> CameraComponent.h:7</div></div>
+<div class="ttc" id="anamespaceECSEngine_html"><div class="ttname"><a href="namespaceECSEngine.html">ECSEngine</a></div><div class="ttdef"><b>Definition</b> AnimationComponent.h:8</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

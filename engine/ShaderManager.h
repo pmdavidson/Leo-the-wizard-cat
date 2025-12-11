@@ -18,9 +18,26 @@
 
 namespace ECSEngine
 {
+/**
+ * @brief Manages loading and retrieval of fragment shaders.
+ *
+ * @section Lifetime and Validity
+ *
+ * Loaded shaders are owned by ShaderManager for its lifetime. GetShader()
+ * returns raw pointers that remain valid until the manager is destroyed or
+ * the shader is removed (currently never removed).
+ */
 class ShaderManager
 {
 public:
+    /**
+     * @brief Loads a fragment shader and stores it by name.
+     *
+     * @param shaderPath Filesystem path to the fragment shader.
+     * @param shaderName Unique name for later retrieval.
+     *
+     * @note If a shader with the same name already exists, the request is ignored.
+     */
     void RegisterShader(const std::string &shaderPath, const std::string &shaderName)
     {
         if (mShaders.find(shaderName) != mShaders.end())
@@ -37,6 +54,14 @@ public:
         mShaders.emplace(shaderName, std::move(shader));
     }
 
+    /**
+     * @brief Retrieves a loaded shader by name.
+     *
+     * @param shaderName Unique name provided during registration.
+     * @return sf::Shader* Pointer to the shader, or nullptr if not found.
+     *
+     * @warning Returned pointer is owned by ShaderManager; do not delete.
+     */
     sf::Shader *GetShader(const std::string &shaderName)
     {
         auto it = mShaders.find(shaderName);

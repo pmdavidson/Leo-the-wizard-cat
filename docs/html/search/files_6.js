@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['windowmanager_2ecpp_0',['WindowManager.cpp',['../WindowManager_8cpp.html',1,'']]],
-  ['windowmanager_2eh_1',['WindowManager.h',['../WindowManager_8h.html',1,'']]]
+  ['locationcomponent_2eh_0',['LocationComponent.h',['../LocationComponent_8h.html',1,'']]]
 ];

@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['y_0',['y',['../structECSEngine_1_1Point2D.html#aaeddfea4d4c964cbcc5574b8bbd40a74',1,'ECSEngine::Point2D']]]
+  ['variants_0',['variants',['../structECSEngine_1_1SpawnComponent.html#a261ef5cdd1c6a8021791bf63d7eb4563',1,'ECSEngine::SpawnComponent']]],
+  ['velocity_1',['velocity',['../structECSEngine_1_1MovementComponent.html#af806340482d08fb2b3622b35388f7e6f',1,'ECSEngine::MovementComponent']]]
 ];

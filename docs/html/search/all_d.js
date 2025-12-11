@@ -1,13 +1,18 @@
 var searchData=
 [
-  ['operator_26_3d_0',['operator&amp;=',['../structECSEngine_1_1Rect.html#a1a5557ef903fab0cb183f59c573ee22f',1,'ECSEngine::Rect']]],
-  ['operator_2a_1',['operator*',['../structECSEngine_1_1Point2D.html#a29cde8abbd06eacf1d5e7433663551d1',1,'ECSEngine::Point2D::operator*(const float &amp;scalar) const'],['../structECSEngine_1_1Point2D.html#a6871b7f604ba21fcc1b23701e3fc1968',1,'ECSEngine::Point2D::operator*(const Point2D &amp;other) const']]],
-  ['operator_2a_3d_2',['operator*=',['../structECSEngine_1_1Point2D.html#a9611da82fb637d7917149c06e4f9de50',1,'ECSEngine::Point2D']]],
-  ['operator_2b_3',['operator+',['../structECSEngine_1_1Point2D.html#abc1c39f99972b62818e65e91e150b9e2',1,'ECSEngine::Point2D::operator+(const Point2D &amp;other) const'],['../structECSEngine_1_1Point2D.html#a3b8be8ef8f815ebd5a7005be30bfc3bf',1,'ECSEngine::Point2D::operator+(const float &amp;other) const']]],
-  ['operator_2b_3d_4',['operator+=',['../structECSEngine_1_1Point2D.html#a50cda7014460de0926a14821fcae2004',1,'ECSEngine::Point2D::operator+=(const float &amp;scalar)'],['../structECSEngine_1_1Point2D.html#a62ead502e804828cc369959fc26b00e5',1,'ECSEngine::Point2D::operator+=(const Point2D &amp;other)']]],
-  ['operator_2d_5',['operator-',['../structECSEngine_1_1Point2D.html#a948a0f16dca03f464cdac447e2454146',1,'ECSEngine::Point2D::operator-(const Point2D &amp;other) const'],['../structECSEngine_1_1Point2D.html#a6293cad5b90b43d131801c80f5da0def',1,'ECSEngine::Point2D::operator-(const float &amp;other) const']]],
-  ['operator_2d_3d_6',['operator-=',['../structECSEngine_1_1Point2D.html#adc153919b486ad123bfd470896325930',1,'ECSEngine::Point2D']]],
-  ['operator_2f_3d_7',['operator/=',['../structECSEngine_1_1Point2D.html#ae5bd8a9f0ed2fdd1664e0bb96413aa52',1,'ECSEngine::Point2D']]],
-  ['operator_3d_3d_8',['operator==',['../structECSEngine_1_1Point2D.html#a43407a6d450353e3b0723aec51fec234',1,'ECSEngine::Point2D']]],
-  ['operator_7c_3d_9',['operator|=',['../structECSEngine_1_1Rect.html#acc7625ce3224547600b64305a60c62a6',1,'ECSEngine::Rect::operator|=(const Rect &amp;other)'],['../structECSEngine_1_1Rect.html#aee406ff3f2990dd9bfa97621203a6cf4',1,'ECSEngine::Rect::operator|=(const Point2D &amp;other)']]]
+  ['magnitude_0',['magnitude',['../structECSEngine_1_1CameraShake.html#a4978992d669211c4f500f664126a904b',1,'ECSEngine::CameraShake']]],
+  ['main_1',['main',['../main_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97',1,'main(int argc, char *argv[]):&#160;main.cpp'],['../CMakeCXXCompilerId_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97',1,'main(int argc, char *argv[]):&#160;CMakeCXXCompilerId.cpp'],['../CMakeCCompilerId_8c.html#a0ddf1224851353fc92bfbff6f499fa97',1,'main(int argc, char *argv[]):&#160;CMakeCCompilerId.c']]],
+  ['main_2ecpp_2',['main.cpp',['../main_8cpp.html',1,'']]],
+  ['mainmenuscene_3',['mainmenuscene',['../classMainMenuScene.html#a1ed661f0f5316f5e8440580ef9cb5847',1,'MainMenuScene::MainMenuScene()'],['../classMainMenuScene.html',1,'MainMenuScene&lt; Components &gt;']]],
+  ['mainmenuscene_2eh_4',['MainMenuScene.h',['../MainMenuScene_8h.html',1,'']]],
+  ['makescene_5',['MakeScene',['../classECSEngine_1_1ECSEngine.html#a6837fe6f2aad3430af2d9f986bd80fc6',1,'ECSEngine::ECSEngine']]],
+  ['mathutil_2eh_6',['MathUtil.h',['../MathUtil_8h.html',1,'']]],
+  ['maxhp_7',['maxhp',['../structECSEngine_1_1EnemyComponent.html#ade7e47e33fd99fcf3dab40dc4ac3913e',1,'ECSEngine::EnemyComponent::maxHp'],['../structECSEngine_1_1HpComponent.html#a9e8fa4be13558588cd05b750cc1d092b',1,'ECSEngine::HpComponent::maxHp']]],
+  ['maxjumps_8',['maxJumps',['../structECSEngine_1_1JumpComponent.html#a504f47621052169a9c29caca077de73c',1,'ECSEngine::JumpComponent']]],
+  ['maxlifetime_9',['maxLifetime',['../structECSEngine_1_1ProjectileComponent.html#a951ddcafbd60d926c57d26c2e27eee4f',1,'ECSEngine::ProjectileComponent']]],
+  ['movedirection_10',['moveDirection',['../structECSEngine_1_1EnemyComponent.html#a4c774b91073fdc99a24285c09ac09522',1,'ECSEngine::EnemyComponent']]],
+  ['movementcomponent_11',['movementcomponent',['../structECSEngine_1_1MovementComponent.html#a0e39dfe3c22e25eb25a251c81f33c3e2',1,'ECSEngine::MovementComponent::MovementComponent()'],['../structECSEngine_1_1MovementComponent.html#a1c5b416705d1a0dffcd3d35215da7f46',1,'ECSEngine::MovementComponent::MovementComponent(const Point2D &amp;vel)'],['../structECSEngine_1_1MovementComponent.html',1,'ECSEngine::MovementComponent']]],
+  ['movementsystem_12',['MovementSystem',['../classECSEngine_1_1MovementSystem.html',1,'ECSEngine']]],
+  ['movementsystem_2eh_13',['MovementSystem.h',['../MovementSystem_8h.html',1,'']]],
+  ['movespeed_14',['moveSpeed',['../structECSEngine_1_1EnemyComponent.html#af3b562e18e997ce13c1b49e1c7e0ebc9',1,'ECSEngine::EnemyComponent']]]
 ];

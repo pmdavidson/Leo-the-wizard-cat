@@ -45,8 +45,20 @@ namespace ECSEngine
 					{
 						if (entityManager.template HasComponent<LocationComponent>(entityId))
 						{
+							// Pick a random variant if available, otherwise use the spawner's default
+							const SpawnComponent::SpawnVariant* variantPtr = nullptr;
+							if (!spawnComp.variants.empty())
+							{
+								std::uniform_int_distribution<size_t> variantDist(0, spawnComp.variants.size() - 1);
+								variantPtr = &spawnComp.variants[variantDist(gen)];
+							}
+
+							const auto& selectedAnimations = variantPtr ? variantPtr->animations : spawnComp.animations;
+							const auto selectedSpriteId = variantPtr ? variantPtr->spriteId : spawnComp.spriteId;
+							const auto& selectedDescription = variantPtr ? variantPtr->description : spawnComp.spawnDescription;
+
 							auto &spawnerLocation = entityManager.template GetComponent<LocationComponent>(entityId);
-							sf::Sprite sprite = spriteManager.GetSprite(spawnComp.spriteId);
+							sf::Sprite sprite = spriteManager.GetSprite(selectedSpriteId);
 							sf::IntRect textureRect = sprite.getTextureRect();
 
 							Rect spriteBounds(0.0f, 0.0f,
@@ -80,7 +92,7 @@ namespace ECSEngine
 
 							float spriteOffsetY = collisionOffsetY + collisionHeight - 32.0f;
 							SpriteComponent slimeSprite;
-							slimeSprite.spriteId = spawnComp.spriteId;
+							slimeSprite.spriteId = selectedSpriteId;
 							slimeSprite.bounds = Rect(0.0f, spriteOffsetY, spriteBounds.width, spriteBounds.height);
 							slimeSprite.inWorldSpace = true;
 							slimeSprite.layer = 2; // Enemies should be on layer 2 (just above world)
@@ -111,23 +123,23 @@ namespace ECSEngine
 								r = 1.0f;
 
 							// Set elemental resistances based on slime type
-							if (spawnComp.spawnDescription == "redSlime")
+							if (selectedDescription == "redSlime")
 							{
 								// Red: resist fire
 								enemy.resistances[static_cast<size_t>(SpellType::Fire)] = 0.5f;
 							}
-							else if (spawnComp.spawnDescription == "blueSlime")
+							else if (selectedDescription == "blueSlime")
 							{
 								// Blue (water): resist water and fire
 								enemy.resistances[static_cast<size_t>(SpellType::Water)] = 0.5f;
 								enemy.resistances[static_cast<size_t>(SpellType::Fire)] = 0.5f;
 							}
-							else if (spawnComp.spawnDescription == "greenSlime")
+							else if (selectedDescription == "greenSlime")
 							{
 								// Green: resist water
 								enemy.resistances[static_cast<size_t>(SpellType::Water)] = 0.5f;
 							}
-							else if (spawnComp.spawnDescription == "brownSlime")
+							else if (selectedDescription == "brownSlime")
 							{
 								// Brown/rock: resistant to all elements (set all to 0.5x), base HP stays at 30
 								for (auto &r : enemy.resistances)
@@ -140,10 +152,10 @@ namespace ECSEngine
 							entityManager.template AddComponent<EnemyComponent>(slimeId, enemy);
 
 							// Add AnimationComponent for slime if animations are available
-							if (!spawnComp.animations.empty())
+							if (!selectedAnimations.empty())
 							{
 								AnimationComponent slimeAnim;
-								slimeAnim.animations = spawnComp.animations;
+								slimeAnim.animations = selectedAnimations;
 								slimeAnim.frameDuration = 0.05f; // Faster animations
 								
 								// Start with idle animation if available

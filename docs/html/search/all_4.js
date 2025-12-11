@@ -1,14 +1,17 @@
 var searchData=
 [
-  ['ecsengine_0',['ecsengine',['../classECSEngine_1_1ECSEngine.html',1,'ECSEngine::ECSEngine&lt; Components &gt;'],['../namespaceECSEngine.html',1,'ECSEngine'],['../classECSEngine_1_1ECSEngine.html#ad356ea46ef94fcfefa3a0972672427d0',1,'ECSEngine::ECSEngine::ECSEngine()']]],
-  ['ecsengine_2eh_1',['ECSEngine.h',['../ECSEngine_8h.html',1,'']]],
-  ['end_2',['end',['../classECSEngine_1_1EntityManager.html#ab244967e4dc241a33097bcfe76cb19f5',1,'ECSEngine::EntityManager']]],
-  ['entity_3',['entity',['../classECSEngine_1_1Entity.html',1,'ECSEngine::Entity'],['../classECSEngine_1_1Entity.html#a1a6e1e9962adb3688a425011acf7c56c',1,'ECSEngine::Entity::Entity()']]],
-  ['entity_2ecpp_4',['Entity.cpp',['../Entity_8cpp.html',1,'']]],
-  ['entity_2eh_5',['Entity.h',['../Entity_8h.html',1,'']]],
-  ['entityid_6',['entityid',['../main_8cpp.html#ab5980549e8727612d6514f90959c61f5',1,'EntityId:&#160;main.cpp'],['../namespaceECSEngine.html#a58263079733ecf551a2e3054f3ccc708',1,'ECSEngine::EntityID'],['../structECSEngine_1_1SpawnComponent.html#a4fa4c53d21eaa8bb314af231078165de',1,'ECSEngine::SpawnComponent::entityId'],['../structECSEngine_1_1CameraFollower.html#a66998e4a5482ac05958765c5cfb4bb46',1,'ECSEngine::CameraFollower::entityId']]],
-  ['entitymanager_7',['entitymanager',['../classECSEngine_1_1EntityManager.html#a2ff54595e4cd7cb684617d299a4ecd07',1,'ECSEngine::EntityManager::EntityManager()'],['../classECSEngine_1_1EntityManager.html',1,'ECSEngine::EntityManager&lt; Components &gt;']]],
-  ['entitymanager_2ecpp_8',['EntityManager.cpp',['../EntityManager_8cpp.html',1,'']]],
-  ['entitymanager_2eh_9',['EntityManager.h',['../EntityManager_8h.html',1,'']]],
-  ['entitymanager_3c_20components_2e_2e_2e_20_3e_10',['EntityManager&lt; Components... &gt;',['../classECSEngine_1_1EntityManager.html',1,'ECSEngine']]]
+  ['damage_0',['damage',['../structECSEngine_1_1SpellProperties.html#aa37f80a51eb288bdee584dc1710b76ee',1,'ECSEngine::SpellProperties::damage'],['../structECSEngine_1_1ProjectileComponent.html#ab32db66221a41eaa4af7e1f7b522b35c',1,'ECSEngine::ProjectileComponent::damage']]],
+  ['damageflashduration_1',['damageflashduration',['../structECSEngine_1_1EnemyComponent.html#aec1df1ed8ed26211ba69f38d7f08dcc6',1,'ECSEngine::EnemyComponent::damageFlashDuration'],['../structECSEngine_1_1HpComponent.html#a895b6787d5a5e14d4586bc73f3219158',1,'ECSEngine::HpComponent::damageFlashDuration']]],
+  ['damageflashtimer_2',['damageflashtimer',['../structECSEngine_1_1EnemyComponent.html#af476e2c5d89d19090dd10bb0b29313cf',1,'ECSEngine::EnemyComponent::damageFlashTimer'],['../structECSEngine_1_1HpComponent.html#a1a434b4f6fab30120e4b955e8488e83c',1,'ECSEngine::HpComponent::damageFlashTimer']]],
+  ['damagesoundname_3',['damageSoundName',['../structECSEngine_1_1EnemyComponent.html#a6d136e0af2eb18ab0afed59196ce7323',1,'ECSEngine::EnemyComponent']]],
+  ['deathanimtimer_4',['deathanimtimer',['../structECSEngine_1_1EnemyComponent.html#ae17b801c8780c4e741f8634848c4236a',1,'ECSEngine::EnemyComponent::deathAnimTimer'],['../structECSEngine_1_1HpComponent.html#af669135b00d6c5b823cd347dddaa16a1',1,'ECSEngine::HpComponent::deathAnimTimer']]],
+  ['deathsoundname_5',['deathSoundName',['../structECSEngine_1_1EnemyComponent.html#a40708dab634f4aaa652e1a52f7a63d8d',1,'ECSEngine::EnemyComponent']]],
+  ['dec_6',['dec',['../CMakeCXXCompilerId_8cpp.html#ad1280362da42492bbc11aa78cbf776ad',1,'DEC:&#160;CMakeCXXCompilerId.cpp'],['../CMakeCCompilerId_8c.html#ad1280362da42492bbc11aa78cbf776ad',1,'DEC:&#160;CMakeCCompilerId.c']]],
+  ['description_7',['description',['../structECSEngine_1_1SpawnComponent_1_1SpawnVariant.html#afe793f89c1ddbcaafd9898f90d31d13c',1,'ECSEngine::SpawnComponent::SpawnVariant']]],
+  ['digitspriteids_8',['digitSpriteIds',['../structECSEngine_1_1ScoreComponent.html#a21a866931b96b385cbf2be0f02266f70',1,'ECSEngine::ScoreComponent']]],
+  ['directionchangeinterval_9',['directionChangeInterval',['../structECSEngine_1_1EnemyComponent.html#a49c228b654aeb0c552590ce8e04dfdcd',1,'ECSEngine::EnemyComponent']]],
+  ['directionchangetimer_10',['directionChangeTimer',['../structECSEngine_1_1EnemyComponent.html#a9c77f69a3b1d954fc4cdd179705a4a01',1,'ECSEngine::EnemyComponent']]],
+  ['displayentityids_11',['displayEntityIds',['../structECSEngine_1_1ScoreComponent.html#a8eaad826e26128e7c90392755a7aed91',1,'ECSEngine::ScoreComponent']]],
+  ['distance_12',['Distance',['../structECSEngine_1_1Point2D.html#a3595617cb3230316209e71111c7e57ec',1,'ECSEngine::Point2D']]],
+  ['dot_13',['dot',['../structECSEngine_1_1Point2D.html#a6ea123c494921aca63b2baae9a9cb0de',1,'ECSEngine::Point2D::Dot(Point2D b) const'],['../structECSEngine_1_1Point2D.html#a9d20d9a8dc5dc31abb05703cc836624b',1,'ECSEngine::Point2D::Dot(Point2D a, Point2D b)']]]
 ];

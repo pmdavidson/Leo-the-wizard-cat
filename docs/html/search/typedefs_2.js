@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['spriteid_0',['spriteid',['../main_8cpp.html#acc42abd7e13309d099dd81b66c48148c',1,'SpriteID:&#160;main.cpp'],['../namespaceECSEngine.html#a6f1e917d13ee2e1a248af8f6c475eebd',1,'ECSEngine::SpriteID']]]
+  ['entityid_0',['entityid',['../classMainMenuScene.html#ae7bfea350bf8358f853a0c48f807fc6d',1,'MainMenuScene::EntityId'],['../main_8cpp.html#ab5980549e8727612d6514f90959c61f5',1,'EntityId:&#160;main.cpp'],['../namespaceECSEngine.html#a58263079733ecf551a2e3054f3ccc708',1,'ECSEngine::EntityID']]]
 ];

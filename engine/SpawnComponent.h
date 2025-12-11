@@ -26,6 +26,15 @@ namespace ECSEngine
                 // Animation data for spawned entities
                 std::unordered_map<std::string, std::vector<SpriteID>> animations;
 
+                struct SpawnVariant
+                {
+                        std::string description;
+                        SpriteID spriteId{};
+                        std::unordered_map<std::string, std::vector<SpriteID>> animations;
+                };
+
+                std::vector<SpawnVariant> variants;
+
                 SpawnComponent() = default;
 
                 SpawnComponent(EntityID id, const std::string &desc, SpriteID sprite, float nextSpawn, float betweenSpawns, int totalEvents, float w, float h)

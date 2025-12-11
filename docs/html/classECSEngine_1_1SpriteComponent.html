@@ -99,8 +99,8 @@ Collaboration diagram for ECSEngine::SpriteComponent:</div>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:aafafddf56d12065b4d5f2ab0397b352c" id="r_aafafddf56d12065b4d5f2ab0397b352c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classECSEngine_1_1SpriteComponent.html#aafafddf56d12065b4d5f2ab0397b352c">SpriteComponent</a> ()=default</td></tr>
 <tr class="separator:aafafddf56d12065b4d5f2ab0397b352c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a317878b35de102db662e7dee6cef1d99" id="r_a317878b35de102db662e7dee6cef1d99"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classECSEngine_1_1SpriteComponent.html#a317878b35de102db662e7dee6cef1d99">SpriteComponent</a> (<a class="el" href="namespaceECSEngine.html#a6f1e917d13ee2e1a248af8f6c475eebd">SpriteID</a> id, const <a class="el" href="structECSEngine_1_1Rect.html">Rect</a> &amp;drawBounds, bool world=true)</td></tr>
-<tr class="separator:a317878b35de102db662e7dee6cef1d99"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a97a028e0bcc3ab05128681bcd624aafb" id="r_a97a028e0bcc3ab05128681bcd624aafb"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classECSEngine_1_1SpriteComponent.html#a97a028e0bcc3ab05128681bcd624aafb">SpriteComponent</a> (<a class="el" href="namespaceECSEngine.html#a6f1e917d13ee2e1a248af8f6c475eebd">SpriteID</a> id, const <a class="el" href="structECSEngine_1_1Rect.html">Rect</a> &amp;drawBounds, bool world=true, int layerNum=1, std::string shadeName=&quot;&quot;)</td></tr>
+<tr class="separator:a97a028e0bcc3ab05128681bcd624aafb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
@@ -110,6 +110,12 @@ Public Attributes</h2></td></tr>
 <tr class="separator:aec086c7047a8098ec1cb8f07c11eba38"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a79f382a4d010f0661d1b0dad32e9e139" id="r_a79f382a4d010f0661d1b0dad32e9e139"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classECSEngine_1_1SpriteComponent.html#a79f382a4d010f0661d1b0dad32e9e139">inWorldSpace</a></td></tr>
 <tr class="separator:a79f382a4d010f0661d1b0dad32e9e139"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af9281dca6846144ca1f7e3ba1fa7c676" id="r_af9281dca6846144ca1f7e3ba1fa7c676"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classECSEngine_1_1SpriteComponent.html#af9281dca6846144ca1f7e3ba1fa7c676">layer</a> = 0</td></tr>
+<tr class="separator:af9281dca6846144ca1f7e3ba1fa7c676"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5dce676f8f52727c6aa0037f16d68e61" id="r_a5dce676f8f52727c6aa0037f16d68e61"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classECSEngine_1_1SpriteComponent.html#a5dce676f8f52727c6aa0037f16d68e61">shaderName</a> = &quot;&quot;</td></tr>
+<tr class="separator:a5dce676f8f52727c6aa0037f16d68e61"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8b6b9e38aa0050286e63676f77020d26" id="r_a8b6b9e38aa0050286e63676f77020d26"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classECSEngine_1_1SpriteComponent.html#a8b6b9e38aa0050286e63676f77020d26">flipX</a> = false</td></tr>
+<tr class="separator:a8b6b9e38aa0050286e63676f77020d26"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="aafafddf56d12065b4d5f2ab0397b352c" name="aafafddf56d12065b4d5f2ab0397b352c"></a>
@@ -137,8 +143,8 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a317878b35de102db662e7dee6cef1d99" name="a317878b35de102db662e7dee6cef1d99"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a317878b35de102db662e7dee6cef1d99">&#9670;&#160;</a></span>SpriteComponent() <span class="overload">[2/2]</span></h2>
+<a id="a97a028e0bcc3ab05128681bcd624aafb" name="a97a028e0bcc3ab05128681bcd624aafb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a97a028e0bcc3ab05128681bcd624aafb">&#9670;&#160;</a></span>SpriteComponent() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -162,7 +168,19 @@ Public Attributes</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>world</em> = <code>true</code>&#160;</td>
+          <td class="paramname"><em>world</em> = <code>true</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>layerNum</em> = <code>1</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::string&#160;</td>
+          <td class="paramname"><em>shadeName</em> = <code>&quot;&quot;</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -194,6 +212,20 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
+<a id="a8b6b9e38aa0050286e63676f77020d26" name="a8b6b9e38aa0050286e63676f77020d26"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8b6b9e38aa0050286e63676f77020d26">&#9670;&#160;</a></span>flipX</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool ECSEngine::SpriteComponent::flipX = false</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a79f382a4d010f0661d1b0dad32e9e139" name="a79f382a4d010f0661d1b0dad32e9e139"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a79f382a4d010f0661d1b0dad32e9e139">&#9670;&#160;</a></span>inWorldSpace</h2>
 
@@ -202,6 +234,34 @@ Public Attributes</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">bool ECSEngine::SpriteComponent::inWorldSpace</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af9281dca6846144ca1f7e3ba1fa7c676" name="af9281dca6846144ca1f7e3ba1fa7c676"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af9281dca6846144ca1f7e3ba1fa7c676">&#9670;&#160;</a></span>layer</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int ECSEngine::SpriteComponent::layer = 0</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a5dce676f8f52727c6aa0037f16d68e61" name="a5dce676f8f52727c6aa0037f16d68e61"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5dce676f8f52727c6aa0037f16d68e61">&#9670;&#160;</a></span>shaderName</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string ECSEngine::SpriteComponent::shaderName = &quot;&quot;</td>
         </tr>
       </table>
 </div><div class="memdoc">

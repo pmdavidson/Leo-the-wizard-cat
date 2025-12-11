@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['x_0',['x',['../structECSEngine_1_1Point2D.html#ab7acf0cfdafde30d673fb40296947a21',1,'ECSEngine::Point2D']]]
+  ['unlitspriteid_0',['unlitSpriteId',['../structECSEngine_1_1CampfireComponent.html#a8fbc899bb62763776a759c062adbd635',1,'ECSEngine::CampfireComponent']]]
 ];

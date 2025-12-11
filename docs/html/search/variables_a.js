@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['left_0',['left',['../structECSEngine_1_1CollisionFlags.html#a427a2c1898bc10dcce4a92a2aaa8a1e0',1,'ECSEngine::CollisionFlags']]]
+  ['keydown_0',['keydown',['../structECSEngine_1_1InputComponent.html#af73796b04b44351cfe767078f791017c',1,'ECSEngine::InputComponent']]],
+  ['knockbackforce_1',['knockbackForce',['../structECSEngine_1_1EnemyComponent.html#afeaca9cb355b170bd8c6d66c2000959c',1,'ECSEngine::EnemyComponent']]]
 ];

@@ -1,9 +1,7 @@
 var searchData=
 [
-  ['cameracomponent_0',['CameraComponent',['../structECSEngine_1_1CameraComponent.html',1,'ECSEngine']]],
-  ['camerafollower_1',['CameraFollower',['../structECSEngine_1_1CameraFollower.html',1,'ECSEngine']]],
-  ['camerashake_2',['CameraShake',['../structECSEngine_1_1CameraShake.html',1,'ECSEngine']]],
-  ['collisioncomponent_3',['CollisionComponent',['../structECSEngine_1_1CollisionComponent.html',1,'ECSEngine']]],
-  ['collisionflags_4',['CollisionFlags',['../structECSEngine_1_1CollisionFlags.html',1,'ECSEngine']]],
-  ['componentstorage_5',['ComponentStorage',['../classECSEngine_1_1ComponentStorage.html',1,'ECSEngine']]]
+  ['addsystemfromtuple_0',['AddSystemFromTuple',['../structAddSystemFromTuple.html',1,'']]],
+  ['addsystemfromtuple_3c_20system_2c_20std_3a_3atuple_3c_20components_2e_2e_2e_20_3e_20_3e_1',['AddSystemFromTuple&lt; System, std::tuple&lt; Components... &gt; &gt;',['../structAddSystemFromTuple_3_01System_00_01std_1_1tuple_3_01Components_8_8_8_01_4_01_4.html',1,'']]],
+  ['animationcomponent_2',['AnimationComponent',['../structECSEngine_1_1AnimationComponent.html',1,'ECSEngine']]],
+  ['animationsystem_3',['AnimationSystem',['../classECSEngine_1_1AnimationSystem.html',1,'ECSEngine']]]
 ];
